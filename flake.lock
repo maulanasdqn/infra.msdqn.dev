@@ -634,14 +634,18 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1771840128,
-        "narHash": "sha256-v2E94O+qCDXKmcJ3BbetKUh7zCiZ8ruJ7vWtGK4NHKg=",
-        "path": "/Users/ms/Development/personal/nix-pilot",
-        "type": "path"
+        "lastModified": 1771778735,
+        "narHash": "sha256-ZhF0tfBFVUwsiXPBLUDzfwGnayEknZrQ1j4/cKfg9Y0=",
+        "owner": "maulanasdqn",
+        "repo": "nix-pilot",
+        "rev": "15813079982b8821674effa6842bac804678fe0b",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/ms/Development/personal/nix-pilot",
-        "type": "path"
+        "owner": "maulanasdqn",
+        "ref": "develop",
+        "repo": "nix-pilot",
+        "type": "github"
       }
     },
     "nix_2": {
@@ -858,14 +862,18 @@
         "rust-overlay": "rust-overlay_3"
       },
       "locked": {
-        "lastModified": 1771840132,
-        "narHash": "sha256-2oez7Wdfcnb7JnRKBqXnve0cZX5fxCO8c9A0uJR4o+k=",
-        "path": "/Users/ms/Development/personal/research/rust-rag-example",
-        "type": "path"
+        "lastModified": 1771840843,
+        "narHash": "sha256-UQfN7I6Q7tdG+mcO1QDs6WnaCqyd702Sf3zPd+BrHJI=",
+        "owner": "maulanasdqn",
+        "repo": "rust-rag-example",
+        "rev": "9730608d392bcf756521a01ee8b646226baa06ba",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/ms/Development/personal/research/rust-rag-example",
-        "type": "path"
+        "owner": "maulanasdqn",
+        "ref": "develop",
+        "repo": "rust-rag-example",
+        "type": "github"
       }
     },
     "rkm-admin-frontend": {
