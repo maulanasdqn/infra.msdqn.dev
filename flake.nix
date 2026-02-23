@@ -244,7 +244,7 @@
           rkm-frontend.nixosModules.default
           rkm-admin-frontend.nixosModules.default
           rag-app.nixosModules.default
-          nix-pilot.nixosModules.default
+          # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
           ./hosts/vps/hostinger
         ];
       };
