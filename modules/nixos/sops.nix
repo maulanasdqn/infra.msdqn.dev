@@ -49,10 +49,10 @@
       };
 
       # RAG server environment (OPENAI_API_KEY)
-      "rag_server_env" = {
-        mode = "0400";
-        owner = "rag-server";
-      };
+      # "rag_server_env" = {
+      #   mode = "0400";
+      #   owner = "rag-server";
+      # };
     };
   };
 }
