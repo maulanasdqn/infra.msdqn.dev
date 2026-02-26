@@ -86,6 +86,11 @@
       url = "github:maulanasdqn/rust-rag-example/develop";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    roasting-startup = {
+      url = "github:maulanasdqn/roasting-startup/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -107,6 +112,7 @@
       rkm-admin-frontend,
       nix-pilot,
       rag-app,
+      roasting-startup,
       ...
     }:
     let
@@ -243,6 +249,7 @@
           rkm-backend.nixosModules.default
           rkm-frontend.nixosModules.default
           rkm-admin-frontend.nixosModules.default
+          roasting-startup.nixosModules.default
           # rag-app.nixosModules.default  # Temporarily disabled
           # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
           ./hosts/vps/hostinger
