@@ -985,11 +985,11 @@
         "rust-overlay": "rust-overlay_5"
       },
       "locked": {
-        "lastModified": 1772129361,
-        "narHash": "sha256-Y91//CusQ186Ge6IYml+TUZHUi1wG+eMkJCgc4q1U3M=",
+        "lastModified": 1772130243,
+        "narHash": "sha256-rXeoWWIXg6A7RQAwVpbgZ14UvptZdRazZ6a7kxLRL9g=",
         "owner": "maulanasdqn",
         "repo": "roasting-startup",
-        "rev": "4abce49496ba597728ecfeacfe60b416b85f28ba",
+        "rev": "0bfcacfbbf0ceee4fcf51c6d07d0e3d6ca62add7",
         "type": "github"
       },
       "original": {
