@@ -41,10 +41,6 @@ in
     "lp"
   ];
 
-  # udev rules for USB programmers (USBasp, etc.)
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", GROUP="plugdev", MODE="0666"
-  '';
 
   networking.networkmanager.enable = true;
 
@@ -168,6 +164,27 @@ in
     nssmdns4 = true;
     openFirewall = true;
   };
+
+  # RFCOMM bind untuk SMARTCOM BT-801 thermal printer (RPP02N)
+  # MAC Address: 86:67:7A:CE:07:41, Channel: 1
+  systemd.services.rfcomm-printer = {
+    description = "Bind RFCOMM0 to SMARTCOM BT-801 Bluetooth Thermal Printer";
+    after = [ "bluetooth.service" ];
+    wants = [ "bluetooth.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.bluez}/bin/rfcomm bind 0 86:67:7A:CE:07:41 1";
+      ExecStop = "${pkgs.bluez}/bin/rfcomm release 0";
+    };
+  };
+
+  # Udev rule untuk set permission /dev/rfcomm0 agar bisa diakses CUPS
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", GROUP="plugdev", MODE="0666"
+    KERNEL=="rfcomm[0-9]*", MODE="0666", GROUP="lp"
+  '';
 
   fonts = {
     enableDefaultPackages = true;
