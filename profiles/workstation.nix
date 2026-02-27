@@ -38,6 +38,7 @@ in
     "video"
     "dialout"
     "plugdev"
+    "lp"
   ];
 
   # udev rules for USB programmers (USBasp, etc.)
@@ -144,7 +145,29 @@ in
     };
   };
 
-  services.printing.enable = true;
+  # Printing - CUPS with support for SMARTCOM BT-801 thermal printer 80mm
+  services.printing = {
+    enable = true;
+    drivers = with pkgs; [
+      cups-filters        # Generic filters + support for raw/ESC-POS printers
+      gutenprint          # Additional printer drivers
+      gutenprintBin       # Binary gutenprint drivers
+    ];
+    browsing = true;
+    defaultShared = false;
+    # Allow raw printing for ESC/POS thermal printers
+    extraConf = ''
+      FileDevice Yes
+      DefaultAuthType Basic
+    '';
+  };
+
+  # Avahi for network printer discovery (optional, useful if printer is networked)
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
 
   fonts = {
     enableDefaultPackages = true;
