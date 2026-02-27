@@ -8,7 +8,7 @@ let
     pname = "zjiang-cups-driver";
     version = "1.0";
 
-    src = ../packages/zjiang-cups-driver;
+    src = ../../packages/zjiang-cups-driver;
 
     nativeBuildInputs = [ pkgs.autoPatchelfHook ];
     buildInputs = [

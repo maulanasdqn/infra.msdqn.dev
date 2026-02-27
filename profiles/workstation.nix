@@ -17,6 +17,7 @@ in
 {
   imports = [
     ./base.nix
+    ../modules/nixos/printing.nix
   ];
 
   # Hibernate configuration - otomatis dari swapDevices
@@ -157,7 +158,6 @@ in
       DefaultAuthType Basic
     '';
   };
-
   # Avahi for network printer discovery (optional, useful if printer is networked)
   services.avahi = {
     enable = true;
