@@ -101,10 +101,16 @@
       url = "git+ssh://git@github.com/maulanasdqn/kilat-app.git?ref=develop";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    clan-core = {
+      url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
+      self,
       nixpkgs,
       nix-darwin,
       home-manager,
@@ -125,6 +131,7 @@
       roasting-startup,
       verychic-frontend,
       kilat-app,
+      clan-core,
       ...
     }:
     let
@@ -205,8 +212,97 @@
           "x86_64-darwin"
           "aarch64-darwin"
         ];
+      clan = clan-core.lib.clan {
+        inherit self;
+        meta.name = "msdqn";
+        meta.domain = "msdqn.dev";
+
+        inventory = {
+          services = { };
+        };
+
+        machines = {
+          # NixOS Workstation
+          ${config.workstationHostname} = {
+            nixpkgs.hostPlatform = "x86_64-linux";
+            imports = [
+              ./hosts/workstation
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = workstationSpecialArgs;
+                  backupFileExtension = "backup";
+                };
+              }
+              ./modules/home/nixos.nix
+              (
+                { ... }:
+                {
+                  _module.args = workstationSpecialArgs;
+                }
+              )
+            ];
+          };
+
+          # Hostinger VPS
+          hostinger = {
+            nixpkgs.hostPlatform = "x86_64-linux";
+            imports = [
+              # disko and sops-nix are provided by clan-core
+              personal-website.nixosModules.default
+              rkm-backend.nixosModules.default
+              rkm-frontend.nixosModules.default
+              rkm-admin-frontend.nixosModules.default
+              roasting-startup.nixosModules.default
+              verychic-frontend.nixosModules.default
+              kilat-app.nixosModules.default
+              # rag-app.nixosModules.default  # Temporarily disabled
+              # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
+              ./hosts/vps/hostinger
+              (
+                { ... }:
+                {
+                  _module.args = hostingerSpecialArgs;
+                  clan.core.networking.targetHost = config.vpsHostingerIP;
+                }
+              )
+            ];
+          };
+
+          # DigitalOcean VPS
+          digitalocean = {
+            nixpkgs.hostPlatform = "x86_64-linux";
+            imports = [
+              # disko is provided by clan-core
+              ./hosts/vps/digitalocean
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = digitaloceanSpecialArgs;
+                  backupFileExtension = "backup";
+                };
+              }
+              ./modules/home/nixos-server.nix
+              (
+                { ... }:
+                {
+                  _module.args = digitaloceanSpecialArgs;
+                }
+              )
+            ];
+          };
+        };
+      };
     in
     {
+      # Inherit NixOS configurations from clan
+      inherit (clan.config) nixosConfigurations clanInternals;
+
+      # Darwin configuration (managed separately - clan darwin support requires additional setup)
       darwinConfigurations.${config.darwinHostname} = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         specialArgs = darwinSpecialArgs;
@@ -230,62 +326,6 @@
           ./modules/nix.nix
           ./modules/darwin
           ./modules/home/darwin.nix
-        ];
-      };
-
-      nixosConfigurations.${config.workstationHostname} = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = workstationSpecialArgs;
-        modules = [
-          ./hosts/workstation
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = workstationSpecialArgs;
-              backupFileExtension = "backup";
-            };
-          }
-          ./modules/home/nixos.nix
-        ];
-      };
-
-      nixosConfigurations.hostinger = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = hostingerSpecialArgs;
-        modules = [
-          disko.nixosModules.disko
-          sops-nix.nixosModules.sops
-          personal-website.nixosModules.default
-          rkm-backend.nixosModules.default
-          rkm-frontend.nixosModules.default
-          rkm-admin-frontend.nixosModules.default
-          roasting-startup.nixosModules.default
-          verychic-frontend.nixosModules.default
-          kilat-app.nixosModules.default
-          # rag-app.nixosModules.default  # Temporarily disabled
-          # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
-          ./hosts/vps/hostinger
-        ];
-      };
-
-      nixosConfigurations.digitalocean = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = digitaloceanSpecialArgs;
-        modules = [
-          disko.nixosModules.disko
-          ./hosts/vps/digitalocean
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = digitaloceanSpecialArgs;
-              backupFileExtension = "backup";
-            };
-          }
-          ./modules/home/nixos-server.nix
         ];
       };
 
@@ -315,6 +355,7 @@
                     '';
               })
               nixfmt
+              clan-core.packages.${system}.clan-cli
             ];
           };
         }

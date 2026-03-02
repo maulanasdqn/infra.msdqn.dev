@@ -38,7 +38,7 @@
 
     firewall = {
       enable = true;
-      allowPing = false;
+      allowPing = lib.mkForce false;  # Security: disable ping responses
       logReversePathDrops = true;
       logRefusedConnections = true;
       allowedTCPPorts = [

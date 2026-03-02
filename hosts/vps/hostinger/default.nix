@@ -31,6 +31,9 @@
     }
   ];
 
+  # Ensure PostgreSQL database exists for kilat user (ensureDBOwnership requirement)
+  services.postgresql.ensureDatabases = [ "kilat" ];
+
   networking = {
     hostName = hostname;
     useDHCP = false;
@@ -40,7 +43,10 @@
         prefixLength = 24;
       }
     ];
-    defaultGateway = gateway;
+    defaultGateway = {
+      address = gateway;
+      interface = "ens18";
+    };
     nameservers = [
       "8.8.8.8"
       "1.1.1.1"

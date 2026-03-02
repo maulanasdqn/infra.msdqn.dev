@@ -1,6 +1,6 @@
 {
   username,
-  enableTilingWM,
+  enableTilingWM ? false,
   lib,
   pkgs,
   ...
@@ -15,7 +15,6 @@
     ./tmux
     ./ssh
     ./vscode
-  ] ++ lib.optionals enableTilingWM [
     ./hyprland
   ];
 
