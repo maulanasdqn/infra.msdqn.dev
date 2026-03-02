@@ -1,5 +1,10 @@
 { config, pkgs, acmeEmail, ... }:
 {
+  # Set password for kilat PostgreSQL user after service starts
+  systemd.services.postgresql.postStart = pkgs.lib.mkAfter ''
+    $PSQL -c "ALTER USER kilat WITH PASSWORD 'kilat';" || true
+  '';
+
   services.kilat = {
     enable = true;
     port = 8082;
@@ -47,7 +52,7 @@
     requires = [ "minio.service" ];
     before = [ "kilat-server.service" ];
 
-    path = [ pkgs.minio-client ];
+    path = [ pkgs.minio-client pkgs.glibc.bin ];
 
     serviceConfig = {
       Type = "oneshot";
