@@ -1567,11 +1567,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1772430069,
-        "narHash": "sha256-rG3gjzX5AQiqhns2oXBb+DXI6wEhlyHOMXvwG4/Zon0=",
+        "lastModified": 1772510365,
+        "narHash": "sha256-0lVpdk3l2xQ9q63mNq/6VMVWVWn5IclqDG+qqXv1Q9w=",
         "ref": "testing",
-        "rev": "a6035fa34ec33c72b20faa7c33ba8a950fa4bad7",
-        "revCount": 107,
+        "rev": "44c0240179c97dc0f5588d291993e41964d26f41",
+        "revCount": 113,
         "type": "git",
         "url": "ssh://git@github.com/mrscraper-com/verychic-frontend.git"
       },
