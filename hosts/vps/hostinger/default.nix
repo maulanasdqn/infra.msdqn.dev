@@ -2,6 +2,7 @@
   hostname,
   ipAddress,
   gateway,
+  acmeEmail,
   ...
 }:
 {
@@ -10,6 +11,7 @@
     ./disk-config.nix
     ../../../profiles/server.nix
     ../../../modules/nixos/sops.nix
+    ../../../modules/nixos/k3s
     ./services/personal-website.nix
     ./services/rkm-backend.nix
     ./services/rkm-frontend.nix
@@ -33,6 +35,12 @@
 
   # Ensure PostgreSQL database exists for kilat user (ensureDBOwnership requirement)
   services.postgresql.ensureDatabases = [ "kilat" ];
+
+  # Enable k3s Kubernetes cluster
+  services.k3s = {
+    enable = true;
+    role = "server";
+  };
 
   networking = {
     hostName = hostname;

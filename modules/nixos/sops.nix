@@ -65,6 +65,13 @@
         mode = "0400";
         owner = "root";
       };
+
+      # K3s cluster token (for multi-node support)
+      # Initially auto-generated, add to secrets.yaml when expanding cluster
+      # "k3s_token" = {
+      #   mode = "0400";
+      #   owner = "root";
+      # };
     };
   };
 }
