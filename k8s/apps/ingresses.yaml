@@ -159,11 +159,38 @@ spec:
             port:
               number: 7676
 ---
-# Kilat App - kilat.app and api.kilat.app
+# Kilat App Frontend - kilat.app
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: kilat-app
+  name: kilat-frontend
+  namespace: apps
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - kilat.app
+    secretName: kilat-frontend-tls
+  rules:
+  - host: kilat.app
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kilat-frontend
+            port:
+              number: 80
+---
+# Kilat App API - api.kilat.app
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kilat-api
   namespace: apps
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -173,20 +200,9 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - kilat.app
     - api.kilat.app
-    secretName: kilat-app-tls
+    secretName: kilat-api-tls
   rules:
-  - host: kilat.app
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: kilat-server
-            port:
-              number: 8082
   - host: api.kilat.app
     http:
       paths:

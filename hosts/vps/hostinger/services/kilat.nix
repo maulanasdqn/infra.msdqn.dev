@@ -1,4 +1,4 @@
-{ config, pkgs, acmeEmail, ... }:
+{ config, pkgs, acmeEmail, kilat-app, ... }:
 {
   # Set password for kilat PostgreSQL user after service starts
   systemd.services.postgresql.postStart = pkgs.lib.mkAfter ''
@@ -74,5 +74,14 @@
       ${pkgs.minio-client}/bin/mc anonymous set download local/kilat-media
       echo "MinIO bucket 'kilat-media' ready"
     '';
+  };
+
+  # Serve kilat-ui frontend via NixOS nginx (k8s ingress proxies to port 8080)
+  services.nginx.virtualHosts."kilat.app" = {
+    listen = [{ addr = "0.0.0.0"; port = 8080; }];
+    root = kilat-app.packages.${pkgs.stdenv.hostPlatform.system}.kilat-ui;
+    locations."/" = {
+      tryFiles = "$uri $uri/ /index.html";
+    };
   };
 }

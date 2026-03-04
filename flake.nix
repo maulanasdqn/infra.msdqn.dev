@@ -197,7 +197,7 @@
         ipAddress = config.vpsHostingerIP;
         gateway = config.vpsHostingerGateway;
         enableLaravel = false;
-        inherit nixvim sshKeys acmeEmail sops-nix secretsFile;
+        inherit nixvim sshKeys acmeEmail sops-nix secretsFile kilat-app;
       };
 
       digitaloceanSpecialArgs = {
