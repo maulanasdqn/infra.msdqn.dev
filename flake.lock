@@ -734,11 +734,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1772593252,
-        "narHash": "sha256-Wgx4ZS1/cXLGe4qPu3Y8o/vqge5QPNyi8Y8hhS+amEc=",
+        "lastModified": 1772598103,
+        "narHash": "sha256-KwfosXF6jLaXlNrxztUzBcae93lnjNsYVveTf2BcRwE=",
         "ref": "develop",
-        "rev": "b29b7692f1ff3303616c366c993f941056887a91",
-        "revCount": 71,
+        "rev": "cc40f529ccda70e9149a2dba6536a3c9e3a1f69f",
+        "revCount": 72,
         "type": "git",
         "url": "ssh://git@github.com/maulanasdqn/kilat-app.git"
       },
