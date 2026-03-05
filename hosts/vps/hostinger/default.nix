@@ -4,8 +4,16 @@
   gateway,
   acmeEmail,
   lib,
+  pkgs,
+  rkm-frontend,
+  rkm-admin-frontend,
+  verychic-frontend,
+  kilat-app,
   ...
 }:
+let
+  system = pkgs.stdenv.hostPlatform.system;
+in
 {
   imports = [
     ./hardware.nix
@@ -58,6 +66,15 @@
     enable = true;
     role = "server";
   };
+
+  # Create stable symlinks for k8s nginx to serve static frontends
+  # These paths don't change on rebuild, only the symlink targets do
+  systemd.tmpfiles.rules = [
+    "L+ /var/www/rkm-frontend - - - - ${rkm-frontend.packages.${system}.default}/share/rkm-frontend"
+    "L+ /var/www/rkm-admin-frontend - - - - ${rkm-admin-frontend.packages.${system}.default}"
+    "L+ /var/www/verychic-frontend - - - - ${verychic-frontend.packages.${system}.default}/share/verychic-frontend"
+    "L+ /var/www/kilat-ui - - - - ${kilat-app.packages.${system}.kilat-ui}"
+  ];
 
   networking = {
     hostName = hostname;

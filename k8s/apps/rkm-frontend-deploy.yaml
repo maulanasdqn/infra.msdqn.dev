@@ -9,7 +9,7 @@ data:
     server {
       listen 80;
       server_name _;
-      root /nix/store/rb5ccx64cvjb5xwzpf7045pvfr5bammc-rkm-frontend-0.1.0/share/rkm-frontend;
+      root /var/www/rkm-frontend;
       index index.html;
 
       location / {
@@ -47,6 +47,9 @@ spec:
         - name: nix
           mountPath: /nix
           readOnly: true
+        - name: var-www
+          mountPath: /var/www
+          readOnly: true
         - name: nginx-config
           mountPath: /etc/nginx/conf.d
         resources:
@@ -60,6 +63,10 @@ spec:
       - name: nix
         hostPath:
           path: /nix
+          type: Directory
+      - name: var-www
+        hostPath:
+          path: /var/www
           type: Directory
       - name: nginx-config
         configMap:

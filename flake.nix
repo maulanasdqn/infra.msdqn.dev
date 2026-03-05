@@ -217,6 +217,8 @@
         enableLaravel = false;
         inherit nixvim sshKeys acmeEmail sops-nix secretsFile kilat-app;
         inherit nix-csi easykubenix;
+        # Frontend flakes for stable symlinks
+        inherit rkm-frontend rkm-admin-frontend verychic-frontend;
       };
 
       digitaloceanSpecialArgs = {
