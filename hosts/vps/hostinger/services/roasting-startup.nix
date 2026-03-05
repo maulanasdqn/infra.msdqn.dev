@@ -4,8 +4,9 @@
     enable = true;
     port = 7676;
     host = "0.0.0.0";  # Bind to all interfaces for k8s access
-    # nginx handled by k8s nginx-ingress - disable module's nginx
-    domain = "roast.kilat.app";  # Keep for reference but nginx disabled by module
+    domain = "roast.kilat.app";
+    # Disable nginx - handled by k8s nginx-ingress
+    nginx.enable = false;
 
     # Secrets file containing:
     # - DATABASE_URL
