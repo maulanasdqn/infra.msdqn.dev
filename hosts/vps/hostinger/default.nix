@@ -76,6 +76,40 @@ in
     "L+ /var/www/kilat-ui - - - - ${kilat-app.packages.${system}.kilat-ui}"
   ];
 
+  # Auto-restart k8s frontend pods after NixOS rebuild to pick up new symlink targets
+  systemd.services.k8s-frontend-reload = {
+    description = "Reload k8s frontend deployments after NixOS activation";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "k3s.service" "systemd-tmpfiles-resetup.service" ];
+    requires = [ "k3s.service" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+
+    # Store hash of symlink targets to detect changes
+    script = ''
+      HASH_FILE="/var/lib/k8s-frontend-reload/symlinks.hash"
+      mkdir -p /var/lib/k8s-frontend-reload
+
+      # Calculate hash of current symlink targets
+      CURRENT_HASH=$(readlink /var/www/rkm-frontend /var/www/verychic-frontend /var/www/kilat-ui 2>/dev/null | sha256sum | cut -d' ' -f1)
+
+      # Check if hash changed
+      if [ -f "$HASH_FILE" ]; then
+        OLD_HASH=$(cat "$HASH_FILE")
+        if [ "$CURRENT_HASH" != "$OLD_HASH" ]; then
+          echo "Symlinks changed, restarting frontend pods..."
+          /run/current-system/sw/bin/kubectl rollout restart deployment rkm-frontend verychic-frontend -n apps 2>/dev/null || true
+        fi
+      fi
+
+      # Save current hash
+      echo "$CURRENT_HASH" > "$HASH_FILE"
+    '';
+  };
+
   networking = {
     hostName = hostname;
     useDHCP = false;
