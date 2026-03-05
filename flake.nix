@@ -117,6 +117,10 @@
       url = "github:lillecarl/easykubenix";
     };
 
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+    };
+
     # dinix - disabled until flake.nix is added to repo
     # dinix = {
     #   url = "github:lillecarl/dinix";
@@ -150,6 +154,7 @@
       clan-core,
       nix-csi,
       easykubenix,
+      claude-code,
       ...
     }:
     let
@@ -193,6 +198,7 @@
           sops-nix
           secretsFile
           clan-core
+          claude-code
           ;
       };
 
