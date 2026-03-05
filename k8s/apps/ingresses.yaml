@@ -124,7 +124,7 @@ spec:
           service:
             name: rkm-frontend
             port:
-              number: 8080
+              number: 80
   - host: www.rajawalikaryamulya.co.id
     http:
       paths:
@@ -134,7 +134,7 @@ spec:
           service:
             name: rkm-frontend
             port:
-              number: 8080
+              number: 80
 ---
 # RKM Admin Frontend - cms.rajawalikaryamulya.co.id
 apiVersion: networking.k8s.io/v1
@@ -323,7 +323,7 @@ spec:
           service:
             name: verychic-frontend
             port:
-              number: 8443
+              number: 80
 ---
 # MinIO S3 - s3.msdqn.dev and storage.kilat.app
 apiVersion: networking.k8s.io/v1

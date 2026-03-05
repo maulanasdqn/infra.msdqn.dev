@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rkm-frontend-nginx
+  namespace: apps
+data:
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+      root /nix/store/rb5ccx64cvjb5xwzpf7045pvfr5bammc-rkm-frontend-0.1.0/share/rkm-frontend;
+      index index.html;
+
+      location / {
+        try_files $uri $uri/ /index.html;
+      }
+
+      location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|webp)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rkm-frontend
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rkm-frontend
+  template:
+    metadata:
+      labels:
+        app: rkm-frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - name: nix
+          mountPath: /nix
+          readOnly: true
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      volumes:
+      - name: nix
+        hostPath:
+          path: /nix
+          type: Directory
+      - name: nginx-config
+        configMap:
+          name: rkm-frontend-nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rkm-frontend
+  namespace: apps
+spec:
+  selector:
+    app: rkm-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
