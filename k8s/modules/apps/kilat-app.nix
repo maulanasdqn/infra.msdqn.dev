@@ -66,6 +66,7 @@ in
                   { name = "FAL_API_KEY"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "fal-api-key"; }; }
                   { name = "OPENROUTER_API_KEY"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "openrouter-api-key"; }; }
                   { name = "BYTEPLUS_API_KEY"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "byteplus-api-key"; }; }
+                  { name = "ELEVENLABS_API_KEY"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "elevenlabs-api-key"; }; }
                   # Email
                   { name = "RESEND_API_KEY"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "resend-api-key"; }; }
                   { name = "EMAIL_FROM"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "email-from"; }; }
