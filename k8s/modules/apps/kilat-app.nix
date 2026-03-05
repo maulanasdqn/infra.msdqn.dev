@@ -44,6 +44,8 @@ in
                 command = [ "${kilatServer}/bin/kilat-server" ];
                 ports = [{ containerPort = 8082; name = "http"; protocol = "TCP"; }];
                 env = [
+                  # SSL certificates (required for OAuth, external API calls)
+                  { name = "SSL_CERT_FILE"; value = "/etc/ssl/certs/ca-certificates.crt"; }
                   # Database
                   { name = "DATABASE_URL"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "database-url"; }; }
                   # Server
@@ -71,7 +73,10 @@ in
                   { name = "RESEND_API_KEY"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "resend-api-key"; }; }
                   { name = "EMAIL_FROM"; valueFrom.secretKeyRef = { name = "kilat-secrets"; key = "email-from"; }; }
                 ];
-                volumeMounts = [{ name = "nix"; mountPath = "/nix"; readOnly = true; }];
+                volumeMounts = [
+                  { name = "nix"; mountPath = "/nix"; readOnly = true; }
+                  { name = "ssl-certs"; mountPath = "/etc/ssl/certs"; readOnly = true; }
+                ];
                 resources = {
                   requests = { memory = "128Mi"; cpu = "100m"; };
                   limits = { memory = "512Mi"; cpu = "500m"; };
@@ -97,6 +102,14 @@ in
                   readOnly = true;
                   # Optional: pass storePath for logging/debugging
                   volumeAttributes.storePath = "${kilatServer}";
+                };
+              }
+              {
+                # Mount host SSL certificates for OAuth and external API calls
+                name = "ssl-certs";
+                hostPath = {
+                  path = "/etc/ssl/certs";
+                  type = "Directory";
                 };
               }
             ];
