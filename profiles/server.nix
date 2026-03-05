@@ -106,8 +106,7 @@
       limit_conn_zone $binary_remote_addr zone=conn_per_ip:10m;
 
       # ===== SECURITY SETTINGS =====
-      # Hide nginx version
-      server_tokens off;
+      # Note: server_tokens is already set by recommendedOptimisation
 
       # Request size limits
       client_max_body_size 100m;
