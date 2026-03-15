@@ -42,6 +42,7 @@ in
     ./services/minio.nix
     ./services/fluentbit.nix
     ./services/wazuh-agent.nix
+    ./services/aysiem-heartbeat.nix
   ];
 
   # NixOS nginx as the sole reverse proxy + static file server
