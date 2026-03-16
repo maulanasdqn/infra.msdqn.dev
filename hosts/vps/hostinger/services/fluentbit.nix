@@ -72,13 +72,15 @@ let
     [OUTPUT]
         name             http
         match            *
-        host             ingest-aysiem.msdqn.dev
+        host             103.31.205.209
         port             443
         uri              /api/v1/ingest/agent
         format           json_lines
         json_date_key    timestamp
         json_date_format iso8601
         tls              on
+        tls.verify       off
+        header           Host ingest-aysiem.msdqn.dev
         header           X-Node-Id 019ceabb-b183-79b2-8622-2bb6652af6dc
         header           X-Node-Hostname msdqn
   '';

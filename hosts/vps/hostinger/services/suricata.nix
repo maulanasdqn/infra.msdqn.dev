@@ -1,5 +1,7 @@
 { pkgs, ... }:
 let
+  python = pkgs.python3.withPackages (ps: [ ps.pyyaml ]);
+
   suricataConfig = pkgs.writeText "suricata.yaml" ''
     %YAML 1.1
     ---
@@ -35,6 +37,10 @@ let
         TEREDO_PORTS: 3544
 
     default-log-dir: /var/log/suricata/
+
+    unix-command:
+      enabled: yes
+      filename: /run/suricata/suricata-command.socket
 
     outputs:
       - eve-log:
@@ -125,6 +131,8 @@ let
 
     coredump:
       max-dump: unlimited
+
+    pid-file: /run/suricata/suricata.pid
   '';
 in
 {
@@ -134,10 +142,12 @@ in
     after = [ "network.target" ];
     wantedBy = [ "multi-user.target" ];
 
+    path = [ python pkgs.suricata ];
+
     preStart = ''
       mkdir -p /var/log/suricata
       mkdir -p /var/lib/suricata/rules
-      mkdir -p /var/run/suricata
+      mkdir -p /run/suricata
       cp -f ${suricataConfig} /etc/suricata/suricata.yaml
 
       # Download/update rules if older than 24h or missing
@@ -153,21 +163,18 @@ in
     '';
 
     serviceConfig = {
-      ExecStart = "${pkgs.suricata}/bin/suricata -c /etc/suricata/suricata.yaml --af-packet -D";
-      ExecStartPost = "${pkgs.coreutils}/bin/sleep 1";
+      ExecStart = "${pkgs.suricata}/bin/suricata -c /etc/suricata/suricata.yaml --af-packet --pidfile /run/suricata/suricata.pid -D";
       Type = "forking";
-      PIDFile = "/var/run/suricata/suricata.pid";
+      PIDFile = "/run/suricata/suricata.pid";
       Restart = "on-failure";
       RestartSec = "10s";
-      # Suricata needs root for raw packet capture
-      CapabilityBoundingSet = "CAP_NET_RAW CAP_NET_ADMIN CAP_SYS_NICE";
-      AmbientCapabilities = "CAP_NET_RAW CAP_NET_ADMIN CAP_SYS_NICE";
     };
   };
 
   # Weekly rule update timer
   systemd.services.suricata-update = {
     description = "Update Suricata rules";
+    path = [ python ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${pkgs.suricata}/bin/suricata-update --suricata ${pkgs.suricata}/bin/suricata --suricata-conf /etc/suricata/suricata.yaml --data-dir /var/lib/suricata --output /var/lib/suricata/rules";
@@ -189,5 +196,6 @@ in
     "d /etc/suricata 0755 root root -"
     "d /var/log/suricata 0755 root root -"
     "d /var/lib/suricata/rules 0755 root root -"
+    "d /run/suricata 0755 root root -"
   ];
 }
