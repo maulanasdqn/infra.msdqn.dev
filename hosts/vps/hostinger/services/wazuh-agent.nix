@@ -192,11 +192,16 @@ in
       chmod 640 /var/ossec/etc/ossec.conf
     '';
 
+    script = ''
+      exec ${wazuhControl}/bin/wazuh-control -c '/var/ossec/bin/wazuh-control start && sleep infinity'
+    '';
+
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${wazuhFHS}/bin/wazuh-agentd -f";
+      ExecStop = "${wazuhControl}/bin/wazuh-control -c '/var/ossec/bin/wazuh-control stop'";
       Restart = "on-failure";
       RestartSec = "10s";
+      KillMode = "control-group";
     };
   };
 
