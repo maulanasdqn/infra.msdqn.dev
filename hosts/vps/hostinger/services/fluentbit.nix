@@ -75,8 +75,8 @@ let
         host             103.31.205.209
         port             443
         uri              /api/v1/ingest/agent
-        format           json_lines
-        json_date_key    timestamp
+        format           json_stream
+        json_date_key    @timestamp
         json_date_format iso8601
         tls              on
         tls.verify       off
