@@ -268,5 +268,8 @@ in
       "8.8.8.8"
       "1.1.1.1"
     ];
+    extraHosts = ''
+      103.31.205.209 ingest-aysiem.msdqn.dev
+    '';
   };
 }
