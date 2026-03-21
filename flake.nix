@@ -320,6 +320,7 @@
               verychic-frontend.nixosModules.default
               kilat-app.nixosModules.default
               warehouse-management.nixosModules.default
+              shopee-tw.nixosModules.default
               # rag-app.nixosModules.default  # Temporarily disabled
               # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
               ./hosts/vps/hostinger
