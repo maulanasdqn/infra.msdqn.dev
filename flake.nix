@@ -108,7 +108,7 @@
     };
 
     shopee-tw = {
-      url = "github:maulanasdqn/shopee-tw-steve/develop";
+      url = "git+ssh://git@github.com/maulanasdqn/shopee-tw-steve.git?ref=develop";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
