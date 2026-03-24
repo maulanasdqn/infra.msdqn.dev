@@ -17,18 +17,18 @@ let
   };
 in
 {
-  # ADB + udev rules
-  programs.adb.enable = true;
+  # Accept Android SDK license
+  nixpkgs.config.android_sdk.accept_license = true;
 
-  # User groups for KVM and ADB access
+  # User groups for KVM access
   users.users.${username}.extraGroups = [
     "kvm"
-    "adbusers"
   ];
 
-  # Android SDK environment
+  # Android SDK + tools
   environment.systemPackages = [
     androidComposition.androidsdk
+    pkgs.android-tools # adb, fastboot
   ];
 
   # Environment variables
@@ -37,3 +37,4 @@ in
     ANDROID_SDK_ROOT = "${androidComposition.androidsdk}/libexec/android-sdk";
   };
 }
+

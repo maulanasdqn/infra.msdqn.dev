@@ -18,6 +18,7 @@ in
   imports = [
     ./base.nix
     ../modules/nixos/printing.nix
+    ../modules/nixos/android.nix
   ];
 
   # Hibernate configuration - otomatis dari swapDevices
