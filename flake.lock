@@ -1639,11 +1639,11 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1774388804,
-        "narHash": "sha256-gsEQMrDIsdUmiAMZlSsPTcKUmnlrjfs/L1kpiT5WHZU=",
+        "lastModified": 1774389359,
+        "narHash": "sha256-NjOXnHyXtkML/H4/TLqoJJ5Asc7eyf9K9DnynXX1ics=",
         "ref": "develop",
-        "rev": "87fd61ae72db84286e269062a00d95a670486b6f",
-        "revCount": 57,
+        "rev": "b155f46a19d3fff4b1177872b37074949aa502b3",
+        "revCount": 58,
         "type": "git",
         "url": "ssh://git@github.com/maulanasdqn/shopee-tw-steve.git"
       },
