@@ -15,5 +15,6 @@
     proxyPass = "zqh6qliz";
     shopeeEmail = "msdqn@outlook.com";
     shopeePassword = "EtTGCGN4qZM!";
+    socks5ProxyUrl = "socks5://127.0.0.1:1080";
   };
 }
