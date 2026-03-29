@@ -323,7 +323,7 @@
               rkm-backend.nixosModules.default
               rkm-frontend.nixosModules.default
               rkm-admin-frontend.nixosModules.default
-              roasting-startup.nixosModules.default
+              # roasting-startup.nixosModules.default
               verychic-frontend.nixosModules.default
               kilat-app.nixosModules.default
               warehouse-management.nixosModules.default
