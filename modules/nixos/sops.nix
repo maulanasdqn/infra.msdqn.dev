@@ -54,11 +54,11 @@
       #   owner = "rag-server";
       # };
 
-      # Roasting Startup environment (OPENROUTER_API_KEY)
-      "roasting_startup_env" = {
-        mode = "0400";
-        owner = "roasting";
-      };
+      # Roasting Startup environment (OPENROUTER_API_KEY) — disabled
+      # "roasting_startup_env" = {
+      #   mode = "0400";
+      #   owner = "roasting";
+      # };
 
       # Kilat.App environment
       "kilat_env" = {
