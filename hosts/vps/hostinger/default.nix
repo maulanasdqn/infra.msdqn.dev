@@ -36,7 +36,7 @@ in
     ./services/rkm-admin-frontend.nix
     # ./services/roasting-startup.nix
     ./services/verychic-frontend.nix
-    ./services/kilat.nix
+    # ./services/kilat.nix
     ./services/warehouse-management.nix
     ./services/backup.nix
     ./services/yes-date-me-backup.nix
@@ -257,7 +257,7 @@ in
     "L+ /var/www/rkm-frontend - - - - ${rkm-frontend.packages.${system}.default}/share/rkm-frontend"
     "L+ /var/www/rkm-admin-frontend - - - - ${rkm-admin-frontend.packages.${system}.default}"
     "L+ /var/www/verychic-frontend - - - - ${verychic-frontend.packages.${system}.default}/share/verychic-frontend"
-    "L+ /var/www/kilat-ui - - - - ${kilat-app.packages.${system}.kilat-ui}"
+    # "L+ /var/www/kilat-ui - - - - ${kilat-app.packages.${system}.kilat-ui}"
   ];
 
   # Open HTTP/HTTPS for nginx

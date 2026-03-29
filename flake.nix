@@ -325,7 +325,7 @@
               rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
               verychic-frontend.nixosModules.default
-              kilat-app.nixosModules.default
+              # kilat-app.nixosModules.default
               warehouse-management.nixosModules.default
               shopee-tw.nixosModules.default
               # rag-app.nixosModules.default  # Temporarily disabled
