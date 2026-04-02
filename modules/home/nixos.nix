@@ -1,6 +1,7 @@
 {
   username,
   enableTilingWM,
+  enableLaravel,
   lib,
   pkgs,
   ...
@@ -18,6 +19,8 @@
     ./gnome-shortcuts.nix
   ] ++ lib.optionals enableTilingWM [
     ./hyprland
+  ] ++ lib.optionals enableLaravel [
+    ./laravel
   ];
 
   home-manager.users.${username} = {

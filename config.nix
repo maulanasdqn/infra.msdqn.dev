@@ -18,7 +18,7 @@
   vpsDigitalOceanUsername = "your-username";
   vpsDigitalOceanHostname = "your-droplet-hostname";
 
-  enableLaravel = false;
+  enableLaravel = true;
   enableRust = true;
   enableVolta = true;
 

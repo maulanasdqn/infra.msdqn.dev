@@ -7,9 +7,7 @@ let
       ++ (with all; [
         bcmath
         calendar
-        ctype
         curl
-        dom
         exif
         fileinfo
         filter
@@ -25,15 +23,11 @@ let
         pdo_mysql
         pdo_pgsql
         pgsql
-        posix
         readline
         redis
-        session
         simplexml
         sockets
         sodium
-        tokenizer
-        xml
         xmlreader
         xmlwriter
         zip
@@ -46,12 +40,22 @@ let
       max_execution_time = 300
     '';
   };
+
+  laravel-installer = pkgs.writeShellScriptBin "laravel" ''
+    if [ "$1" = "new" ]; then
+      shift
+      exec ${php.packages.composer}/bin/composer create-project laravel/laravel "$@"
+    else
+      exec ${php.packages.composer}/bin/composer "$@"
+    fi
+  '';
 in
 {
   home-manager.users.${username} = {
     home.packages = with pkgs; [
       php
       php.packages.composer
+      laravel-installer
       mariadb.client
       postgresql
       redis
