@@ -6,11 +6,11 @@
       php83Packages.php-cs-fixer
       phpstan
 
-      nodePackages.typescript-language-server
-      nodePackages.vscode-langservers-extracted
-      nodePackages.eslint
+      typescript-language-server
+      vscode-langservers-extracted
+      eslint
 
-      nodePackages."@astrojs/language-server"
+      astro-language-server
 
       rust-analyzer
       clippy

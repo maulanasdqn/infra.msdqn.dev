@@ -20,11 +20,12 @@
         jq
         tree
         bun
-        deno
         slack
         speedtest-cli
         k6
         ffmpeg
+        zig
+        zls
       ]
       ++ lib.optionals enableRust [ rustup ]
       ++ lib.optionals enableVolta [ volta ]
@@ -54,7 +55,6 @@
     home.sessionPath =
       [
         "$HOME/.bun/bin"
-        "$HOME/.deno/bin"
         "$HOME/.npm-global/bin"
       ]
       ++ lib.optionals enableRust [ "$HOME/.cargo/bin" ]
