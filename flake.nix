@@ -127,6 +127,11 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # dinix - disabled until flake.nix is added to repo
     # dinix = {
     #   url = "github:lillecarl/dinix";
@@ -162,6 +167,7 @@
       clan-core,
       claude-code,
       nix-on-droid,
+      nixos-wsl,
       ...
     }:
     let
@@ -212,6 +218,19 @@
       workstationSpecialArgs = {
         username = config.workstationUsername;
         enableTilingWM = config.workstationEnableTilingWM;
+        inherit
+          nixvim
+          enableLaravel
+          enableRust
+          enableVolta
+          enableGolang
+          sshKeys
+          ;
+      };
+
+      wslSpecialArgs = {
+        username = config.wslUsername;
+        enableTilingWM = false;
         inherit
           nixvim
           enableLaravel
@@ -370,8 +389,29 @@
     in
     {
       # Inherit configurations from clan
-      inherit (clan.config) nixosConfigurations darwinConfigurations clanInternals;
+      inherit (clan.config) darwinConfigurations clanInternals;
       clan = clan.config;
+
+      nixosConfigurations = clan.config.nixosConfigurations // {
+        wsl = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = wslSpecialArgs;
+          modules = [
+            nixos-wsl.nixosModules.default
+            ./hosts/wsl
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = wslSpecialArgs;
+                backupFileExtension = "backup";
+              };
+            }
+            ./modules/home/wsl.nix
+          ];
+        };
+      };
 
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
         pkgs = import nixpkgs {

@@ -7,6 +7,9 @@
   workstationHostname = "workstation";
   workstationEnableTilingWM = true;
 
+  wslUsername = "your-username";
+  wslHostname = "wsl";
+
   vpsHostingerUsername = "your-username";
   vpsHostingerHostname = "your-hostname";
   vpsHostingerIP = "0.0.0.0";

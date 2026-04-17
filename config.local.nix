@@ -7,6 +7,9 @@
   workstationHostname = "workstation";
   workstationEnableTilingWM = true;
 
+  wslUsername = "ms";
+  wslHostname = "wsl";
+
   vpsHostingerUsername = "ms";
   vpsHostingerHostname = "msdqn";
   vpsHostingerIP = "72.62.125.38";
