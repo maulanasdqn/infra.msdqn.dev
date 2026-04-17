@@ -2,6 +2,7 @@
   username,
   lib,
   pkgs,
+  claude-code,
   ...
 }:
 {
@@ -58,6 +59,8 @@
 
         imagemagick
         ffmpeg
+
+        claude-code.packages.${pkgs.system}.default
       ];
 
       sessionVariables = {
