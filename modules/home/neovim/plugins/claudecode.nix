@@ -3,7 +3,8 @@
   home-manager.users.${username}.programs.nixvim = {
     extraPlugins = [
       (pkgs.vimUtils.buildVimPlugin {
-        name = "claudecode-nvim";
+        pname = "claudecode-nvim";
+        version = "0-unstable";
         src = pkgs.fetchFromGitHub {
           owner = "coder";
           repo = "claudecode.nvim";

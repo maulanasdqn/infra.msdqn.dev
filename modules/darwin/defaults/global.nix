@@ -1,61 +1,11 @@
 { lib, ... }:
 {
-  system.activationScripts.accessibility.text = ''
-    current_motion=$(defaults read com.apple.universalaccess reduceMotion 2>/dev/null || echo "0")
-    current_transparency=$(defaults read com.apple.universalaccess reduceTransparency 2>/dev/null || echo "0")
-
-    if [ "$current_motion" != "1" ]; then
-      defaults write com.apple.universalaccess reduceMotion -bool true
-    fi
-
-    if [ "$current_transparency" != "1" ]; then
-      defaults write com.apple.universalaccess reduceTransparency -bool true
-    fi
-
-    # Disable all animations system-wide
-    defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
-    defaults write -g NSScrollAnimationEnabled -bool false
-    defaults write -g NSWindowResizeTime -float 0.001
-    defaults write -g QLPanelAnimationDuration -float 0
-    defaults write -g NSScrollViewRubberbanding -bool false
-    defaults write -g NSDocumentRevisionsWindowTransformAnimation -bool false
-    defaults write -g NSToolbarFullScreenAnimationDuration -float 0
-    defaults write -g NSBrowserColumnAnimationSpeedMultiplier -float 0
-
-    # Disable Dock animations
-    defaults write com.apple.dock expose-animation-duration -float 0.1
-    defaults write com.apple.dock autohide-time-modifier -float 0
-    defaults write com.apple.dock autohide-delay -float 0
-    defaults write com.apple.dock launchanim -bool false
-    defaults write com.apple.dock springboard-show-duration -float 0
-    defaults write com.apple.dock springboard-hide-duration -float 0
-
-    # Disable Finder animations
-    defaults write com.apple.finder DisableAllAnimations -bool true
-
-    # Disable Mission Control animations
-    defaults write com.apple.universalaccess reduceMotion -bool true
-
-    # Speed up Mission Control
-    defaults write com.apple.dock expose-animation-duration -float 0.1
-
-    # Disable send/reply animations in Mail
-    defaults write com.apple.mail DisableReplyAnimations -bool true
-    defaults write com.apple.mail DisableSendAnimations -bool true
-
-    # Remove all login items and add only Shottr
-    osascript -e 'tell application "System Events" to delete every login item' 2>/dev/null || true
-    osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/Shottr.app", hidden:false}' 2>/dev/null || true
-  '';
   system.defaults.NSGlobalDomain = {
     AppleShowAllExtensions = true;
 
     ApplePressAndHoldEnabled = false;
     KeyRepeat = 1;
     InitialKeyRepeat = 10;
-
-    NSAutomaticWindowAnimationsEnabled = false;
-    NSWindowResizeTime = 0.001;
 
     _HIHideMenuBar = false;
 
@@ -78,26 +28,6 @@
       };
     };
 
-    "com.apple.dock" = {
-      workspaces-swoosh-animation-off = true;
-      expose-animation-duration = 0.1;
-      springboard-show-duration = 0;
-      springboard-hide-duration = 0;
-    };
-
-    "NSGlobalDomain" = {
-      NSAppSleepDisabled = true;
-      NSScrollAnimationEnabled = false;
-      NSWindowResizeTime = 0.001;
-      QLPanelAnimationDuration = 0;
-      NSBrowserColumnAnimationSpeedMultiplier = 0;
-    };
-
-    "com.apple.finder" = {
-      DisableAllAnimations = true;
-      FXEnableExtensionChangeWarning = false;
-    };
-
     "com.apple.Siri" = {
       StatusMenuVisible = false;
       UserHasDeclinedEnable = true;
@@ -110,8 +40,6 @@
     "com.apple.mail" = {
       DisableInlineAttachmentViewing = true;
       AddressesIncludeNameOnPasteboard = false;
-      DisableReplyAnimations = true;
-      DisableSendAnimations = true;
     };
 
     "com.apple.Safari" = {
@@ -123,14 +51,9 @@
       DialogType = "none";
     };
 
-    "com.apple.frameworks.diskimages" = {
-      skip-verify = true;
-      skip-verify-locked = true;
-      skip-verify-remote = true;
-    };
-
-    "com.apple.ImageCapture" = {
-      disableHotPlug = true;
+    "com.apple.desktopservices" = {
+      DSDontWriteNetworkStores = true;
+      DSDontWriteUSBStores = true;
     };
 
     "com.apple.TimeMachine" = {
@@ -141,17 +64,10 @@
       disable-shadow = true;
     };
 
-    "com.apple.helpviewer" = {
-      DevMode = true;
-    };
-
-    "com.apple.desktopservices" = {
-      DSDontWriteNetworkStores = true;
-      DSDontWriteUSBStores = true;
-    };
-
-    "com.apple.print.PrintingPrefs" = {
-      "Quit When Finished" = true;
+    "com.apple.SoftwareUpdate" = {
+      AutomaticCheckEnabled = false;
+      AutomaticDownload = false;
+      CriticalUpdateInstall = false;
     };
 
     "com.apple.LaunchServices" = {
@@ -160,12 +76,6 @@
 
     "com.apple.commerce" = {
       AutoUpdate = false;
-    };
-
-    "com.apple.SoftwareUpdate" = {
-      AutomaticCheckEnabled = false;
-      AutomaticDownload = false;
-      CriticalUpdateInstall = false;
     };
 
     "com.apple.appstore" = {

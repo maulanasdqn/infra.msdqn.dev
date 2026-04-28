@@ -2,7 +2,7 @@
 {
   home-manager.users.${username}.programs.nixvim.plugins.telescope = {
     enable = true;
-    extensions.fzf-native.enable = true;
+    extensions.fzf-native.enable = false;
     settings = {
       defaults = {
         path_display = [ "smart" ];

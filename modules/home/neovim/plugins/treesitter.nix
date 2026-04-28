@@ -3,6 +3,7 @@
   home-manager.users.${username}.programs.nixvim.plugins = {
     treesitter = {
       enable = true;
+      nixGrammars = false;
       settings = {
         highlight.enable = true;
         indent.enable = true;

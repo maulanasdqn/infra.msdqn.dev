@@ -15,6 +15,7 @@
     ./starship
     ./zsh
     ./neovim
+
     ./tmux
     ./docker
     ./ssh
