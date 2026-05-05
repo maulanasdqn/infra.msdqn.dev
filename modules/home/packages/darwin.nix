@@ -26,6 +26,12 @@
         ffmpeg
         zig
         zls
+        cmake
+        ninja
+        meson
+        pkg-config
+        ccache
+        bear
       ]
       ++ lib.optionals enableRust [ rustup ]
       ++ lib.optionals enableVolta [ volta ]
