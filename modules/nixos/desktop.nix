@@ -25,6 +25,13 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
 
+  # Tell Chromium / Electron apps (Discord, Edge, Slack, VSCode) to run
+  # natively on Wayland instead of XWayland — fixes blurry scaling and
+  # GPU-process crashes on Hyprland.
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+  };
+
   programs.hyprland = lib.mkIf enableTilingWM {
     enable = true;
     xwayland.enable = true;

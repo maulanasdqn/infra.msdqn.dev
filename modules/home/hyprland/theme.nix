@@ -9,24 +9,18 @@
       enable = true;
 
       theme = {
-        name = "Catppuccin-Latte-Standard-Pink-Light";
-        package = pkgs.catppuccin-gtk.override {
-          accents = [ "pink" ];
-          variant = "latte";
-        };
+        name = "rose-pine";
+        package = pkgs.rose-pine-gtk-theme;
       };
 
       iconTheme = {
-        name = "Papirus-Light";
-        package = pkgs.catppuccin-papirus-folders.override {
-          flavor = "latte";
-          accent = "pink";
-        };
+        name = "rose-pine";
+        package = pkgs.rose-pine-icon-theme;
       };
 
       cursorTheme = {
-        name = "catppuccin-mocha-pink-cursors";
-        package = pkgs.catppuccin-cursors.mochaPink;
+        name = "Bibata-Modern-Classic";
+        package = pkgs.bibata-cursors;
         size = 24;
       };
 
@@ -36,12 +30,12 @@
       };
 
       gtk3.extraConfig = {
-        gtk-application-prefer-dark-theme = false;
+        gtk-application-prefer-dark-theme = true;
         gtk-decoration-layout = "appmenu:none";
       };
 
       gtk4.extraConfig = {
-        gtk-application-prefer-dark-theme = false;
+        gtk-application-prefer-dark-theme = true;
         gtk-decoration-layout = "appmenu:none";
       };
     };
@@ -57,17 +51,17 @@
     home.packages = with pkgs; [
       libsForQt5.qtstyleplugin-kvantum
       kdePackages.qtstyleplugin-kvantum
-      catppuccin-kvantum
+      rose-pine-kvantum
     ];
 
     xdg.configFile."Kvantum/kvantum.kvconfig".text = ''
       [General]
-      theme=catppuccin-latte-pink
+      theme=rose-pine-iris
     '';
 
     home.pointerCursor = {
-      name = "catppuccin-mocha-pink-cursors";
-      package = pkgs.catppuccin-cursors.mochaPink;
+      name = "Bibata-Modern-Classic";
+      package = pkgs.bibata-cursors;
       size = 24;
       gtk.enable = true;
       x11.enable = true;
@@ -75,8 +69,8 @@
 
     home.sessionVariables = {
       XCURSOR_SIZE = "24";
-      XCURSOR_THEME = "catppuccin-mocha-pink-cursors";
-      GTK_THEME = "Catppuccin-Latte-Standard-Pink-Light";
+      XCURSOR_THEME = "Bibata-Modern-Classic";
+      GTK_THEME = "rose-pine";
     };
 
     # TODO: Add wallpaper.jpg to repo root to enable this

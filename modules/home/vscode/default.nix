@@ -11,7 +11,7 @@
 
       profiles.default = {
         extensions = with pkgs.vscode-extensions; [
-          catppuccin.catppuccin-vsc
+          mvllow.rose-pine
           catppuccin.catppuccin-vsc-icons
 
           jnoortheen.nix-ide
@@ -37,38 +37,30 @@
         ];
 
         userSettings = {
-          "workbench.colorTheme" = "Catppuccin Latte";
-          "workbench.iconTheme" = "catppuccin-latte";
-          "catppuccin.accentColor" = "pink";
+          "workbench.colorTheme" = "Rosé Pine";
+          "workbench.iconTheme" = "catppuccin-mocha";
 
           "workbench.colorCustomizations" = {
-            "[Catppuccin Latte]" = {
-              "titleBar.activeBackground" = "#ff69b4";
-              "titleBar.activeForeground" = "#ffffff";
-              "titleBar.inactiveBackground" = "#ffb6c1";
-              "activityBar.background" = "#fff0f5";
-              "activityBar.foreground" = "#ff69b4";
-              "activityBarBadge.background" = "#ff69b4";
-              "activityBarBadge.foreground" = "#ffffff";
-              "statusBar.background" = "#ff69b4";
-              "statusBar.foreground" = "#ffffff";
-              "statusBar.debuggingBackground" = "#ff85a2";
-              "statusBar.noFolderBackground" = "#ffb6c1";
-              "tab.activeBackground" = "#fff5f7";
-              "tab.activeBorderTop" = "#ff69b4";
-              "editor.selectionBackground" = "#ffc0cb80";
-              "editor.selectionHighlightBackground" = "#ffb6c140";
-              "editorCursor.foreground" = "#ff69b4";
-              "editorLineNumber.activeForeground" = "#ff69b4";
-              "progressBar.background" = "#ff69b4";
-              "focusBorder" = "#ff69b4";
-              "inputOption.activeBorder" = "#ff69b4";
-              "button.background" = "#ff69b4";
-              "button.hoverBackground" = "#ff85a2";
-              "list.activeSelectionBackground" = "#ffc0cb60";
-              "list.hoverBackground" = "#fff0f5";
-              "badge.background" = "#ff69b4";
-              "badge.foreground" = "#ffffff";
+            "[Rosé Pine]" = {
+              "titleBar.activeBackground" = "#c4a7e7";
+              "titleBar.activeForeground" = "#191724";
+              "titleBar.inactiveBackground" = "#1f1d2e";
+              "activityBarBadge.background" = "#c4a7e7";
+              "activityBarBadge.foreground" = "#191724";
+              "statusBar.background" = "#c4a7e7";
+              "statusBar.foreground" = "#191724";
+              "statusBar.debuggingBackground" = "#eb6f92";
+              "statusBar.noFolderBackground" = "#1f1d2e";
+              "tab.activeBorderTop" = "#c4a7e7";
+              "editorCursor.foreground" = "#ebbcba";
+              "editorLineNumber.activeForeground" = "#c4a7e7";
+              "progressBar.background" = "#c4a7e7";
+              "focusBorder" = "#c4a7e7";
+              "inputOption.activeBorder" = "#c4a7e7";
+              "button.background" = "#c4a7e7";
+              "button.foreground" = "#191724";
+              "badge.background" = "#c4a7e7";
+              "badge.foreground" = "#191724";
             };
           };
 

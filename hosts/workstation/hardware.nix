@@ -26,12 +26,12 @@
   ];
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/dbdeaa49-4716-4c13-acdf-13ebfbc4b82f";
+    device = "/dev/disk/by-uuid/839aa9c0-07fc-4019-abdf-2966b5794881";
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/55FA-1BA7";
+    device = "/dev/disk/by-uuid/3C0C-1B05";
     fsType = "vfat";
     options = [
       "fmask=0077"
@@ -40,7 +40,7 @@
   };
 
   swapDevices = [
-    { device = "/dev/disk/by-uuid/4e465fd0-d532-4c71-a725-eb7040166ab7"; }
+    { device = "/dev/disk/by-uuid/a1b612d4-776f-4f8c-be3b-7f4566760a22"; }
   ];
 
   networking.useDHCP = lib.mkDefault true;

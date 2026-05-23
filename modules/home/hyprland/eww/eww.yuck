@@ -1,0 +1,96 @@
+;; ╭───────────────────────────────────────────────╮
+;; │  Rosé Pine — eww vertical side bar            │
+;; ╰───────────────────────────────────────────────╯
+
+;; ── data sources ────────────────────────────────
+(defpoll HOUR    :interval "5s"  :initial "00" "date +%H")
+(defpoll MINUTE  :interval "5s"  :initial "00" "date +%M")
+(defpoll DAY     :interval "30m" :initial "01" "date +%d")
+(defpoll MONTH   :interval "30m" :initial "Jan" "date +%b")
+
+(defpoll WS      :interval "0.4s" :initial "1" "hyprctl activeworkspace -j | jq -r .id")
+
+(defpoll BATT    :interval "30s" :initial "100"
+  "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || echo 100")
+(defpoll BATT_ST :interval "30s" :initial "Unknown"
+  "cat /sys/class/power_supply/BAT0/status 2>/dev/null || echo Unknown")
+(defpoll AC      :interval "5s"  :initial "0"
+  "cat /sys/class/power_supply/AC0/online 2>/dev/null || echo 0")
+
+(defpoll VOL     :interval "1s" :initial "0"
+  "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{ print int($2 * 100) }'")
+(defpoll MUTED   :interval "1s" :initial "false"
+  "wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | grep -q MUTED && echo true || echo false")
+
+(defpoll BRIGHT  :interval "2s" :initial "0"
+  "brightnessctl -m 2>/dev/null | cut -d, -f4 | tr -d %")
+
+(defpoll SSID    :interval "5s" :initial ""
+  "nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '/^yes/{print $2; exit}' | cut -c1-12")
+
+;; ── widgets ─────────────────────────────────────
+(defwidget sep []
+  (box :class "sep" :height 1 :hexpand true))
+
+(defwidget workspaces []
+  (box :class "workspaces" :orientation "v" :space-evenly false :spacing 9
+       :valign "start" :hexpand true
+    (for i in '[1, 2, 3, 4, 5, 6]'
+      (box :halign "center" :hexpand true
+        (button :class {WS == "${i}" ? "ws ws-on" : "ws"}
+                :halign "center"
+                :onclick "hyprctl dispatch workspace ${i}")))))
+
+(defwidget clock []
+  (box :class "clock" :orientation "v" :space-evenly false :spacing 0
+       :valign "center" :halign "center"
+    (label :class "clk-h" :text HOUR)
+    (label :class "clk-m" :text MINUTE)
+    (box :class "clk-dot")
+    (label :class "clk-d"  :text DAY)
+    (label :class "clk-mo" :text MONTH)))
+
+(defwidget metric [icon value cls]
+  (box :class "metric ${cls}" :orientation "v" :space-evenly false :spacing 0
+       :hexpand true
+    (label :class "metric-ico" :text icon :halign "center" :hexpand true)
+    (label :class "metric-val" :text value :halign "center" :hexpand true)))
+
+(defwidget tray []
+  (box :class "tray" :orientation "v" :space-evenly false :spacing 16
+       :valign "end" :hexpand true
+    (metric :icon {MUTED == "true" ? "" : ""}
+            :value {MUTED == "true" ? "—" : "${VOL}"}
+            :cls "m-vol")
+    (metric :icon "" :value BRIGHT :cls "m-bright")
+    (metric :icon {AC == "1" ? "" : ""}
+            :value BATT
+            :cls {AC == "1" ? "m-batt batt-charge" : (BATT <= 15 ? "m-batt batt-low" : "m-batt")})
+    (metric :icon {SSID != "" ? "" : ""}
+            :value {SSID != "" ? SSID : "off"}
+            :cls {SSID != "" ? "m-net" : "m-net net-off"})
+    (button :class "power" :onclick "$HOME/.local/bin/wofi-power &"
+            :halign "center" "")))
+
+(defwidget bar []
+  (box :class "panel" :orientation "v" :space-evenly false
+    (box :class "head" :orientation "v" :space-evenly false :spacing 14 :valign "start"
+      (label :class "logo" :text "" :halign "center" :hexpand true)
+      (sep)
+      (workspaces))
+    (box :vexpand true)
+    (clock)
+    (box :vexpand true)
+    (tray)))
+
+;; ── window ──────────────────────────────────────
+(defwindow bar
+  :monitor 0
+  :stacking "fg"
+  :exclusive true
+  :geometry (geometry :x "0px"
+                      :y "0px"
+                      :width "94px"
+                      :height "100%"
+                      :anchor "left center")
+  (bar))

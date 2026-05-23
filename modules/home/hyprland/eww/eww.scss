@@ -1,0 +1,140 @@
+// Rose Pine - eww side bar styling
+
+$base:      #191724;
+$surface:   #1f1d2e;
+$text:      #e0def4;
+$subtle:    #908caa;
+$muted:     #6e6a86;
+$love:      #eb6f92;
+$gold:      #f6c177;
+$rose:      #ebbcba;
+$pine:      #31748f;
+$foam:      #9ccfd8;
+$iris:      #c4a7e7;
+
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font", "Quicksand", sans-serif;
+}
+
+.panel {
+  background-color: rgba(25, 23, 36, 0.55);
+  border: 1px solid rgba(196, 167, 231, 0.22);
+  border-radius: 26px;
+  margin: 16px 0 16px 8px;
+  padding: 18px 0;
+  color: $text;
+}
+
+.head { padding: 0 6px; }
+
+.logo {
+  font-family: "JetBrainsMono Nerd Font Mono";
+  font-size: 32px;
+  color: $iris;
+}
+
+.sep {
+  background-color: rgba(196, 167, 231, 0.18);
+  border-radius: 1px;
+  margin: 2px 16px;
+}
+
+// workspaces
+.ws {
+  background-color: rgba(224, 222, 244, 0.16);
+  border-radius: 10px;
+  min-width: 12px;
+  min-height: 12px;
+  transition: all 220ms ease;
+}
+
+.ws:hover {
+  background-color: rgba(196, 167, 231, 0.55);
+}
+
+.ws-on {
+  background-color: $iris;
+  min-width: 12px;
+  min-height: 30px;
+}
+
+// clock
+.clk-h {
+  font-size: 24px;
+  font-weight: 700;
+  color: $rose;
+}
+
+.clk-m {
+  font-size: 24px;
+  font-weight: 700;
+  color: $iris;
+}
+
+.clk-dot {
+  min-width: 4px;
+  min-height: 4px;
+  border-radius: 4px;
+  background-color: $love;
+  margin: 7px 0;
+}
+
+.clk-d {
+  font-size: 26px;
+  font-weight: 700;
+  color: $text;
+}
+
+.clk-mo {
+  font-size: 15px;
+  font-weight: 700;
+  color: $subtle;
+}
+
+// metrics
+.metric-ico {
+  font-family: "JetBrainsMono Nerd Font Mono";
+  font-size: 23px;
+  color: $foam;
+  margin-bottom: -4px;
+}
+
+.metric-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: $text;
+  margin-top: -2px;
+}
+
+.m-batt .metric-ico { color: $gold; }
+.m-bright .metric-ico { color: $gold; }
+
+.batt-low .metric-ico,
+.batt-low .metric-val { color: $love; }
+
+.batt-charge .metric-ico,
+.batt-charge .metric-val { color: $foam; }
+
+.m-net .metric-ico { color: $foam; }
+.m-net .metric-val { font-size: 10px; font-weight: 600; }
+.m-net.net-off .metric-ico,
+.m-net.net-off .metric-val { color: $muted; }
+
+// power
+.power {
+  font-family: "JetBrainsMono Nerd Font Mono";
+  font-size: 18px;
+  color: $base;
+  background-color: $love;
+  border-radius: 22px;
+  min-width: 44px;
+  min-height: 44px;
+  margin-top: 2px;
+  transition: all 200ms ease;
+}
+
+.power:hover {
+  background-color: $love;
+  box-shadow: 0 0 14px rgba(235, 111, 146, 0.75);
+}

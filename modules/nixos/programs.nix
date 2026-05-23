@@ -42,7 +42,7 @@
     zip
     htop
     btop
-    neofetch
+    fastfetch
 
     gcc
     gnumake

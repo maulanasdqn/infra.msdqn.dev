@@ -44,6 +44,7 @@
       unrar
 
       slack
+      discord
 
       microsoft-edge
 

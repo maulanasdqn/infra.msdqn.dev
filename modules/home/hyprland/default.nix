@@ -5,9 +5,10 @@
 }:
 {
   imports = [
-    ./waybar.nix
+    ./eww.nix
     ./wofi.nix
     ./theme.nix
+    ./hypridle.nix
   ];
 
   home-manager.users.${username} = {
@@ -16,21 +17,26 @@
       xwayland.enable = true;
 
       settings = {
-        "$pink" = "rgb(ff85a2)";
-        "$hotpink" = "rgb(ff69b4)";
-        "$lightpink" = "rgb(ffc0cb)";
-        "$babypink" = "rgb(ffebee)";
-        "$rose" = "rgb(fce4ec)";
-        "$white" = "rgb(ffffff)";
-        "$cream" = "rgb(fff5f7)";
-        "$text" = "rgb(5d4057)";
-        "$surface" = "rgb(ffe4e9)";
+        "$base" = "rgb(191724)";
+        "$surface" = "rgb(1f1d2e)";
+        "$overlay" = "rgb(26233a)";
+        "$muted" = "rgb(6e6a86)";
+        "$subtle" = "rgb(908caa)";
+        "$text" = "rgb(e0def4)";
+        "$love" = "rgb(eb6f92)";
+        "$gold" = "rgb(f6c177)";
+        "$rose" = "rgb(ebbcba)";
+        "$pine" = "rgb(31748f)";
+        "$foam" = "rgb(9ccfd8)";
+        "$iris" = "rgb(c4a7e7)";
+        "$highlightMed" = "rgb(403d52)";
 
         monitor = ",preferred,auto,1.25";
 
         exec-once = [
-          "hyprctl setcursor catppuccin-mocha-pink-cursors 24"
+          "hyprctl setcursor Bibata-Modern-Classic 24"
           "hyprpaper"
+          "eww open bar"
           "swayosd-server"
           "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
           "wl-paste --type text --watch cliphist store"
@@ -40,9 +46,9 @@
         general = {
           gaps_in = 8;
           gaps_out = 16;
-          border_size = 3;
-          "col.active_border" = "$hotpink $pink 45deg";
-          "col.inactive_border" = "$lightpink";
+          border_size = 1;
+          "col.active_border" = "$iris $rose 45deg";
+          "col.inactive_border" = "$highlightMed";
           layout = "dwindle";
           allow_tearing = false;
         };
@@ -55,12 +61,14 @@
             passes = 3;
             new_optimizations = true;
             xray = true;
+            vibrancy = 0.17;
+            popups = true;
           };
           shadow = {
             enabled = true;
             range = 20;
             render_power = 3;
-            color = "rgba(ff69b433)";
+            color = "rgba(0f0d1aee)";
           };
         };
 
@@ -108,7 +116,7 @@
         };
 
         env = [
-          "XCURSOR_THEME,catppuccin-mocha-pink-cursors"
+          "XCURSOR_THEME,Bibata-Modern-Classic"
           "XCURSOR_SIZE,24"
         ];
 
@@ -118,21 +126,19 @@
           disable_splash_rendering = true;
         };
 
-        windowrulev2 = [
-          "float, class:^(pavucontrol)$"
-          "float, class:^(nm-connection-editor)$"
-          "float, class:^(org.gnome.Calculator)$"
-          "float, title:^(Picture-in-Picture)$"
-          "opacity 0.95, class:^(kitty)$"
-          "opacity 0.95, class:^(Alacritty)$"
-          "opacity 0.9, class:^(code)$"
+        windowrule = [
+          "float on, match:class ^(pavucontrol)$"
+          "float on, match:class ^(nm-connection-editor)$"
+          "float on, match:class ^(org.gnome.Calculator)$"
+          "float on, match:title ^(Picture-in-Picture)$"
+          "opacity 1.0 0.92, match:class ^(kitty)$"
+          "opacity 1.0 0.92, match:class ^(Alacritty)$"
+          "opacity 0.9, match:class ^(code)$"
         ];
 
         layerrule = [
-          "blur, waybar"
-          "blur, wofi"
-          "ignorezero, waybar"
-          "ignorezero, wofi"
+          "blur on, ignore_alpha 0.3, match:namespace gtk-layer-shell"
+          "blur on, ignore_alpha 0.3, match:namespace wofi"
         ];
 
         "$mod" = "SUPER";
@@ -230,15 +236,15 @@
     };
 
     home.file.".config/hypr/hyprpaper.conf".text = ''
-      preload = ~/.config/hypr/wallpaper.jpg
-      wallpaper = ,~/.config/hypr/wallpaper.jpg
+      preload = ~/Downloads/2109.jpg
+      wallpaper = ,~/Downloads/2109.jpg
       splash = false
     '';
 
     home.file.".config/hypr/hyprlock.conf".text = ''
       background {
         monitor =
-        path = ~/.config/hypr/wallpaper.jpg
+        path = ~/Downloads/2109.jpg
         blur_passes = 3
         blur_size = 8
         brightness = 1.0
@@ -251,11 +257,11 @@
         dots_size = 0.33
         dots_spacing = 0.15
         dots_center = true
-        outer_color = rgb(ff69b4)
-        inner_color = rgb(fff5f7)
-        font_color = rgb(5d4057)
+        outer_color = rgb(c4a7e7)
+        inner_color = rgb(1f1d2e)
+        font_color = rgb(e0def4)
         fade_on_empty = false
-        placeholder_text = <span foreground="##ff69b4">Password...</span>
+        placeholder_text = <span foreground="##c4a7e7">Password...</span>
         hide_input = false
         position = 0, -20
         halign = center
@@ -265,7 +271,7 @@
       label {
         monitor =
         text = Hi Cutie!
-        color = rgb(ff69b4)
+        color = rgb(c4a7e7)
         font_size = 48
         font_family = JetBrainsMono Nerd Font
         position = 0, 150
@@ -276,7 +282,7 @@
       label {
         monitor =
         text = $TIME
-        color = rgb(5d4057)
+        color = rgb(e0def4)
         font_size = 96
         font_family = JetBrainsMono Nerd Font
         position = 0, 50
@@ -288,9 +294,9 @@
     services.mako = {
       enable = true;
       settings = {
-        background-color = "#fff5f7";
-        text-color = "#5d4057";
-        border-color = "#ff69b4";
+        background-color = "#1f1d2e";
+        text-color = "#e0def4";
+        border-color = "#c4a7e7";
         border-size = 3;
         border-radius = 12;
         default-timeout = 5000;
@@ -314,37 +320,39 @@
         font_family = "JetBrainsMono Nerd Font";
         font_size = 14;
 
-        background = "#fff5f7";
-        foreground = "#5d4057";
-        cursor = "#ff69b4";
-        cursor_text_color = "#fff5f7";
-        selection_background = "#ffc0cb";
-        selection_foreground = "#5d4057";
+        background = "#191724";
+        foreground = "#e0def4";
+        cursor = "#ebbcba";
+        cursor_text_color = "#191724";
+        selection_background = "#403d52";
+        selection_foreground = "#e0def4";
 
-        active_tab_background = "#ff69b4";
-        active_tab_foreground = "#ffffff";
-        inactive_tab_background = "#ffe4e9";
-        inactive_tab_foreground = "#5d4057";
+        active_tab_background = "#c4a7e7";
+        active_tab_foreground = "#191724";
+        inactive_tab_background = "#26233a";
+        inactive_tab_foreground = "#6e6a86";
 
-        color0 = "#5d4057";
-        color1 = "#e84a72";
-        color2 = "#7cb879";
-        color3 = "#d4a023";
-        color4 = "#5c9fd4";
-        color5 = "#ff69b4";
-        color6 = "#b47ead";
-        color7 = "#fce4ec";
+        color0 = "#26233a";
+        color1 = "#eb6f92";
+        color2 = "#31748f";
+        color3 = "#f6c177";
+        color4 = "#9ccfd8";
+        color5 = "#c4a7e7";
+        color6 = "#ebbcba";
+        color7 = "#e0def4";
 
-        color8 = "#7d6077";
-        color9 = "#ff6b8a";
-        color10 = "#8ed88b";
-        color11 = "#e8b84a";
-        color12 = "#7ab8e8";
-        color13 = "#ff85c1";
-        color14 = "#d49bcf";
-        color15 = "#ffffff";
+        color8 = "#6e6a86";
+        color9 = "#eb6f92";
+        color10 = "#31748f";
+        color11 = "#f6c177";
+        color12 = "#9ccfd8";
+        color13 = "#c4a7e7";
+        color14 = "#ebbcba";
+        color15 = "#e0def4";
 
-        background_opacity = "0.95";
+        background_opacity = "0.80";
+        dynamic_background_opacity = "yes";
+        background_blur = 1;
         window_padding_width = 12;
         confirm_os_window_close = 0;
 
@@ -358,9 +366,9 @@
 
     home.file.".config/swayosd/style.css".text = ''
       window {
-        background: rgba(255, 250, 251, 0.95);
+        background: rgba(31, 29, 46, 0.95);
         border-radius: 20px;
-        border: 2px solid rgba(255, 105, 180, 0.4);
+        border: 2px solid rgba(196, 167, 231, 0.4);
         padding: 12px 20px;
       }
 
@@ -370,27 +378,27 @@
 
       image {
         margin-right: 12px;
-        color: #ff69b4;
+        color: #c4a7e7;
       }
 
       progressbar {
         min-height: 8px;
         border-radius: 4px;
-        background: #ffe4e9;
+        background: #26233a;
       }
 
       progressbar:disabled {
-        background: #ffc0cb;
+        background: #403d52;
       }
 
       progressbar progress {
         min-height: 8px;
         border-radius: 4px;
-        background: linear-gradient(90deg, #ff69b4, #ff85a2);
+        background: linear-gradient(90deg, #c4a7e7, #ebbcba);
       }
 
       label {
-        color: #5d4057;
+        color: #e0def4;
         font-family: "Quicksand", sans-serif;
         font-weight: 600;
         font-size: 14px;

@@ -125,7 +125,7 @@
       nerd-fonts.hack
       noto-fonts
       noto-fonts-cjk-sans
-      noto-fonts-emoji
+      noto-fonts-color-emoji
     ];
     fontconfig = {
       defaultFonts = {
@@ -155,7 +155,7 @@
       zip
       htop
       btop
-      neofetch
+      fastfetch
       gcc
       gnumake
       cmake

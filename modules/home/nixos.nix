@@ -33,10 +33,10 @@
       };
       "org/gnome/desktop/interface" = {
         text-scaling-factor = 1.5;
-        gtk-theme = "Catppuccin-Latte-Standard-Pink-Light";
-        icon-theme = "Papirus-Light";
-        cursor-theme = "catppuccin-mocha-pink-cursors";
-        color-scheme = "prefer-light";
+        gtk-theme = "rose-pine";
+        icon-theme = "rose-pine";
+        cursor-theme = "Bibata-Modern-Classic";
+        color-scheme = "prefer-dark";
       };
     };
 
