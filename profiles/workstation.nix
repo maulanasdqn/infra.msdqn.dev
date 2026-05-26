@@ -78,6 +78,30 @@
   programs.dconf.enable = true;
 
   security.rtkit.enable = true;
+
+  systemd.user.services.alc256-mic-route = {
+    description = "Route ALC256 capture to headset mic with sane gain";
+    wantedBy = [ "default.target" ];
+    after = [ "pipewire.service" "wireplumber.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 2";
+    };
+    script = ''
+      ${pkgs.pulseaudio}/bin/pactl set-source-port \
+        alsa_input.pci-0000_03_00.6.analog-stereo \
+        analog-input-headset-mic || true
+      ${pkgs.pulseaudio}/bin/pactl set-source-volume \
+        alsa_input.pci-0000_03_00.6.analog-stereo 50% || true
+      ${pkgs.pulseaudio}/bin/pactl set-source-mute \
+        alsa_input.pci-0000_03_00.6.analog-stereo 0 || true
+      ${pkgs.pulseaudio}/bin/pactl set-default-source rnnoise_source || true
+      ${pkgs.alsa-utils}/bin/amixer -c 1 sset 'Capture' 50% || true
+      ${pkgs.alsa-utils}/bin/amixer -c 1 sset 'Headset Mic Boost' 0 || true
+    '';
+  };
+
   services.pipewire = {
     enable = true;
     alsa = {
@@ -86,6 +110,45 @@
     };
     pulse.enable = true;
     jack.enable = true;
+
+    extraLadspaPackages = [ pkgs.rnnoise-plugin ];
+
+    extraConfig.pipewire."99-input-denoising" = {
+      "context.modules" = [
+        {
+          name = "libpipewire-module-filter-chain";
+          args = {
+            "node.description" = "Noise Canceling Source";
+            "media.name" = "Noise Canceling Source";
+            "filter.graph" = {
+              nodes = [
+                {
+                  type = "ladspa";
+                  name = "rnnoise";
+                  plugin = "librnnoise_ladspa";
+                  label = "noise_suppressor_mono";
+                  control = {
+                    "VAD Threshold (%)" = 50.0;
+                    "VAD Grace Period (ms)" = 200;
+                    "Retroactive VAD Grace (ms)" = 0;
+                  };
+                }
+              ];
+            };
+            "capture.props" = {
+              "node.name" = "capture.rnnoise_source";
+              "node.passive" = true;
+              "audio.rate" = 48000;
+            };
+            "playback.props" = {
+              "node.name" = "rnnoise_source";
+              "media.class" = "Audio/Source";
+              "audio.rate" = 48000;
+            };
+          };
+        }
+      ];
+    };
   };
 
   services.openssh = {
