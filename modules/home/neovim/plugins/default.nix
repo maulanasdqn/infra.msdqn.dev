@@ -9,5 +9,6 @@
     ./ui.nix
     ./formatting.nix
     ./claudecode.nix
+    ./stynx.nix
   ];
 }

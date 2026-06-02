@@ -59,6 +59,25 @@ $iris:      #c4a7e7;
   min-height: 30px;
 }
 
+// caffeine indicator (only visible when active)
+.caffeine-btn {
+  background-color: rgba(246, 193, 119, 0.16);
+  border-radius: 12px;
+  min-width: 30px;
+  min-height: 30px;
+  transition: all 200ms ease;
+}
+
+.caffeine-btn:hover {
+  background-color: rgba(246, 193, 119, 0.32);
+}
+
+.caffeine-ico {
+  font-family: "JetBrainsMono Nerd Font Mono";
+  font-size: 18px;
+  color: $gold;
+}
+
 // clock
 .clk-h {
   font-size: 24px;

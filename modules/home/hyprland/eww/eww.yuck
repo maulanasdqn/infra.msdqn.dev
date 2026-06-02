@@ -10,6 +10,10 @@
 
 (defpoll WS      :interval "0.4s" :initial "1" "hyprctl activeworkspace -j | jq -r .id")
 
+;; caffeine mode is ON when hypridle is stopped (no idle lock/sleep)
+(defpoll CAFFEINE :interval "2s" :initial "false"
+  "systemctl --user -q is-active hypridle && echo false || echo true")
+
 (defpoll BATT    :interval "30s" :initial "100"
   "cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || echo 100")
 (defpoll BATT_ST :interval "30s" :initial "Unknown"
@@ -40,6 +44,13 @@
         (button :class {WS == "${i}" ? "ws ws-on" : "ws"}
                 :halign "center"
                 :onclick "hyprctl dispatch workspace ${i}")))))
+
+(defwidget caffeine-ind []
+  (box :class "caffeine" :visible CAFFEINE :halign "center" :hexpand true
+    (button :class "caffeine-btn" :halign "center"
+            :tooltip "Caffeine on — idle lock & sleep disabled"
+            :onclick "caffeine"
+      (label :class "caffeine-ico" :text ""))))
 
 (defwidget clock []
   (box :class "clock" :orientation "v" :space-evenly false :spacing 0
@@ -77,6 +88,7 @@
   (box :class "panel" :orientation "v" :space-evenly false
     (box :class "head" :orientation "v" :space-evenly false :spacing 14 :valign "start"
       (label :class "logo" :text "" :halign "center" :hexpand true)
+      (caffeine-ind)
       (sep)
       (workspaces))
     (box :vexpand true)

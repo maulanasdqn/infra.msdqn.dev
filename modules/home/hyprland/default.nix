@@ -229,6 +229,7 @@
           "$mod SHIFT, C, exec, hyprpicker -a"
 
           "$mod, X, exec, hyprlock"
+          "$mod SHIFT, X, exec, caffeine"
         ];
 
         bindm = [
