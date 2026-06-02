@@ -22,6 +22,7 @@
       "slack"
       "figma"
       "pritunl"
+      "postman"
     ];
   };
 }
