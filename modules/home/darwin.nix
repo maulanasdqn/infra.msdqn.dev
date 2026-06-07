@@ -22,7 +22,6 @@
     ./ssh
     ./sops
     ./kitty
-    ./hammerspoon
     ./services
     ./wallpaper
     ./laravel

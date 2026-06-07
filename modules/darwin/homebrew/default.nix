@@ -14,7 +14,6 @@
     ];
 
     casks = [
-      "hammerspoon"
       "helium-browser"
       "firefox"
       "discord"

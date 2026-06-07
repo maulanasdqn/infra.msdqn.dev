@@ -88,23 +88,25 @@ let
   '';
 in
 lib.mkIf enableTilingWM {
-  environment.systemPackages = [ pkgs.aerospace ];
+  environment.systemPackages = [ pkgs.aerospace pkgs.jankyborders ];
 
   home-manager.users.${username} = {
     home.file.".aerospace.toml".source = aerospaceConfig;
   };
 
-  launchd.user.agents.aerospace = {
+  launchd.user.agents.borders = {
     serviceConfig = {
-      ProgramArguments = [ "/Applications/Nix Apps/AeroSpace.app/Contents/MacOS/AeroSpace" ];
-      EnvironmentVariables = {
-        PATH = "/usr/local/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-        HOME = "/Users/${username}";
-      };
+      ProgramArguments = [
+        "/run/current-system/sw/bin/borders"
+        "width=1.3"
+        "active_color=0xffc4a7e7"
+        "inactive_color=0x40403d52"
+        "blur_radius=0"
+      ];
       KeepAlive = true;
       RunAtLoad = true;
-      StandardOutPath = "/tmp/aerospace.out.log";
-      StandardErrorPath = "/tmp/aerospace.err.log";
+      StandardOutPath = "/tmp/borders.out.log";
+      StandardErrorPath = "/tmp/borders.err.log";
     };
   };
 }
