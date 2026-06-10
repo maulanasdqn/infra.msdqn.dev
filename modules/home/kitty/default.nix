@@ -41,7 +41,7 @@
 
       macos_titlebar_color = "background";
       macos_option_as_alt = "yes";
-      hide_window_decorations = "yes";
+      hide_window_decorations = "titlebar-only";
 
       clipboard_control = "write-clipboard write-primary read-clipboard read-primary";
     };
