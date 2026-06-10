@@ -3,17 +3,29 @@
   home-manager.users.${username}.programs.nixvim.plugins = {
     treesitter = {
       enable = true;
-      nixGrammars = false;
+      nixGrammars = true;
       settings = {
         highlight.enable = true;
         indent.enable = true;
         ensure_installed = [
-          "astro"
-          "css"
-          "html"
+          # JS/TS family
           "javascript"
           "typescript"
           "tsx"
+          "jsdoc"
+          "json"
+          "jsonc"
+          "graphql"
+          "mdx"
+          "svelte"
+          "vue"
+          "prisma"
+          # Web
+          "astro"
+          "css"
+          "scss"
+          "html"
+          # Other
           "swift"
         ];
       };
