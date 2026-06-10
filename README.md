@@ -44,8 +44,7 @@ My personal unified Nix configuration for both **NixOS** and **macOS** (nix-darw
     │   ├── packages/
     │   ├── security/
     │   ├── system/
-    │   ├── yabai/                  # Tiling WM
-    │   ├── skhd/                   # Hotkey daemon
+    │   ├── aerospace/              # Tiling WM + hotkeys
     │   └── sketchybar/             # Custom menu bar
     ├── nixos/                      # NixOS-specific modules
     │   ├── default.nix
@@ -100,8 +99,7 @@ My personal unified Nix configuration for both **NixOS** and **macOS** (nix-darw
 
 | Component | Description |
 |-----------|-------------|
-| **Yabai** | Tiling window manager (optional) |
-| **skhd** | Hotkey daemon (optional) |
+| **AeroSpace** | Tiling window manager + hotkeys (optional) |
 | **Sketchybar** | Custom menu bar (optional) |
 | **Ghostty** | GPU-accelerated terminal |
 | **Homebrew** | Casks and formulae |
@@ -315,7 +313,7 @@ Edit `config.nix` to customize your setup:
   # Darwin (macOS)
   darwinUsername = "your-username";
   darwinHostname = "your-mac-hostname";
-  darwinEnableTilingWM = true;  # yabai, skhd, sketchybar
+  darwinEnableTilingWM = true;  # aerospace, sketchybar
 
   # Workstation (NixOS desktop)
   workstationUsername = "your-username";
@@ -353,7 +351,7 @@ Edit `config.nix` to customize your setup:
 |--------|----------|-------------|
 | `darwinUsername` | macOS | Your macOS username |
 | `darwinHostname` | macOS | Machine hostname |
-| `darwinEnableTilingWM` | macOS | Enable yabai/skhd/sketchybar |
+| `darwinEnableTilingWM` | macOS | Enable aerospace/sketchybar |
 | `workstationUsername` | Workstation | Your workstation username |
 | `workstationHostname` | Workstation | Machine hostname |
 | `workstationEnableTilingWM` | Workstation | Enable hyprland/waybar/wofi |
@@ -393,7 +391,7 @@ nix develop --command rebuild
 
 ## Keybindings
 
-### macOS (skhd)
+### macOS (AeroSpace)
 
 | Key | Action |
 |-----|--------|
