@@ -60,12 +60,10 @@
       NSDisableAutomaticTermination = true;
     };
 
-    "com.apple.universalaccess" = {
-      # Disable transparency — less GPU compositing overhead
-      reduceTransparency = true;
-      # Disable motion animations system-wide
-      reduceMotion = true;
-    };
+    # NOTE: com.apple.universalaccess (reduceTransparency / reduceMotion) removed —
+    # it's a protected domain on modern macOS; `defaults write` fails with
+    # "Could not write domain com.apple.universalaccess; exiting", which aborts the
+    # whole activation. Set these by hand in System Settings > Accessibility if wanted.
 
     "com.apple.finder" = {
       DisableAllAnimations = true;

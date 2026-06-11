@@ -208,7 +208,7 @@
         ;
       secretsFile = ./secrets/secrets.yaml;
 
-      darwinSpecialArgs = {
+      darwinBaseSpecialArgs = {
         username = config.darwinUsername;
         enableTilingWM = config.darwinEnableTilingWM;
         inherit
@@ -225,6 +225,51 @@
           mac-app-util
           ;
       };
+
+      # enableAggressiveTweaks gates machine-wide / single-owner behavior:
+      #   firmware NVRAM boot-args, HID keyboard remap, global power management,
+      #   performance LaunchDaemons, system-wide PostgreSQL, and brew cleanup=zap.
+      # true  -> MacBook (sole owner)        false -> shared Mac mini (safe defaults)
+      mkDarwinSpecialArgs = aggressive: darwinBaseSpecialArgs // {
+        enableAggressiveTweaks = aggressive;
+      };
+
+      mkDarwinMachine =
+        { hostModule, aggressive }:
+        {
+          nixpkgs.hostPlatform = "aarch64-darwin";
+          imports = [
+            determinate.darwinModules.default
+            home-manager.darwinModules.home-manager
+            mac-app-util.darwinModules.default
+            nix-homebrew.darwinModules.nix-homebrew
+            {
+              nix-homebrew = {
+                enable = true;
+                enableRosetta = true;
+                user = config.darwinUsername;
+                autoMigrate = true;
+                mutableTaps = false;
+                taps = {
+                  "homebrew/homebrew-core" = homebrew-core;
+                  "homebrew/homebrew-cask" = homebrew-cask;
+                };
+              };
+            }
+            ./modules/nix.nix
+            ./modules/darwin
+            ./modules/home/darwin.nix
+            hostModule
+            (
+              { ... }:
+              {
+                _module.args = mkDarwinSpecialArgs aggressive;
+                # Local machine - requires SSH enabled on Mac (System Settings > Sharing > Remote Login)
+                clan.core.networking.targetHost = "ms@localhost";
+              }
+            )
+          ];
+        };
 
       workstationSpecialArgs = {
         username = config.workstationUsername;
@@ -285,43 +330,21 @@
 
         inventory = {
           services = { };
-          machines.${config.darwinHostname}.machineClass = "darwin";
+          machines.macmini-mrscraper.machineClass = "darwin";
+          machines.macbook-mrscraper.machineClass = "darwin";
         };
 
         machines = {
-          # Darwin (macOS)
-          ${config.darwinHostname} = {
-            nixpkgs.hostPlatform = "aarch64-darwin";
-            imports = [
-              determinate.darwinModules.default
-              home-manager.darwinModules.home-manager
-              mac-app-util.darwinModules.default
-              nix-homebrew.darwinModules.nix-homebrew
-              {
-                nix-homebrew = {
-                  enable = true;
-                  enableRosetta = true;
-                  user = config.darwinUsername;
-                  autoMigrate = true;
-                  mutableTaps = false;
-                  taps = {
-                    "homebrew/homebrew-core" = homebrew-core;
-                    "homebrew/homebrew-cask" = homebrew-cask;
-                  };
-                };
-              }
-              ./modules/nix.nix
-              ./modules/darwin
-              ./modules/home/darwin.nix
-              (
-                { ... }:
-                {
-                  _module.args = darwinSpecialArgs;
-                  # Local machine - requires SSH enabled on Mac (System Settings > Sharing > Remote Login)
-                  clan.core.networking.targetHost = "ms@localhost";
-                }
-              )
-            ];
+          # Darwin (macOS) — shared Mac mini: trimmed, safe for the second account
+          macmini-mrscraper = mkDarwinMachine {
+            hostModule = ./modules/darwin/hosts/macmini.nix;
+            aggressive = false;
+          };
+
+          # Darwin (macOS) — personal MacBook: full single-owner config
+          macbook-mrscraper = mkDarwinMachine {
+            hostModule = ./modules/darwin/hosts/macbook.nix;
+            aggressive = true;
           };
 
           # NixOS Workstation

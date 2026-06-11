@@ -1,11 +1,15 @@
-{ username, ... }:
+{ username, lib, enableAggressiveTweaks ? false, ... }:
 {
   system.stateVersion = 5;
+  system.primaryUser = username;
 
-  # Disable memory compression — eliminates CPU overhead from compressor and
-  # decompression latency; swap remains enabled as OOM safety net.
-  # Requires reboot to take effect.
-  launchd.daemons.set-boot-args = {
+  # ── Single-owner machine tweaks (MacBook) — gated by enableAggressiveTweaks ──
+  # These change firmware (NVRAM), global power management, and the HID keymap
+  # (which applies to ALL users incl. the login window), so they are NOT applied on
+  # the shared Mac mini where a second account (mrscrapersupport57) is in use.
+
+  # Disable memory compression — NVRAM boot-args, firmware-level, whole machine, needs reboot.
+  launchd.daemons.set-boot-args = lib.mkIf enableAggressiveTweaks {
     serviceConfig = {
       Label = "com.local.set-boot-args";
       ProgramArguments = [
@@ -16,13 +20,15 @@
     };
   };
 
-  # AC: sleep after 30min; Battery: 10min — managed per-source by pmset-performance daemon
-  power.sleep.computer = 30;
-  power.sleep.display = 10;
-  power.sleep.harddisk = 10;
-  system.primaryUser = username;
+  # System power management (machine-wide).
+  power.sleep = lib.mkIf enableAggressiveTweaks {
+    computer = 30;
+    display = 10;
+    harddisk = 10;
+  };
 
-  system.keyboard = {
+  # HID key remap — applies to every user, including the login window.
+  system.keyboard = lib.mkIf enableAggressiveTweaks {
     enableKeyMapping = true;
     userKeyMapping = [
       {
@@ -36,7 +42,7 @@
     ];
   };
 
-  launchd.daemons.keyboard-remap = {
+  launchd.daemons.keyboard-remap = lib.mkIf enableAggressiveTweaks {
     serviceConfig = {
       Label = "com.local.keyboard-remap";
       ProgramArguments = [

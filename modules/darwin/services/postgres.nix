@@ -1,6 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, lib, enableAggressiveTweaks ? false, ... }:
 {
-  services.postgresql = {
+  # System-wide PostgreSQL (port 5433, trust auth) — single-owner machines only.
+  services.postgresql = lib.mkIf enableAggressiveTweaks {
     enable = true;
     package = pkgs.postgresql_17;
     settings = {

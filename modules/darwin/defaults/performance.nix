@@ -1,6 +1,8 @@
-{ ... }:
+{ lib, enableAggressiveTweaks ? false, ... }:
 {
-  launchd.daemons = {
+  # Whole-machine performance daemons (disable Spotlight/Time Machine on ALL volumes,
+  # kernel/network sysctl, pmset, weekly storage cleanup). Single-owner machines only.
+  launchd.daemons = lib.mkIf enableAggressiveTweaks {
     disable-tm-local = {
       serviceConfig = {
         Label = "com.local.disable-tm-local";
