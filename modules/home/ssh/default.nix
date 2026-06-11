@@ -1,4 +1,4 @@
-{ username, sshKeys, lib, ... }:
+{ username, ... }:
 {
   home-manager.users.${username} = {
     programs.ssh = {
@@ -18,8 +18,9 @@
       };
     };
 
-    home.file.".ssh/authorized_keys" = lib.mkIf (sshKeys != []) {
-      text = lib.concatStringsSep "\n" sshKeys + "\n";
-    };
+    # NOTE: authorized_keys is intentionally NOT managed here. home-manager would
+    # write it as a /nix/store symlink, which sshd StrictModes rejects ("bad
+    # ownership or modes for directory /nix/store"). Inbound keys are instead set
+    # via users.users.<name>.openssh.authorizedKeys.keys in modules/darwin/default.nix.
   };
 }
