@@ -95,11 +95,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    verychic-frontend = {
-      url = "git+ssh://git@github.com/mrscraper-com/verychic-frontend.git?ref=testing";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     kilat-app = {
       url = "git+ssh://git@github.com/maulanasdqn/kilat-app.git?ref=develop";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -169,7 +164,6 @@
       nix-pilot,
       rag-app,
       roasting-startup,
-      verychic-frontend,
       kilat-app,
       warehouse-management,
       shopee-tw,
@@ -307,7 +301,7 @@
         gateway = config.vpsHostingerGateway;
         enableLaravel = false;
         inherit nixvim sshKeys acmeEmail sops-nix secretsFile kilat-app warehouse-management shopee-tw;
-        inherit rkm-frontend rkm-admin-frontend verychic-frontend;
+        inherit rkm-frontend rkm-admin-frontend;
       };
 
       digitaloceanSpecialArgs = {
@@ -381,7 +375,6 @@
               rkm-frontend.nixosModules.default
               rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
-              verychic-frontend.nixosModules.default
               # kilat-app.nixosModules.default
               warehouse-management.nixosModules.default
               shopee-tw.nixosModules.default

@@ -7,7 +7,6 @@
   pkgs,
   rkm-frontend,
   rkm-admin-frontend,
-  verychic-frontend,
   kilat-app,
   warehouse-management,
   shopee-tw,
@@ -35,7 +34,6 @@ in
     ./services/rkm-frontend.nix
     ./services/rkm-admin-frontend.nix
     # ./services/roasting-startup.nix
-    ./services/verychic-frontend.nix
     # ./services/kilat.nix
     ./services/warehouse-management.nix
     ./services/backup.nix
@@ -217,24 +215,6 @@ in
       };
     };
 
-    # verychic.msdqn.dev — Verychic frontend
-    virtualHosts."verychic.msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      root = "/var/www/verychic-frontend";
-      extraConfig = securityHeaders;
-      locations."/" = {
-        tryFiles = "$uri $uri/ /index.html";
-      };
-      locations."~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$" = {
-        tryFiles = "$uri =404";
-        extraConfig = ''
-          expires 1y;
-          add_header Cache-Control "public, immutable";
-          ${securityHeaders}
-        '';
-      };
-    };
   };
 
   # ACME (Let's Encrypt) configuration
@@ -256,7 +236,6 @@ in
   systemd.tmpfiles.rules = [
     "L+ /var/www/rkm-frontend - - - - ${rkm-frontend.packages.${system}.default}/share/rkm-frontend"
     "L+ /var/www/rkm-admin-frontend - - - - ${rkm-admin-frontend.packages.${system}.default}"
-    "L+ /var/www/verychic-frontend - - - - ${verychic-frontend.packages.${system}.default}/share/verychic-frontend"
     # "L+ /var/www/kilat-ui - - - - ${kilat-app.packages.${system}.kilat-ui}"
   ];
 
