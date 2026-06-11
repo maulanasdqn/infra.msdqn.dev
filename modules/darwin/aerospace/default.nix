@@ -25,7 +25,9 @@ let
     inner.vertical   = 8
     outer.left       = 10
     outer.bottom     = 10
-    outer.top        = 15
+    # Reserve room for the sketchybar top bar (y_offset 8 + height 40 = 48px)
+    # plus a small breathing gap, so tiled windows don't slide under it.
+    outer.top        = 52
     outer.right      = 10
 
     [mode.main.binding]
@@ -88,25 +90,9 @@ let
   '';
 in
 lib.mkIf enableTilingWM {
-  environment.systemPackages = [ pkgs.aerospace pkgs.jankyborders ];
+  environment.systemPackages = [ pkgs.aerospace ];
 
   home-manager.users.${username} = {
     home.file.".aerospace.toml".source = aerospaceConfig;
-  };
-
-  launchd.user.agents.borders = {
-    serviceConfig = {
-      ProgramArguments = [
-        "/run/current-system/sw/bin/borders"
-        "width=1.3"
-        "active_color=0xffc4a7e7"
-        "inactive_color=0x40403d52"
-        "blur_radius=0"
-      ];
-      KeepAlive = true;
-      RunAtLoad = true;
-      StandardOutPath = "/tmp/borders.out.log";
-      StandardErrorPath = "/tmp/borders.err.log";
-    };
   };
 }
