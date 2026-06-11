@@ -97,7 +97,7 @@ in
       };
     };
 
-    # storage.kilat.app + s3.stynx.app — MinIO S3
+    # storage.kilat.app + s3.rajawalikaryamulya.co.id — MinIO S3
     virtualHosts."storage.kilat.app" = {
       enableACME = true;
       forceSSL = true;
@@ -107,8 +107,8 @@ in
       };
     };
 
-    # s3.stynx.app needs its own cert since it's a different domain
-    virtualHosts."s3.stynx.app" = {
+    # s3.rajawalikaryamulya.co.id needs its own cert since it's a different domain
+    virtualHosts."s3.rajawalikaryamulya.co.id" = {
       enableACME = true;
       forceSSL = true;
       extraConfig = "client_max_body_size 1g;";

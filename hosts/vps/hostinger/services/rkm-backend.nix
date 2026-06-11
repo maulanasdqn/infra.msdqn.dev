@@ -19,7 +19,7 @@
       MINIO_ENDPOINT = "http://127.0.0.1:9000";
       MINIO_BUCKET = "rkm-media";
       MINIO_REGION = "us-east-1";
-      MINIO_PUBLIC_URL = "https://s3.stynx.app/rkm-media";
+      MINIO_PUBLIC_URL = "https://s3.rajawalikaryamulya.co.id/rkm-media";
     };
   };
 }
