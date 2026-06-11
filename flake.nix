@@ -337,13 +337,13 @@
         machines = {
           # Darwin (macOS) — shared Mac mini: trimmed, safe for the second account
           macmini-mrscraper = mkDarwinMachine {
-            hostModule = ./modules/darwin/hosts/macmini.nix;
+            hostModule = ./hosts/darwin/macmini-mrscraper;
             aggressive = false;
           };
 
           # Darwin (macOS) — personal MacBook: full single-owner config
           macbook-mrscraper = mkDarwinMachine {
-            hostModule = ./modules/darwin/hosts/macbook.nix;
+            hostModule = ./hosts/darwin/macbook-mrscraper;
             aggressive = true;
           };
 
