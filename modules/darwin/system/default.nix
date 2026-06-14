@@ -8,13 +8,17 @@
   # (which applies to ALL users incl. the login window), so they are NOT applied on
   # the shared Mac mini where a second account (mrscrapersupport57) is in use.
 
-  # Disable memory compression — NVRAM boot-args, firmware-level, whole machine, needs reboot.
+  # VM compressor mode — NVRAM boot-args, firmware-level, whole machine, needs reboot.
+  # vm_compressor=4 is the macOS default: memory compression PLUS swap to disk.
+  # (The old value 2 kept compression but disabled swap, so vm.swapusage stayed
+  # at 0KB even under heavy memory pressure.) Set explicitly so the daemon
+  # overwrites any stale =2 value still in NVRAM from a prior boot.
   launchd.daemons.set-boot-args = lib.mkIf enableAggressiveTweaks {
     serviceConfig = {
       Label = "com.local.set-boot-args";
       ProgramArguments = [
         "/usr/sbin/nvram"
-        "boot-args=-arm64e_preview_abi vm_compressor=2"
+        "boot-args=-arm64e_preview_abi vm_compressor=4"
       ];
       RunAtLoad = true;
     };

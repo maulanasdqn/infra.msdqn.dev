@@ -25,9 +25,12 @@ let
     inner.vertical   = 8
     outer.left       = 10
     outer.bottom     = 10
-    # Reserve room for the sketchybar top bar (y_offset 8 + height 40 = 48px)
-    # plus a small breathing gap, so tiled windows don't slide under it.
-    outer.top        = 52
+    # outer.top is measured from the system-reserved region top (~27px on a
+    # notched MacBook), not the screen top. The sketchybar (y_offset 8 +
+    # height 40) floats over that and renders down to ~43px. Stacking the full
+    # bar height here left a ~36px gap; 26px clears the bar with a 10px
+    # breathing gap that matches the side/bottom gaps.
+    outer.top        = 26
     outer.right      = 10
 
     [mode.main.binding]
