@@ -326,6 +326,7 @@
           services = { };
           machines.macmini-mrscraper.machineClass = "darwin";
           machines.macbook-mrscraper.machineClass = "darwin";
+          machines.beast.machineClass = "darwin";
         };
 
         machines = {
@@ -338,6 +339,12 @@
           # Darwin (macOS) — personal MacBook: full single-owner config
           macbook-mrscraper = mkDarwinMachine {
             hostModule = ./hosts/darwin/macbook-mrscraper;
+            aggressive = true;
+          };
+
+          # Darwin (macOS) — beast: full single-owner config
+          beast = mkDarwinMachine {
+            hostModule = ./hosts/darwin/beast;
             aggressive = true;
           };
 
