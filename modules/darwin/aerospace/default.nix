@@ -10,7 +10,10 @@ let
     # Rosé Pine — Aerospace tiling WM
     # Keybinds mirror workstation (Hyprland/SUPER → macOS/cmd)
 
-    start-at-login = true
+    # Startup is owned by the nix-managed launchd agent below (RunAtLoad +
+    # KeepAlive), NOT AeroSpace's own login item. The login item is unreliable
+    # across reboots (macOS can leave it unapproved/disabled → no gaps on boot).
+    start-at-login = false
 
     exec-on-workspace-change = [
       '/bin/bash', '-c',
@@ -97,5 +100,21 @@ lib.mkIf enableTilingWM {
 
   home-manager.users.${username} = {
     home.file.".aerospace.toml".source = aerospaceConfig;
+  };
+
+  # Launch AeroSpace at login via a nix-managed user agent instead of AeroSpace's
+  # own start-at-login login item (which macOS can silently disable across
+  # reboots, leaving you with no tiling gaps). KeepAlive restarts it if it dies.
+  # Mirrors the sketchybar agent so the gaps + bar always come back on boot.
+  launchd.user.agents.aerospace = {
+    serviceConfig = {
+      ProgramArguments = [
+        "${pkgs.aerospace}/Applications/AeroSpace.app/Contents/MacOS/AeroSpace"
+      ];
+      KeepAlive = true;
+      RunAtLoad = true;
+      StandardOutPath = "/tmp/aerospace.out.log";
+      StandardErrorPath = "/tmp/aerospace.err.log";
+    };
   };
 }

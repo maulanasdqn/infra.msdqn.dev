@@ -282,7 +282,14 @@ lib.mkIf enableTilingWM {
 
   launchd.user.agents.sketchybar = {
     serviceConfig = {
-      ProgramArguments = [ "/usr/local/bin/sketchybar" ];
+      # Point at the immutable nix store binary, NOT /usr/local/bin/sketchybar.
+      # The /usr/local copy is rm -f'd and re-cp'd at every boot by the
+      # activate-system daemon; if this agent's RunAtLoad fires during that
+      # window it execs a missing/partial binary → blank bar after reboot.
+      # The store path always exists, so startup is race-free. (The /usr/local
+      # copy still exists below for the aerospace trigger + bare `sketchybar`
+      # calls inside the config, both of which run later.)
+      ProgramArguments = [ "${pkgs.sketchybar}/bin/sketchybar" ];
       EnvironmentVariables = {
         PATH = "/usr/local/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
       };
