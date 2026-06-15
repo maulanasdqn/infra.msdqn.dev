@@ -46,11 +46,21 @@ let
     sketchybar --set clock_month label="$(date +'%b')"
   '';
 
-  wifiScript = pkgs.writeShellScript "sb-wifi" ''
+  wifiScript = pkgs.writeShellScript "sb-network" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
-    IP=$(ipconfig getifaddr en0 2>/dev/null)
+    # Use the active default-route interface, not a hardcoded en0 — the Mac mini
+    # is on en1 (Wi-Fi), MacBooks vary. Pick whichever carries the default route.
+    IFACE=$(route -n get default 2>/dev/null | awk '/interface:/{print $2}')
+    IP=""
+    [ -n "$IFACE" ] && IP=$(ipconfig getifaddr "$IFACE" 2>/dev/null)
     if [ -n "$IP" ]; then
-      sketchybar --set wifi icon="󰖩" icon.color=0xff9ccfd8 label="$IP"
+      WIFI_DEV=$(networksetup -listallhardwareports 2>/dev/null \
+        | awk '/Hardware Port: Wi-Fi/{getline; print $2}')
+      if [ "$IFACE" = "$WIFI_DEV" ]; then
+        sketchybar --set wifi icon="󰖩" icon.color=0xff9ccfd8 label="$IP"
+      else
+        sketchybar --set wifi icon="󰈀" icon.color=0xff9ccfd8 label="$IP"
+      fi
     else
       sketchybar --set wifi icon="󰤮" icon.color=0x886e6a86 label="off"
     fi
@@ -70,19 +80,30 @@ let
   brightnessScript = pkgs.writeShellScript "sb-brightness" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     BRIGHT=$(python3 -c "
-import ctypes
+import ctypes, sys
 ds = ctypes.CDLL('/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices')
 ds.DisplayServicesGetBrightness.restype = ctypes.c_int
 val = ctypes.c_float()
-ds.DisplayServicesGetBrightness(1, ctypes.byref(val))
+ret = ds.DisplayServicesGetBrightness(1, ctypes.byref(val))
+if ret != 0:
+    sys.exit(1)
 print(int(val.value * 100))
 " 2>/dev/null)
-    [ -z "$BRIGHT" ] && BRIGHT="—"
-    sketchybar --set brightness icon="󰖨" icon.color=0xfff6c177 label="''${BRIGHT}"
+    # No controllable internal display (Mac mini → external-only, ret!=0) — hide it.
+    if [ -z "$BRIGHT" ]; then
+      sketchybar --set brightness drawing=off
+      exit 0
+    fi
+    sketchybar --set brightness drawing=on icon="󰖨" icon.color=0xfff6c177 label="''${BRIGHT}"
   '';
 
   batteryScript = pkgs.writeShellScript "sb-battery" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
+    # Desktops (Mac mini) have no internal battery — hide the item entirely.
+    if ! pmset -g batt 2>/dev/null | grep -q "InternalBattery"; then
+      sketchybar --set battery drawing=off
+      exit 0
+    fi
     BATT=$(pmset -g batt 2>/dev/null | grep -o "[0-9]*%" | head -1 | tr -d "%")
     AC=$(pmset -g batt 2>/dev/null | grep -c "AC Power" || true)
     if [ "$AC" -gt 0 ]; then
