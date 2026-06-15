@@ -20,6 +20,17 @@ let
       "/usr/local/bin/sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE"
     ]
 
+    # Restore the window layout after a reboot. AeroSpace starts at login (via the
+    # launchd agent below) and launches these apps; the [[on-window-detected]]
+    # rules at the bottom then pin each one to its workspace. Together they
+    # reproduce the saved layout hands-free on every boot.
+    after-startup-command = [
+      'exec-and-forget open -b net.kovidgoyal.kitty',
+      'exec-and-forget open -b net.imput.helium',
+      'exec-and-forget open -b com.tinyspeck.slackmacgap',
+      'exec-and-forget open -b com.hnc.Discord',
+    ]
+
     [key-mapping]
     preset = 'qwerty'
 
@@ -93,6 +104,27 @@ let
     alt-shift-b = 'exec-and-forget /usr/local/bin/sketchybar --bar hidden=toggle'
     alt-ctrl-0  = 'exec-and-forget pmset displaysleepnow'
     alt-shift-r = 'reload-config'
+
+    # ── Window → workspace assignment (restores layout after reboot) ──────────
+    # Captured from the live layout. Whenever one of these apps opens a window
+    # (including the after-startup-command launches above), it's moved to its
+    # workspace. Edit a number here to remap, or add a block for a new app
+    # (find its id with: aerospace list-windows --all --format '%{app-bundle-id}').
+    [[on-window-detected]]
+    if.app-id = 'net.kovidgoyal.kitty'
+    run = 'move-node-to-workspace 1'
+
+    [[on-window-detected]]
+    if.app-id = 'net.imput.helium'
+    run = 'move-node-to-workspace 2'
+
+    [[on-window-detected]]
+    if.app-id = 'com.tinyspeck.slackmacgap'
+    run = 'move-node-to-workspace 3'
+
+    [[on-window-detected]]
+    if.app-id = 'com.hnc.Discord'
+    run = 'move-node-to-workspace 5'
   '';
 in
 lib.mkIf enableTilingWM {
