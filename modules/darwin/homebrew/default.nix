@@ -10,7 +10,13 @@
       cleanup = if enableAggressiveTweaks then "zap" else "none";
     };
 
-    brews = lib.optionals enableLaravel [
+    brews = [
+      # xcodegen is sourced from Homebrew rather than nixpkgs: 2.45+ requires
+      # Swift 6, but nixpkgs' swift toolchain is still 5.10.1 (even on master),
+      # so it can only build xcodegen 2.44.1. Homebrew ships the current release.
+      "xcodegen"
+    ]
+    ++ lib.optionals enableLaravel [
       "mysql"
       "postgresql@16"
       "redis"

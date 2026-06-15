@@ -28,6 +28,7 @@
         ccache
         bear
         android-tools
+        xcodes
       ]
       ++ lib.optionals enableRust [ rustup ]
       ++ lib.optionals enableVolta [ volta ]
