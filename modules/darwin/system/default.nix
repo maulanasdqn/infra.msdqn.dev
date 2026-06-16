@@ -8,21 +8,13 @@
   # (which applies to ALL users incl. the login window), so they are NOT applied on
   # the shared Mac mini where a second account (mrscrapersupport57) is in use.
 
-  # VM compressor mode — NVRAM boot-args, firmware-level, whole machine, needs reboot.
-  # vm_compressor=4 is the macOS default: memory compression PLUS swap to disk.
-  # (The old value 2 kept compression but disabled swap, so vm.swapusage stayed
-  # at 0KB even under heavy memory pressure.) Set explicitly so the daemon
-  # overwrites any stale =2 value still in NVRAM from a prior boot.
-  launchd.daemons.set-boot-args = lib.mkIf enableAggressiveTweaks {
-    serviceConfig = {
-      Label = "com.local.set-boot-args";
-      ProgramArguments = [
-        "/usr/sbin/nvram"
-        "boot-args=-arm64e_preview_abi vm_compressor=4"
-      ];
-      RunAtLoad = true;
-    };
-  };
+  # NOTE: there is intentionally no `vm_compressor` boot-arg here.
+  # `vm_compressor` is an Intel-Mac kernel knob — on Apple Silicon there is no
+  # `vm.compressor_mode` sysctl and the boot-arg is inert (and custom boot-args
+  # don't even persist under Full Security). Memory compression + on-demand swap
+  # are always on and not user-tunable. Swap reading 0KB while RAM is full is
+  # normal: the kernel compresses pages in RAM and only writes disk swapfiles
+  # when the compressor saturates. Nothing to configure.
 
   # System power management (machine-wide).
   power.sleep = lib.mkIf enableAggressiveTweaks {

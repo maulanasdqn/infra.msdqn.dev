@@ -46,6 +46,30 @@ let
     sketchybar --set clock_month label="$(date +'%b')"
   '';
 
+  # Memory-pressure early-warning. Uses the kernel's own pressure level
+  # (kern.memorystatus_vm_pressure_level: 1=normal 2=warn 4=critical) for the
+  # icon colour, and live swap usage (vm.swapusage) as the label — swap growing
+  # is the concrete "about to lag" signal on this 16GB machine. Both are instant
+  # sysctl reads, so this stays cheap at a 5s refresh.
+  memScript = pkgs.writeShellScript "sb-memory" ''
+    export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
+    LEVEL=$(sysctl -n kern.memorystatus_vm_pressure_level 2>/dev/null || echo 1)
+    SWAP_M=$(sysctl -n vm.swapusage 2>/dev/null | sed -n 's/.*used = \([0-9.]*\)M.*/\1/p')
+    SWAP_M=''${SWAP_M:-0}
+    INT=''${SWAP_M%.*}
+    if [ "''${INT:-0}" -ge 1024 ]; then
+      LABEL=$(awk "BEGIN{printf \"%.1fG\", $SWAP_M/1024}")
+    else
+      LABEL="''${INT:-0}M"
+    fi
+    case "$LEVEL" in
+      2) COLOR=0xfff6c177 ;;  # warn     — gold
+      4) COLOR=0xffeb6f92 ;;  # critical — love/red
+      *) COLOR=0xff9ccfd8 ;;  # normal   — foam
+    esac
+    sketchybar --set memory icon="󰍛" icon.color="$COLOR" label="$LABEL"
+  '';
+
   wifiScript = pkgs.writeShellScript "sb-network" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     # Use the active default-route interface, not a hardcoded en0 — the Mac mini
@@ -220,6 +244,19 @@ print(int(val.value * 100))
         script="${batteryScript}" \
         icon="󱐋" \
         icon.color=0xfff6c177 \
+        icon.padding_left=10 \
+        icon.padding_right=4 \
+        label="..." \
+        label.padding_left=0 \
+        label.padding_right=10
+
+    # Memory pressure — icon colour = kernel pressure level, label = swap used
+    sketchybar --add item memory right \
+      --set memory \
+        update_freq=5 \
+        script="${memScript}" \
+        icon="󰍛" \
+        icon.color=0xff9ccfd8 \
         icon.padding_left=10 \
         icon.padding_right=4 \
         label="..." \
