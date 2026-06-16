@@ -110,6 +110,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    bsm-landing = {
+      url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git?ref=develop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     clan-core = {
       url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -167,6 +172,7 @@
       kilat-app,
       warehouse-management,
       shopee-tw,
+      bsm-landing,
       clan-core,
       claude-code,
       claude-desktop,
@@ -385,6 +391,7 @@
               # kilat-app.nixosModules.default
               warehouse-management.nixosModules.default
               shopee-tw.nixosModules.default
+              bsm-landing.nixosModules.default
               # rag-app.nixosModules.default  # Temporarily disabled
               # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
               ./hosts/vps/hostinger

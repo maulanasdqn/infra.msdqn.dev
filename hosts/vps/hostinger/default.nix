@@ -44,6 +44,7 @@ in
     ./services/suricata.nix
     ./services/aysiem-heartbeat.nix
     ./services/shopee-tw.nix
+    ./services/bsm-landing.nix
   ];
 
   # NixOS nginx as the sole reverse proxy + static file server

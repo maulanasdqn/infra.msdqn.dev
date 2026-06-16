@@ -17,6 +17,27 @@
         "type": "github"
       }
     },
+    "bsm-landing": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769676081,
+        "narHash": "sha256-OQBxRCZ0FuT44EohvDFCEPL+AvQeFnFfYLKzXolSg/8=",
+        "ref": "develop",
+        "rev": "f6b884b42203450c5831455f80e4eb41aece6579",
+        "revCount": 149,
+        "type": "git",
+        "url": "ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git"
+      },
+      "original": {
+        "ref": "develop",
+        "type": "git",
+        "url": "ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git"
+      }
+    },
     "cachix": {
       "inputs": {
         "devenv": [
@@ -2283,6 +2304,7 @@
     },
     "root": {
       "inputs": {
+        "bsm-landing": "bsm-landing",
         "clan-core": "clan-core",
         "claude-code": "claude-code",
         "claude-desktop": "claude-desktop",
