@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   username,
@@ -6,6 +7,14 @@
   ...
 }:
 let
+  # Top gap must clear the floating sketchybar (y_offset 8 + height 40 ≈ 48px).
+  # AeroSpace measures outer.top from the system work-area top, which differs:
+  #   - Notched MacBook: menu bar is always present (~37px), so AeroSpace starts
+  #     lower and a 26px gap already clears the bar.
+  #   - Mac mini on an external display: the menu bar is auto-hidden, so the work
+  #     area starts at screen-top (y=0) and the bar would cover ~22px of every
+  #     window. Push windows below the bar (+10px). Scoped to this host only.
+  topGap = if config.networking.hostName == "macmini-mrscraper" then 58 else 26;
   aerospaceConfig = pkgs.writeText "aerospace.toml" ''
     # Rosé Pine — Aerospace tiling WM
     # Keybinds mirror workstation (Hyprland/SUPER → macOS/cmd)
@@ -39,12 +48,9 @@ let
     inner.vertical   = 8
     outer.left       = 10
     outer.bottom     = 10
-    # outer.top is measured from the system-reserved region top (~27px on a
-    # notched MacBook), not the screen top. The sketchybar (y_offset 8 +
-    # height 40) floats over that and renders down to ~43px. Stacking the full
-    # bar height here left a ~36px gap; 26px clears the bar with a 10px
-    # breathing gap that matches the side/bottom gaps.
-    outer.top        = 26
+    # Host-specific — see topGap above. Notched MacBook clears the bar at 26px;
+    # only the Mac mini (auto-hidden menu bar, work area at screen-top) needs more.
+    outer.top        = ${toString topGap}
     outer.right      = 10
 
     [mode.main.binding]

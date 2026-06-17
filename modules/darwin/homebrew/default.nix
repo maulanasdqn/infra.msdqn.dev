@@ -29,6 +29,7 @@
       "figma"
       "pritunl"
       "postman"
+      "microsoft-teams"
     ];
   };
 }
