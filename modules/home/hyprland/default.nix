@@ -32,7 +32,7 @@
         "$highlightMed" = "rgb(403d52)";
 
         monitor = [
-          "eDP-1,2880x1800@90,0x0,1.33"
+          "eDP-1,2880x1800@90,0x0,1.5"
           "HDMI-A-1,1920x1080@60,auto,0.8"
           ",preferred,auto,1.0"
         ];
@@ -165,7 +165,7 @@
         "$mod" = "SUPER";
         "$terminal" = "kitty";
         "$menu" = "wofi --show drun";
-        "$browser" = "firefox";
+        "$browser" = "helium-browser";
         "$fileManager" = "nautilus";
 
         bind = [

@@ -24,7 +24,6 @@
 
     casks = [
       "helium-browser"
-      "firefox"
       "discord"
       "slack"
       "figma"

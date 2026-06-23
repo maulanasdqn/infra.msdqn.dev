@@ -27,6 +27,13 @@
       go
       python3
 
+      rustc
+      cargo
+      rustfmt
+      clippy
+      rust-analyzer
+      gcc
+
       docker-compose
       lazydocker
 
@@ -52,8 +59,6 @@
       slack
       discord
 
-      google-chrome
-
       imagemagick
       ffmpeg
     ];
@@ -67,6 +72,7 @@
       "$HOME/.local/bin"
       "$HOME/go/bin"
       "$HOME/.bun/bin"
+      "$HOME/.cargo/bin"
     ];
   };
 }

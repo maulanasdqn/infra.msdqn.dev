@@ -35,8 +35,8 @@
           "/bin/sh"
           "-c"
           ''
-            # Chrome code_sign_clone (biggest offender, accumulates ~1-2GB/day)
-            find /private/var/folders -type d -name 'com.google.Chrome.code_sign_clone' -exec rm -rf {} + 2>/dev/null
+            # Chromium code_sign_clone (biggest offender, accumulates ~1-2GB/day)
+            find /private/var/folders -type d -name '*.code_sign_clone' -exec rm -rf {} + 2>/dev/null
 
             # uv Python package cache
             rm -rf /Users/ms/.cache/uv
