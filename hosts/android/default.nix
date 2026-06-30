@@ -19,6 +19,8 @@
     openssh
     zsh
     starship
+    ncurses # clear, tput, terminfo (needed by zsh/starship/TUIs)
+    coreutils
   ];
 
   environment.etcBackupExtension = ".bak";
