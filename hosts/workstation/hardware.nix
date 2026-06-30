@@ -46,6 +46,8 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/839aa9c0-07fc-4019-abdf-2966b5794881";
     fsType = "ext4";
+    # noatime: skip read-access-time writes -> fewer disk writes, faster reads.
+    options = [ "noatime" ];
   };
 
   fileSystems."/boot" = {

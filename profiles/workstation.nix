@@ -9,6 +9,7 @@
   imports = [
     ./base.nix
     ../modules/nixos/android.nix
+    ../modules/nixos/performance.nix
   ];
 
   users.users.${username}.extraGroups = [
