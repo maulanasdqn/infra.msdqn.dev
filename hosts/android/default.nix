@@ -23,15 +23,12 @@
 
   environment.etcBackupExtension = ".bak";
 
-  build.activationBefore.fixNixEnvPty = ''
-    mkdir -p /tmp/nix-env-compat
-    cat > /tmp/nix-env-compat/nix-env << 'EOF'
-    #!/bin/sh
-      exec ${config.nix.package}/bin/nix-env "$@" </dev/null 1>/dev/null
-    EOF
-    chmod +x /tmp/nix-env-compat/nix-env
-    export PATH="/tmp/nix-env-compat:$PATH"
-  '';
+  # NOTE: a previous `fixNixEnvPty` activation hack wrapped nix-env with
+  # `</dev/null`, which made the user-environment build fail with
+  # "unexpected EOF reading a line" on first switch. Plain nix-on-droid
+  # builds the user-environment fine (the "getting pseudoterminal
+  # attributes: Permission denied" line is a harmless proot warning), so the
+  # hack was removed.
 
   nix.extraOptions = ''
     experimental-features = nix-command flakes
