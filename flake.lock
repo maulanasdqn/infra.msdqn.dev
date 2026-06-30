@@ -233,21 +233,6 @@
     },
     "crane_2": {
       "locked": {
-        "lastModified": 1772080396,
-        "narHash": "sha256-84W9UNtSk9DNMh43WBkOjpkbfODlmg+RDi854PnNgLE=",
-        "owner": "ipetkov",
-        "repo": "crane",
-        "rev": "8525580bc0316c39dbfa18bd09a1331e98c9e463",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ipetkov",
-        "repo": "crane",
-        "type": "github"
-      }
-    },
-    "crane_3": {
-      "locked": {
         "lastModified": 1771438068,
         "narHash": "sha256-nGBbXvEZVe/egCPVPFcu89RFtd8Rf6J+4RFoVCFec0A=",
         "owner": "ipetkov",
@@ -261,7 +246,7 @@
         "type": "github"
       }
     },
-    "crane_4": {
+    "crane_3": {
       "locked": {
         "lastModified": 1771796463,
         "narHash": "sha256-9bCDuUzpwJXcHMQYMS1yNuzYMmKO/CCwCexpjWOl62I=",
@@ -276,7 +261,7 @@
         "type": "github"
       }
     },
-    "crane_5": {
+    "crane_4": {
       "locked": {
         "lastModified": 1767744144,
         "narHash": "sha256-9/9ntI0D+HbN4G0TrK3KmHbTvwgswz7p8IEJsWyef8Q=",
@@ -291,7 +276,7 @@
         "type": "github"
       }
     },
-    "crane_6": {
+    "crane_5": {
       "locked": {
         "lastModified": 1771796463,
         "narHash": "sha256-9bCDuUzpwJXcHMQYMS1yNuzYMmKO/CCwCexpjWOl62I=",
@@ -306,7 +291,7 @@
         "type": "github"
       }
     },
-    "crane_7": {
+    "crane_6": {
       "locked": {
         "lastModified": 1773857772,
         "narHash": "sha256-5xsK26KRHf0WytBtsBnQYC/lTWDhQuT57HJ7SzuqZcM=",
@@ -321,7 +306,7 @@
         "type": "github"
       }
     },
-    "crane_8": {
+    "crane_7": {
       "locked": {
         "lastModified": 1773189535,
         "narHash": "sha256-E1G/Or6MWeP+L6mpQ0iTFLpzSzlpGrITfU2220Gq47g=",
@@ -1387,27 +1372,25 @@
         "type": "github"
       }
     },
-    "kilat-app": {
+    "kolaborium": {
       "inputs": {
-        "crane": "crane_2",
         "nixpkgs": [
           "nixpkgs"
-        ],
-        "rust-overlay": "rust-overlay_3"
+        ]
       },
       "locked": {
-        "lastModified": 1776012992,
-        "narHash": "sha256-6oEu0Ph5immqNd780HFAwwUZ+X8mQxmNmybLW5dH+mk=",
-        "ref": "develop",
-        "rev": "4cd8b8a35344bb961f1330f6848cca1fa0210f1c",
-        "revCount": 172,
+        "lastModified": 1781620771,
+        "narHash": "sha256-NoF1HLIMFCY9k+5fqXUkpr3Z6DLWq10Fp9sFtU7NH38=",
+        "ref": "main",
+        "rev": "a79d118e41b2a5af87b63824fad1d1d017d33cbb",
+        "revCount": 17,
         "type": "git",
-        "url": "ssh://git@github.com/maulanasdqn/kilat-app.git"
+        "url": "ssh://git@github.com/bsmart-cerdas-indonesia/kolaborium.git"
       },
       "original": {
-        "ref": "develop",
+        "ref": "main",
         "type": "git",
-        "url": "ssh://git@github.com/maulanasdqn/kilat-app.git"
+        "url": "ssh://git@github.com/bsmart-cerdas-indonesia/kolaborium.git"
       }
     },
     "mac-app-util": {
@@ -1569,12 +1552,12 @@
     },
     "nix-pilot": {
       "inputs": {
-        "crane": "crane_3",
+        "crane": "crane_2",
         "flake-utils": "flake-utils_4",
         "nixpkgs": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay_4",
+        "rust-overlay": "rust-overlay_3",
         "sops-nix": "sops-nix_2"
       },
       "locked": {
@@ -2190,12 +2173,12 @@
     },
     "rag-app": {
       "inputs": {
-        "crane": "crane_4",
+        "crane": "crane_3",
         "flake-utils": "flake-utils_6",
         "nixpkgs": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay_5"
+        "rust-overlay": "rust-overlay_4"
       },
       "locked": {
         "lastModified": 1773518598,
@@ -2236,11 +2219,11 @@
     },
     "rkm-backend": {
       "inputs": {
-        "crane": "crane_5",
+        "crane": "crane_4",
         "nixpkgs": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay_6"
+        "rust-overlay": "rust-overlay_5"
       },
       "locked": {
         "lastModified": 1772765962,
@@ -2280,12 +2263,12 @@
     },
     "roasting-startup": {
       "inputs": {
-        "crane": "crane_6",
+        "crane": "crane_5",
         "flake-utils": "flake-utils_8",
         "nixpkgs": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay_7"
+        "rust-overlay": "rust-overlay_6"
       },
       "locked": {
         "lastModified": 1772158570,
@@ -2316,7 +2299,7 @@
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "hpyd": "hpyd",
-        "kilat-app": "kilat-app",
+        "kolaborium": "kolaborium",
         "mac-app-util": "mac-app-util",
         "nix-darwin": "nix-darwin_2",
         "nix-homebrew": "nix-homebrew",
@@ -2382,27 +2365,6 @@
     "rust-overlay_3": {
       "inputs": {
         "nixpkgs": [
-          "kilat-app",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1772420823,
-        "narHash": "sha256-q3oVwz1Rx41D1D+F6vg41kpOkk3Zi3KwnkHEZp7DCGs=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "458eea8d905c609e9d889423e6b8a1c7bc2f792c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rust-overlay_4": {
-      "inputs": {
-        "nixpkgs": [
           "nix-pilot",
           "nixpkgs"
         ]
@@ -2421,7 +2383,7 @@
         "type": "github"
       }
     },
-    "rust-overlay_5": {
+    "rust-overlay_4": {
       "inputs": {
         "nixpkgs": "nixpkgs_13"
       },
@@ -2439,7 +2401,7 @@
         "type": "github"
       }
     },
-    "rust-overlay_6": {
+    "rust-overlay_5": {
       "inputs": {
         "nixpkgs": [
           "rkm-backend",
@@ -2460,7 +2422,7 @@
         "type": "github"
       }
     },
-    "rust-overlay_7": {
+    "rust-overlay_6": {
       "inputs": {
         "nixpkgs": [
           "roasting-startup",
@@ -2481,7 +2443,7 @@
         "type": "github"
       }
     },
-    "rust-overlay_8": {
+    "rust-overlay_7": {
       "inputs": {
         "nixpkgs": [
           "warehouse-management",
@@ -2520,7 +2482,7 @@
     },
     "shopee-tw": {
       "inputs": {
-        "crane": "crane_7",
+        "crane": "crane_6",
         "flake-utils": "flake-utils_9",
         "nixpkgs": [
           "nixpkgs"
@@ -2882,11 +2844,11 @@
     },
     "warehouse-management": {
       "inputs": {
-        "crane": "crane_8",
+        "crane": "crane_7",
         "nixpkgs": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay_8"
+        "rust-overlay": "rust-overlay_7"
       },
       "locked": {
         "lastModified": 1776654279,

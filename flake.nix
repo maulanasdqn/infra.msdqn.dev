@@ -95,11 +95,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    kilat-app = {
-      url = "git+ssh://git@github.com/maulanasdqn/kilat-app.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     warehouse-management = {
       url = "git+ssh://git@github.com/maulanasdqn/warehouse-management.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -112,6 +107,11 @@
 
     bsm-landing = {
       url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git?ref=develop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    kolaborium = {
+      url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/kolaborium.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -169,10 +169,10 @@
       nix-pilot,
       rag-app,
       roasting-startup,
-      kilat-app,
       warehouse-management,
       shopee-tw,
       bsm-landing,
+      kolaborium,
       clan-core,
       claude-code,
       claude-desktop,
@@ -306,7 +306,7 @@
         ipAddress = config.vpsHostingerIP;
         gateway = config.vpsHostingerGateway;
         enableLaravel = false;
-        inherit nixvim sshKeys acmeEmail sops-nix secretsFile kilat-app warehouse-management shopee-tw;
+        inherit nixvim sshKeys acmeEmail sops-nix secretsFile warehouse-management shopee-tw;
         inherit rkm-frontend rkm-admin-frontend;
       };
 
@@ -388,10 +388,10 @@
               rkm-frontend.nixosModules.default
               rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
-              # kilat-app.nixosModules.default
               warehouse-management.nixosModules.default
               shopee-tw.nixosModules.default
               bsm-landing.nixosModules.default
+              kolaborium.nixosModules.default
               # rag-app.nixosModules.default  # Temporarily disabled
               # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
               ./hosts/vps/hostinger
