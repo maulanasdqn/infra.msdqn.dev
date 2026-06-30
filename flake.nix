@@ -469,6 +469,7 @@
               pkgs = import pkgsSrc {
                 system = "aarch64-linux";
                 overlays = [ nix-on-droid.overlays.default ];
+                config.allowUnfree = true; # unrar and friends
               };
               inherit extraSpecialArgs;
               modules = [ hostModule ];
