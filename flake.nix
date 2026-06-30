@@ -5,6 +5,12 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
 
+    # Pinned to the last nixpkgs-unstable commit before the glibc 2.40->2.42 /
+    # nix 2.31.3 change that broke `tcgetattr` in builders under nix-on-droid's
+    # proot (see nix-community/nix-on-droid#495). Used only for the Android
+    # (nix-on-droid) hosts so user-environment builds don't hit the PTY error.
+    nixpkgs-droid.url = "github:NixOS/nixpkgs/88d3861acdd3d2f0e361767018218e51810df8a1";
+
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -136,6 +142,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-droid,
       nix-darwin,
       home-manager,
       mac-app-util,
@@ -459,9 +466,12 @@
       nixOnDroidConfigurations =
         let
           mkNixOnDroid =
-            hostModule:
+            {
+              hostModule,
+              pkgsSrc ? nixpkgs,
+            }:
             nix-on-droid.lib.nixOnDroidConfiguration {
-              pkgs = import nixpkgs {
+              pkgs = import pkgsSrc {
                 system = "aarch64-linux";
                 overlays = [ nix-on-droid.overlays.default ];
               };
@@ -469,9 +479,13 @@
             };
         in
         {
-          default = mkNixOnDroid ./hosts/android;
-          android = mkNixOnDroid ./hosts/android;
-          honor = mkNixOnDroid ./hosts/android/honor;
+          default = mkNixOnDroid { hostModule = ./hosts/android; };
+          android = mkNixOnDroid { hostModule = ./hosts/android; };
+          # Pinned nixpkgs avoids the nix-on-droid proot PTY build failure (#495).
+          honor = mkNixOnDroid {
+            hostModule = ./hosts/android/honor;
+            pkgsSrc = nixpkgs-droid;
+          };
         };
 
       devShells = forAllSystems (
