@@ -10,7 +10,6 @@
     ./telescope.nix
     ./cmp.nix
     ./ui.nix
-    ./claudecode.nix
     ./lsp.nix
     ./formatting.nix
   ];
