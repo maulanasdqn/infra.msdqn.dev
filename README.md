@@ -12,7 +12,9 @@ My personal unified Nix configuration for both **NixOS** and **macOS** (nix-darw
 ├── config.example.nix              # Example configuration (copy to config.nix)
 ├── .envrc                          # Direnv integration
 ├── hosts/
-│   ├── workstation/                # NixOS workstation config
+│   ├── workstation/                # NixOS workstation configs
+│   │   ├── vivobook/               # Asus Vivobook laptop
+│   │   └── pc/                     # Desktop PC
 │   └── vps/                        # VPS configurations (nixos-anywhere)
 │       ├── hostinger/              # Hostinger VPS (static IP, BIOS)
 │       │   ├── default.nix
@@ -150,10 +152,11 @@ cp config.example.nix config.nix
 nvim config.nix
 
 # Generate hardware config (first time only)
-sudo nixos-generate-config --show-hardware-config > modules/nixos/hardware.nix
+sudo nixos-generate-config --show-hardware-config > hosts/workstation/vivobook/hardware.nix
 
-# Build and apply
-sudo nixos-rebuild switch --flake .#workstation
+# Build and apply (pick the machine: vivobook or pc)
+sudo nixos-rebuild switch --flake .#vivobook
+sudo nixos-rebuild switch --flake .#pc
 ```
 
 ### VPS Deployment (nixos-anywhere)
@@ -315,10 +318,15 @@ Edit `config.nix` to customize your setup:
   darwinHostname = "your-mac-hostname";
   darwinEnableTilingWM = true;  # aerospace, sketchybar
 
-  # Workstation (NixOS desktop)
-  workstationUsername = "your-username";
-  workstationHostname = "your-workstation-hostname";
-  workstationEnableTilingWM = true;  # hyprland, waybar, wofi
+  # Workstation (NixOS) — Asus Vivobook laptop
+  workstationVivobookUsername = "your-username";
+  workstationVivobookHostname = "vivobook";
+  workstationVivobookEnableTilingWM = true;  # hyprland, waybar, wofi
+
+  # Workstation (NixOS) — desktop PC
+  workstationPcUsername = "your-username";
+  workstationPcHostname = "pc";
+  workstationPcEnableTilingWM = true;  # hyprland, waybar, wofi
 
   # VPS - Hostinger
   vpsHostingerUsername = "your-username";
@@ -352,9 +360,12 @@ Edit `config.nix` to customize your setup:
 | `darwinUsername` | macOS | Your macOS username |
 | `darwinHostname` | macOS | Machine hostname |
 | `darwinEnableTilingWM` | macOS | Enable aerospace/sketchybar |
-| `workstationUsername` | Workstation | Your workstation username |
-| `workstationHostname` | Workstation | Machine hostname |
-| `workstationEnableTilingWM` | Workstation | Enable hyprland/waybar/wofi |
+| `workstationVivobookUsername` | Workstation | Vivobook laptop username |
+| `workstationVivobookHostname` | Workstation | Vivobook hostname |
+| `workstationVivobookEnableTilingWM` | Workstation | Enable hyprland/waybar/wofi |
+| `workstationPcUsername` | Workstation | Desktop PC username |
+| `workstationPcHostname` | Workstation | Desktop PC hostname |
+| `workstationPcEnableTilingWM` | Workstation | Enable hyprland/waybar/wofi |
 | `vpsHostingerUsername` | VPS | Hostinger VPS username |
 | `vpsHostingerHostname` | VPS | Hostinger VPS hostname |
 | `vpsHostingerIP` | VPS | Hostinger static IP address |
@@ -382,8 +393,9 @@ nix develop --command rebuild
 ### Workstation
 
 ```bash
-# Rebuild
-sudo nixos-rebuild switch --flake .#workstation
+# Rebuild (pick the machine: vivobook or pc)
+sudo nixos-rebuild switch --flake .#vivobook
+sudo nixos-rebuild switch --flake .#pc
 
 # Or use the helper in dev shell
 nix develop --command rebuild

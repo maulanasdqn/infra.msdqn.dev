@@ -253,20 +253,49 @@
           ];
         };
 
-      workstationSpecialArgs = {
-        username = config.workstationUsername;
-        enableTilingWM = config.workstationEnableTilingWM;
-        inherit
-          nixvim
-          enableLaravel
-          enableRust
-          enableVolta
-          enableGolang
-          sshKeys
-          claude-code
-          claude-desktop
-          ;
-      };
+      mkWorkstationSpecialArgs =
+        { username, enableTilingWM }:
+        {
+          inherit username enableTilingWM;
+          inherit
+            nixvim
+            enableLaravel
+            enableRust
+            enableVolta
+            enableGolang
+            sshKeys
+            claude-code
+            claude-desktop
+            ;
+        };
+
+      mkWorkstationMachine =
+        { hostModule, username, enableTilingWM }:
+        let
+          specialArgs = mkWorkstationSpecialArgs { inherit username enableTilingWM; };
+        in
+        {
+          nixpkgs.hostPlatform = "x86_64-linux";
+          imports = [
+            hostModule
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = specialArgs;
+                backupFileExtension = "backup";
+              };
+            }
+            ./modules/home/nixos.nix
+            (
+              { ... }:
+              {
+                _module.args = specialArgs;
+              }
+            )
+          ];
+        };
 
       wslSpecialArgs = {
         username = config.wslUsername;
@@ -336,28 +365,18 @@
             aggressive = true;
           };
 
-          # NixOS Workstation
-          ${config.workstationHostname} = {
-            nixpkgs.hostPlatform = "x86_64-linux";
-            imports = [
-              ./hosts/workstation
-              home-manager.nixosModules.home-manager
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = workstationSpecialArgs;
-                  backupFileExtension = "backup";
-                };
-              }
-              ./modules/home/nixos.nix
-              (
-                { ... }:
-                {
-                  _module.args = workstationSpecialArgs;
-                }
-              )
-            ];
+          # NixOS Workstation — Asus Vivobook laptop
+          ${config.workstationVivobookHostname} = mkWorkstationMachine {
+            hostModule = ./hosts/workstation/vivobook;
+            username = config.workstationVivobookUsername;
+            enableTilingWM = config.workstationVivobookEnableTilingWM;
+          };
+
+          # NixOS Workstation — desktop PC
+          ${config.workstationPcHostname} = mkWorkstationMachine {
+            hostModule = ./hosts/workstation/pc;
+            username = config.workstationPcUsername;
+            enableTilingWM = config.workstationPcEnableTilingWM;
           };
 
           # Hostinger VPS
