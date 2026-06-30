@@ -9,7 +9,7 @@
 {
   imports = [
     ./hardware.nix
-    ../../profiles/workstation.nix
+    ../../../profiles/workstation.nix
   ];
 
   networking.hostName = "nixos";

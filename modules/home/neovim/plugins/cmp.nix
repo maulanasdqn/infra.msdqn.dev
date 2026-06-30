@@ -1,6 +1,6 @@
-{ username, ... }:
+{ ... }:
 {
-  home-manager.users.${username}.programs.nixvim.plugins = {
+  programs.nixvim.plugins = {
     cmp = {
       enable = true;
       settings = {

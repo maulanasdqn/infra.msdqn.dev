@@ -7,9 +7,6 @@
   pkgs,
   rkm-frontend,
   rkm-admin-frontend,
-  kilat-app,
-  warehouse-management,
-  shopee-tw,
   ...
 }:
 let
@@ -29,13 +26,10 @@ in
     ./disk-config.nix
     ../../../profiles/server.nix
     ../../../modules/nixos/sops.nix
-    ./services/personal-website.nix
     ./services/rkm-backend.nix
     ./services/rkm-frontend.nix
     ./services/rkm-admin-frontend.nix
     # ./services/roasting-startup.nix
-    # ./services/kilat.nix
-    ./services/warehouse-management.nix
     ./services/backup.nix
     ./services/yes-date-me-backup.nix
     ./services/minio.nix
@@ -43,8 +37,8 @@ in
     ./services/wazuh-agent.nix
     ./services/suricata.nix
     ./services/aysiem-heartbeat.nix
-    ./services/shopee-tw.nix
     ./services/bsm-landing.nix
+    ./services/kolaborium.nix
   ];
 
   # NixOS nginx as the sole reverse proxy + static file server
@@ -55,104 +49,13 @@ in
     recommendedTlsSettings = true;
     recommendedGzipSettings = true;
 
-    # Rate limiting zones are defined by the kilat-app NixOS module
-    # (api_limit, auth_limit, static_limit, ai_limit, upload_limit, conn_per_ip)
-
-    # kilat.app — frontend static files
-    virtualHosts."kilat.app" = {
-      enableACME = true;
-      forceSSL = true;
-      root = "/var/www/kilat-ui";
-      extraConfig = ''
-        limit_conn conn_per_ip 20;
-        ${securityHeaders}
-      '';
-      locations."/" = {
-        tryFiles = "$uri $uri/ /index.html";
-        extraConfig = "limit_req zone=static_limit burst=20 nodelay;";
-      };
-      locations."~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$" = {
-        tryFiles = "$uri =404";
-        extraConfig = ''
-          limit_req zone=static_limit burst=100 nodelay;
-          expires 1y;
-          add_header Cache-Control "public, immutable";
-          ${securityHeaders}
-        '';
-      };
-    };
-
-    # api.kilat.app — backend API
-    virtualHosts."api.kilat.app" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = ''
-        client_max_body_size 100m;
-        ${securityHeaders}
-      '';
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:8082";
-        extraConfig = "limit_req zone=api_limit burst=30 nodelay;";
-      };
-    };
-
-    # storage.kilat.app + s3.rajawalikaryamulya.co.id — MinIO S3
-    virtualHosts."storage.kilat.app" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = "client_max_body_size 1g;";
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:9000";
-      };
-    };
-
-    # s3.rajawalikaryamulya.co.id needs its own cert since it's a different domain
+    # s3.rajawalikaryamulya.co.id — MinIO S3 (public media for RKM)
     virtualHosts."s3.rajawalikaryamulya.co.id" = {
       enableACME = true;
       forceSSL = true;
       extraConfig = "client_max_body_size 1g;";
       locations."/" = {
         proxyPass = "http://127.0.0.1:9000";
-      };
-    };
-
-    # api-warehouse.msdqn.dev — Warehouse Management API
-    virtualHosts."api-warehouse.msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:8090";
-      };
-    };
-
-    # warehouse.msdqn.dev — Warehouse Management Frontend
-    virtualHosts."warehouse.msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      root = "${warehouse-management.packages.${system}.wm-web}";
-      extraConfig = securityHeaders;
-      locations."/" = {
-        tryFiles = "$uri $uri/ /index.html";
-      };
-      locations."~* \\.(js|css|woff|woff2)$" = {
-        tryFiles = "$uri =404";
-        extraConfig = ''
-          expires 1y;
-          add_header Cache-Control "public, immutable";
-          ${securityHeaders}
-        '';
-      };
-    };
-
-    # msdqn.dev — personal website
-    virtualHosts."msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      serverAliases = [ "www.msdqn.dev" ];
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:4321";
       };
     };
 
@@ -196,26 +99,6 @@ in
       };
     };
 
-    # roast.kilat.app — Roasting Startup
-    virtualHosts."roast.kilat.app" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:7676";
-      };
-    };
-
-    # shopee.msdqn.dev — Shopee TW scraper API
-    virtualHosts."shopee.msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:3010";
-      };
-    };
-
   };
 
   # ACME (Let's Encrypt) configuration
@@ -231,13 +114,10 @@ in
     }
   ];
 
-  services.postgresql.ensureDatabases = [ "kilat" ];
-
   # Stable symlinks for static frontends — rebuild updates the target
   systemd.tmpfiles.rules = [
     "L+ /var/www/rkm-frontend - - - - ${rkm-frontend.packages.${system}.default}/share/rkm-frontend"
     "L+ /var/www/rkm-admin-frontend - - - - ${rkm-admin-frontend.packages.${system}.default}"
-    # "L+ /var/www/kilat-ui - - - - ${kilat-app.packages.${system}.kilat-ui}"
   ];
 
   # Open HTTP/HTTPS for nginx

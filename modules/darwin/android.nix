@@ -30,6 +30,7 @@ in
     jdk17
     gradle
     kotlin
+    scrcpy
   ];
 
   environment.variables = {

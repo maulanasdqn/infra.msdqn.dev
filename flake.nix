@@ -5,6 +5,12 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
 
+    # Pinned to the last nixpkgs-unstable commit before the glibc 2.40->2.42 /
+    # nix 2.31.3 change that broke `tcgetattr` in builders under nix-on-droid's
+    # proot (see nix-community/nix-on-droid#495). Used only for the Android
+    # (nix-on-droid) hosts so user-environment builds don't hit the PTY error.
+    nixpkgs-droid.url = "github:NixOS/nixpkgs/88d3861acdd3d2f0e361767018218e51810df8a1";
+
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -55,11 +61,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    personal-website = {
-      url = "github:maulanasdqn/personal-website/develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     hpyd = {
       url = "github:maulanasdqn/high-performance-youtube-downloader/develop";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -95,23 +96,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    kilat-app = {
-      url = "git+ssh://git@github.com/maulanasdqn/kilat-app.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    warehouse-management = {
-      url = "git+ssh://git@github.com/maulanasdqn/warehouse-management.git?ref=main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    shopee-tw = {
-      url = "git+ssh://git@github.com/maulanasdqn/shopee-tw-steve.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     bsm-landing = {
       url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git?ref=develop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    kolaborium = {
+      url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/kolaborium.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -151,6 +142,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-droid,
       nix-darwin,
       home-manager,
       mac-app-util,
@@ -161,7 +153,6 @@
       homebrew-core,
       homebrew-cask,
       disko,
-      personal-website,
       hpyd,
       rkm-backend,
       rkm-frontend,
@@ -169,10 +160,8 @@
       nix-pilot,
       rag-app,
       roasting-startup,
-      kilat-app,
-      warehouse-management,
-      shopee-tw,
       bsm-landing,
+      kolaborium,
       clan-core,
       claude-code,
       claude-desktop,
@@ -271,20 +260,49 @@
           ];
         };
 
-      workstationSpecialArgs = {
-        username = config.workstationUsername;
-        enableTilingWM = config.workstationEnableTilingWM;
-        inherit
-          nixvim
-          enableLaravel
-          enableRust
-          enableVolta
-          enableGolang
-          sshKeys
-          claude-code
-          claude-desktop
-          ;
-      };
+      mkWorkstationSpecialArgs =
+        { username, enableTilingWM }:
+        {
+          inherit username enableTilingWM;
+          inherit
+            nixvim
+            enableLaravel
+            enableRust
+            enableVolta
+            enableGolang
+            sshKeys
+            claude-code
+            claude-desktop
+            ;
+        };
+
+      mkWorkstationMachine =
+        { hostModule, username, enableTilingWM }:
+        let
+          specialArgs = mkWorkstationSpecialArgs { inherit username enableTilingWM; };
+        in
+        {
+          nixpkgs.hostPlatform = "x86_64-linux";
+          imports = [
+            hostModule
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = specialArgs;
+                backupFileExtension = "backup";
+              };
+            }
+            ./modules/home/nixos.nix
+            (
+              { ... }:
+              {
+                _module.args = specialArgs;
+              }
+            )
+          ];
+        };
 
       wslSpecialArgs = {
         username = config.wslUsername;
@@ -306,7 +324,7 @@
         ipAddress = config.vpsHostingerIP;
         gateway = config.vpsHostingerGateway;
         enableLaravel = false;
-        inherit nixvim sshKeys acmeEmail sops-nix secretsFile kilat-app warehouse-management shopee-tw;
+        inherit nixvim sshKeys acmeEmail sops-nix secretsFile;
         inherit rkm-frontend rkm-admin-frontend;
       };
 
@@ -354,28 +372,18 @@
             aggressive = true;
           };
 
-          # NixOS Workstation
-          ${config.workstationHostname} = {
-            nixpkgs.hostPlatform = "x86_64-linux";
-            imports = [
-              ./hosts/workstation
-              home-manager.nixosModules.home-manager
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = workstationSpecialArgs;
-                  backupFileExtension = "backup";
-                };
-              }
-              ./modules/home/nixos.nix
-              (
-                { ... }:
-                {
-                  _module.args = workstationSpecialArgs;
-                }
-              )
-            ];
+          # NixOS Workstation — Asus Vivobook laptop
+          ${config.workstationVivobookHostname} = mkWorkstationMachine {
+            hostModule = ./hosts/workstation/vivobook;
+            username = config.workstationVivobookUsername;
+            enableTilingWM = config.workstationVivobookEnableTilingWM;
+          };
+
+          # NixOS Workstation — desktop PC
+          ${config.workstationPcHostname} = mkWorkstationMachine {
+            hostModule = ./hosts/workstation/pc;
+            username = config.workstationPcUsername;
+            enableTilingWM = config.workstationPcEnableTilingWM;
           };
 
           # Hostinger VPS
@@ -383,15 +391,12 @@
             nixpkgs.hostPlatform = "x86_64-linux";
             imports = [
               # disko and sops-nix are provided by clan-core
-              personal-website.nixosModules.default
               rkm-backend.nixosModules.default
               rkm-frontend.nixosModules.default
               rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
-              # kilat-app.nixosModules.default
-              warehouse-management.nixosModules.default
-              shopee-tw.nixosModules.default
               bsm-landing.nixosModules.default
+              kolaborium.nixosModules.default
               # rag-app.nixosModules.default  # Temporarily disabled
               # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
               ./hosts/vps/hostinger
@@ -458,21 +463,33 @@
         };
       };
 
-      nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = import nixpkgs {
-          system = "aarch64-linux";
-          overlays = [ nix-on-droid.overlays.default ];
+      nixOnDroidConfigurations =
+        let
+          mkNixOnDroid =
+            {
+              hostModule,
+              pkgsSrc ? nixpkgs,
+              extraSpecialArgs ? { },
+            }:
+            nix-on-droid.lib.nixOnDroidConfiguration {
+              pkgs = import pkgsSrc {
+                system = "aarch64-linux";
+                overlays = [ nix-on-droid.overlays.default ];
+              };
+              inherit extraSpecialArgs;
+              modules = [ hostModule ];
+            };
+        in
+        {
+          default = mkNixOnDroid { hostModule = ./hosts/android; };
+          android = mkNixOnDroid { hostModule = ./hosts/android; };
+          # Pinned nixpkgs avoids the nix-on-droid proot PTY build failure (#495).
+          honor = mkNixOnDroid {
+            hostModule = ./hosts/android/honor;
+            pkgsSrc = nixpkgs-droid;
+            extraSpecialArgs = { inherit nixvim; };
+          };
         };
-        modules = [ ./hosts/android ];
-      };
-
-      nixOnDroidConfigurations.android = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = import nixpkgs {
-          system = "aarch64-linux";
-          overlays = [ nix-on-droid.overlays.default ];
-        };
-        modules = [ ./hosts/android ];
-      };
 
       devShells = forAllSystems (
         system:

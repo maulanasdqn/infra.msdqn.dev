@@ -1,6 +1,6 @@
-{ username, ... }:
+{ ... }:
 {
-  home-manager.users.${username}.programs.nixvim.plugins = {
+  programs.nixvim.plugins = {
     treesitter = {
       enable = true;
       nixGrammars = true;

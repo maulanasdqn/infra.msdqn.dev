@@ -3,9 +3,13 @@
   darwinHostname = "mrscraper";
   darwinEnableTilingWM = true;
 
-  workstationUsername = "ms";
-  workstationHostname = "workstation";
-  workstationEnableTilingWM = true;
+  workstationVivobookUsername = "ms";
+  workstationVivobookHostname = "vivobook";
+  workstationVivobookEnableTilingWM = true;
+
+  workstationPcUsername = "ms";
+  workstationPcHostname = "pc";
+  workstationPcEnableTilingWM = true;
 
   wslUsername = "ms";
   wslHostname = "wsl";

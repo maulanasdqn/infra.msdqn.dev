@@ -1,6 +1,6 @@
-{ username, pkgs, ... }:
+{ pkgs, ... }:
 {
-  home-manager.users.${username}.programs.nixvim = {
+  programs.nixvim = {
     extraPlugins = [
       (pkgs.vimUtils.buildVimPlugin {
         pname = "claudecode-nvim";

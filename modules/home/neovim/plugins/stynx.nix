@@ -1,4 +1,4 @@
-{ username, pkgs, ... }:
+{ pkgs, ... }:
 let
   # Shared source for both the editor plugin and the `stynx` CLI it drives.
   stynxSrc = pkgs.fetchFromGitHub {
@@ -37,7 +37,7 @@ let
   };
 in
 {
-  home-manager.users.${username}.programs.nixvim = {
+  programs.nixvim = {
     extraPlugins = [ stynx-nvim ];
 
     # Put `stynx` on Neovim's PATH so the plugin's job runner can find it.

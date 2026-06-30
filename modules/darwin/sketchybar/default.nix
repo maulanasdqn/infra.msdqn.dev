@@ -46,12 +46,57 @@ let
     sketchybar --set clock_month label="$(date +'%b')"
   '';
 
-  # Memory-pressure early-warning. Uses the kernel's own pressure level
+  # CPU load. Single instantaneous `top` sample (user+sys), normalised to 100%
+  # across all cores. `-n 0` skips the process list so this stays cheap. Colour
+  # ramps foam → gold (≥50%) → love (≥85%). Hardcode /usr/bin/top: the procps
+  # `top` on PATH (from nixpkgs) is a Linux build that can't sample on macOS.
+  cpuScript = pkgs.writeShellScript "sb-cpu" ''
+    export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
+    USED=$(/usr/bin/top -l 1 -n 0 2>/dev/null | awk '/CPU usage/ {u=$3; s=$5; gsub(/%/,"",u); gsub(/%/,"",s); printf "%.0f", u+s}')
+    USED=''${USED:-0}
+    if [ "$USED" -ge 85 ]; then
+      COLOR=0xffeb6f92   # love
+    elif [ "$USED" -ge 50 ]; then
+      COLOR=0xfff6c177   # gold
+    else
+      COLOR=0xff9ccfd8   # foam
+    fi
+    sketchybar --set cpu icon="󰻠" icon.color="$COLOR" label="''${USED}%"
+  '';
+
+  # RAM usage. Activity-Monitor-style "memory used" = (active + wired +
+  # compressed) pages over hw.memsize, shown as a percentage. Pure vm_stat +
+  # sysctl reads, cheap at a 5s refresh. Colour ramps foam → gold (≥70%) →
+  # love (≥90%).
+  ramScript = pkgs.writeShellScript "sb-ram" ''
+    export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
+    TOTAL=$(sysctl -n hw.memsize 2>/dev/null || echo 0)
+    PCT=$(vm_stat 2>/dev/null | awk -v total="$TOTAL" '
+      /page size of/ {page=$8}
+      /Pages active/ {a=$3}
+      /Pages wired down/ {w=$4}
+      /Pages occupied by compressor/ {c=$5}
+      END {
+        gsub(/\./,"",a); gsub(/\./,"",w); gsub(/\./,"",c);
+        if (total>0) printf "%.0f", (a+w+c)*page*100/total; else printf "0"
+      }')
+    PCT=''${PCT:-0}
+    if [ "$PCT" -ge 90 ]; then
+      COLOR=0xffeb6f92   # love
+    elif [ "$PCT" -ge 70 ]; then
+      COLOR=0xfff6c177   # gold
+    else
+      COLOR=0xff9ccfd8   # foam
+    fi
+    sketchybar --set ram icon="󰍛" icon.color="$COLOR" label="''${PCT}%"
+  '';
+
+  # Swap-pressure early-warning. Uses the kernel's own pressure level
   # (kern.memorystatus_vm_pressure_level: 1=normal 2=warn 4=critical) for the
   # icon colour, and live swap usage (vm.swapusage) as the label — swap growing
-  # is the concrete "about to lag" signal on this 16GB machine. Both are instant
+  # is the concrete "about to lag" signal on this machine. Both are instant
   # sysctl reads, so this stays cheap at a 5s refresh.
-  memScript = pkgs.writeShellScript "sb-memory" ''
+  swapScript = pkgs.writeShellScript "sb-swap" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     LEVEL=$(sysctl -n kern.memorystatus_vm_pressure_level 2>/dev/null || echo 1)
     SWAP_M=$(sysctl -n vm.swapusage 2>/dev/null | sed -n 's/.*used = \([0-9.]*\)M.*/\1/p')
@@ -67,7 +112,7 @@ let
       4) COLOR=0xffeb6f92 ;;  # critical — love/red
       *) COLOR=0xff9ccfd8 ;;  # normal   — foam
     esac
-    sketchybar --set memory icon="󰍛" icon.color="$COLOR" label="$LABEL"
+    sketchybar --set swap icon="󰓡" icon.color="$COLOR" label="$LABEL"
   '';
 
   wifiScript = pkgs.writeShellScript "sb-network" ''
@@ -90,10 +135,16 @@ let
     fi
   '';
 
+  # Event-driven (volume_change), so this fires only when the volume/mute
+  # actually changes — not on a poll. One osascript call returns both the level
+  # and the mute state (two calls = two AppleScript runtime spawns, the single
+  # most expensive repeated process churn on this machine).
   volumeScript = pkgs.writeShellScript "sb-volume" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
-    VOL=$(osascript -e "output volume of (get volume settings)" 2>/dev/null)
-    MUTED=$(osascript -e "output muted of (get volume settings)" 2>/dev/null)
+    RES=$(osascript -e "set s to (get volume settings)" \
+                    -e "return (output volume of s as text) & \",\" & (output muted of s as text)" 2>/dev/null)
+    VOL="''${RES%%,*}"
+    MUTED="''${RES##*,}"
     if [ "$MUTED" = "true" ]; then
       sketchybar --set volume icon="󰖁" icon.color=0x886e6a86 label="—"
     else
@@ -216,7 +267,6 @@ print(int(val.value * 100))
 
     sketchybar --add item volume right \
       --set volume \
-        update_freq=3 \
         script="${volumeScript}" \
         icon="󰕾" \
         icon.color=0xff9ccfd8 \
@@ -224,11 +274,14 @@ print(int(val.value * 100))
         icon.padding_right=4 \
         label="..." \
         label.padding_left=0 \
-        label.padding_right=10
+        label.padding_right=10 \
+      --subscribe volume volume_change
 
+    # Poll slowly (30s) as a fallback, but mainly react to brightness_change —
+    # python3 startup is heavy, so we want this firing on change, not every 5s.
     sketchybar --add item brightness right \
       --set brightness \
-        update_freq=5 \
+        update_freq=30 \
         script="${brightnessScript}" \
         icon="󰖨" \
         icon.color=0xfff6c177 \
@@ -236,7 +289,8 @@ print(int(val.value * 100))
         icon.padding_right=4 \
         label="..." \
         label.padding_left=0 \
-        label.padding_right=10
+        label.padding_right=10 \
+      --subscribe brightness brightness_change
 
     sketchybar --add item battery right \
       --set battery \
@@ -250,12 +304,39 @@ print(int(val.value * 100))
         label.padding_left=0 \
         label.padding_right=10
 
-    # Memory pressure — icon colour = kernel pressure level, label = swap used
-    sketchybar --add item memory right \
-      --set memory \
+    # Swap pressure — icon colour = kernel pressure level, label = swap used.
+    # Added first so the cpu/ram/swap block reads left→right CPU · RAM · SWAP.
+    sketchybar --add item swap right \
+      --set swap \
         update_freq=5 \
-        script="${memScript}" \
+        script="${swapScript}" \
+        icon="󰓡" \
+        icon.color=0xff9ccfd8 \
+        icon.padding_left=10 \
+        icon.padding_right=4 \
+        label="..." \
+        label.padding_left=0 \
+        label.padding_right=10
+
+    # RAM usage — (active + wired + compressed) / total, as a percentage
+    sketchybar --add item ram right \
+      --set ram \
+        update_freq=5 \
+        script="${ramScript}" \
         icon="󰍛" \
+        icon.color=0xff9ccfd8 \
+        icon.padding_left=10 \
+        icon.padding_right=4 \
+        label="..." \
+        label.padding_left=0 \
+        label.padding_right=10
+
+    # CPU load — user + sys, normalised to 100% across all cores
+    sketchybar --add item cpu right \
+      --set cpu \
+        update_freq=10 \
+        script="${cpuScript}" \
+        icon="󰻠" \
         icon.color=0xff9ccfd8 \
         icon.padding_left=10 \
         icon.padding_right=4 \

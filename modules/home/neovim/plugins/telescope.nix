@@ -1,6 +1,6 @@
-{ username, ... }:
+{ ... }:
 {
-  home-manager.users.${username}.programs.nixvim.plugins.telescope = {
+  programs.nixvim.plugins.telescope = {
     enable = true;
     extensions.fzf-native.enable = false;
     settings = {
