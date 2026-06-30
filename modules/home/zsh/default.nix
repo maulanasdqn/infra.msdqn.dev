@@ -42,6 +42,7 @@
         fi
 
         export PATH="$HOME/.cargo/bin:$PATH"
+        export PATH="$HOME/.moon/bin:$PATH"
       '';
     };
 

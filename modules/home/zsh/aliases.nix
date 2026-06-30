@@ -9,6 +9,12 @@
 
     ss = "ls -t ~/Desktop/*.png 2>/dev/null | head -1";
 
+    # Mirror an Android device borderless and at the same height as iPhone
+    # Mirroring's largest zoom (898px window). scrcpy can't draw rounded corners
+    # or a phone frame, so borderless is the closest "phone-screen" look. Width
+    # follows the device aspect ratio; `command` skips the alias to avoid loops.
+    scrcpy = "command scrcpy --window-borderless --window-height 898";
+
     init-laravel = "cp ~/.config/nix/templates/laravel/{flake.nix,.envrc} . && direnv allow";
     init-nodejs = "cp ~/.config/nix/templates/nodejs/{flake.nix,.envrc} . && direnv allow";
     init-rust = "cp ~/.config/nix/templates/rust/{flake.nix,.envrc} . && direnv allow";

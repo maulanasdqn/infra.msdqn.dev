@@ -100,11 +100,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    shopee-tw = {
-      url = "git+ssh://git@github.com/maulanasdqn/shopee-tw-steve.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     bsm-landing = {
       url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git?ref=develop";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -170,7 +165,6 @@
       rag-app,
       roasting-startup,
       warehouse-management,
-      shopee-tw,
       bsm-landing,
       kolaborium,
       clan-core,
@@ -306,7 +300,7 @@
         ipAddress = config.vpsHostingerIP;
         gateway = config.vpsHostingerGateway;
         enableLaravel = false;
-        inherit nixvim sshKeys acmeEmail sops-nix secretsFile warehouse-management shopee-tw;
+        inherit nixvim sshKeys acmeEmail sops-nix secretsFile warehouse-management;
         inherit rkm-frontend rkm-admin-frontend;
       };
 
@@ -389,7 +383,6 @@
               rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
               warehouse-management.nixosModules.default
-              shopee-tw.nixosModules.default
               bsm-landing.nixosModules.default
               kolaborium.nixosModules.default
               # rag-app.nixosModules.default  # Temporarily disabled

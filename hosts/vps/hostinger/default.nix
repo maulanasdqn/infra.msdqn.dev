@@ -8,7 +8,6 @@
   rkm-frontend,
   rkm-admin-frontend,
   warehouse-management,
-  shopee-tw,
   ...
 }:
 let
@@ -41,7 +40,6 @@ in
     ./services/wazuh-agent.nix
     ./services/suricata.nix
     ./services/aysiem-heartbeat.nix
-    ./services/shopee-tw.nix
     ./services/bsm-landing.nix
     ./services/kolaborium.nix
   ];
@@ -141,16 +139,6 @@ in
       extraConfig = securityHeaders;
       locations."/" = {
         proxyPass = "http://127.0.0.1:3100";
-      };
-    };
-
-    # shopee.msdqn.dev — Shopee TW scraper API
-    virtualHosts."shopee.msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:3010";
       };
     };
 

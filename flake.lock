@@ -24,11 +24,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1769676081,
-        "narHash": "sha256-OQBxRCZ0FuT44EohvDFCEPL+AvQeFnFfYLKzXolSg/8=",
+        "lastModified": 1782799041,
+        "narHash": "sha256-oSGYp0qBHuoGY1CoSWvEY+4oNlRDTnDWlKV3DPOjeSA=",
         "ref": "develop",
-        "rev": "f6b884b42203450c5831455f80e4eb41aece6579",
-        "revCount": 149,
+        "rev": "72e38c749a7e3102d831f8f3f78aad3c2aa8e8bc",
+        "revCount": 152,
         "type": "git",
         "url": "ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git"
       },
@@ -292,21 +292,6 @@
       }
     },
     "crane_6": {
-      "locked": {
-        "lastModified": 1773857772,
-        "narHash": "sha256-5xsK26KRHf0WytBtsBnQYC/lTWDhQuT57HJ7SzuqZcM=",
-        "owner": "ipetkov",
-        "repo": "crane",
-        "rev": "b556d7bbae5ff86e378451511873dfd07e4504cd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ipetkov",
-        "repo": "crane",
-        "type": "github"
-      }
-    },
-    "crane_7": {
       "locked": {
         "lastModified": 1773189535,
         "narHash": "sha256-E1G/Or6MWeP+L6mpQ0iTFLpzSzlpGrITfU2220Gq47g=",
@@ -986,24 +971,6 @@
     "flake-utils_8": {
       "inputs": {
         "systems": "systems_12"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_9": {
-      "inputs": {
-        "systems": "systems_13"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -1831,22 +1798,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-stable_2": {
-      "locked": {
-        "lastModified": 1751274312,
-        "narHash": "sha256-/bVBlRpECLVzjV19t5KMdMFWSwKLtb5RyXdjz3LJT+g=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "50ab793786d9de88ee30ec4e4c24fb4236fc2674",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-24.11",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs_10": {
       "locked": {
         "lastModified": 1732617236,
@@ -2315,7 +2266,6 @@
         "rkm-backend": "rkm-backend",
         "rkm-frontend": "rkm-frontend",
         "roasting-startup": "roasting-startup",
-        "shopee-tw": "shopee-tw",
         "sops-nix": "sops-nix_3",
         "warehouse-management": "warehouse-management"
       }
@@ -2480,30 +2430,6 @@
         "type": "github"
       }
     },
-    "shopee-tw": {
-      "inputs": {
-        "crane": "crane_6",
-        "flake-utils": "flake-utils_9",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "nixpkgs-stable": "nixpkgs-stable_2"
-      },
-      "locked": {
-        "lastModified": 1775729138,
-        "narHash": "sha256-qcuiGQR4arqiItkx8iCrdw020nsYOHYambiDlMJ0OEg=",
-        "ref": "develop",
-        "rev": "5d063f37c205554329ca9ad538c951550a859ae3",
-        "revCount": 157,
-        "type": "git",
-        "url": "ssh://git@github.com/maulanasdqn/shopee-tw-steve.git"
-      },
-      "original": {
-        "ref": "develop",
-        "type": "git",
-        "url": "ssh://git@github.com/maulanasdqn/shopee-tw-steve.git"
-      }
-    },
     "sops-nix": {
       "inputs": {
         "nixpkgs": [
@@ -2613,21 +2539,6 @@
       }
     },
     "systems_12": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_13": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
@@ -2844,7 +2755,7 @@
     },
     "warehouse-management": {
       "inputs": {
-        "crane": "crane_7",
+        "crane": "crane_6",
         "nixpkgs": [
           "nixpkgs"
         ],
