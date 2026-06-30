@@ -3,6 +3,7 @@
   pkgs,
   nixvim,
   nixpkgs,
+  claude-code,
   ...
 }:
 
@@ -29,7 +30,7 @@
     useUserPackages = true;
     backupFileExtension = "backup";
     extraSpecialArgs = {
-      inherit nixvim;
+      inherit nixvim claude-code;
       enableLaravel = false;
     };
     config = {
@@ -37,6 +38,7 @@
         ../../../modules/home/zsh/hm.nix
         ../../../modules/home/starship/hm.nix
         ../../../modules/home/neovim/hm.nix
+        ../../../modules/home/packages/cli.nix
       ];
       home.stateVersion = "24.05";
       # home-manager (unstable) paired with nixpkgs 25.11 — silence the mismatch.

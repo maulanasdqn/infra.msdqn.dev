@@ -5,17 +5,12 @@
 }:
 
 {
+  # Bootstrap essentials only. Richer CLI tooling lives in
+  # modules/home/packages/cli.nix (imported by host home configs, e.g. honor).
   environment.packages = with pkgs; [
     git
     curl
     wget
-    jq
-    ripgrep
-    fd
-    fzf
-    bat
-    htop
-    tmux
     openssh
     zsh
     starship

@@ -485,7 +485,7 @@
             hostModule = ./hosts/android/honor;
             pkgsSrc = nixpkgs-stable;
             extraSpecialArgs = {
-              inherit nixvim;
+              inherit nixvim claude-code;
               nixpkgs = nixpkgs-stable;
             };
           };
