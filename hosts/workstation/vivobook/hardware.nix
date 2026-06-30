@@ -21,6 +21,14 @@
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
+  # FnLock default: make the top row act as media/action keys (volume,
+  # brightness, etc.) WITHOUT holding Fn; Fn is then needed for F1–F12.
+  # asus_wmi's fnlock_default defaults to Y (F-keys primary); set it to 0
+  # so the printed media functions are primary. Runtime toggle: Fn+Esc.
+  boot.extraModprobeConfig = ''
+    options asus_wmi fnlock_default=0
+  '';
+
   boot.kernelParams = [
     "acpi.ec_no_wakeup=1"
     "resume_offset=112570368"
