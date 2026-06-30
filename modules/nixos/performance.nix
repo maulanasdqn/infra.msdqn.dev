@@ -65,6 +65,14 @@
     VDPAU_DRIVER = "radeonsi";
   };
 
+  # NOTE on forcing H264 video on YouTube (enhanced-h264ify):
+  # Renoir's VCN decodes H264/HEVC/VP9 but NOT AV1; YouTube defaults to AV1,
+  # which then falls back to software (CPU). The usual fix is the
+  # enhanced-h264ify extension. It can't be installed declaratively here:
+  # Helium is de-googled — it ignores /etc/chromium enterprise policy and
+  # blocks Google's web store, shipping its own store (services.helium.imput.net)
+  # instead. So install it via Helium's built-in store UI (one click).
+
   boot.kernel.sysctl = {
     # 38GB RAM: prefer keeping pages resident over swapping. zram makes the rare
     # swap cheap, but there is no reason to swap aggressively at 60.
