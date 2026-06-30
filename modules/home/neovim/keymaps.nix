@@ -1,6 +1,6 @@
-{ username, ... }:
+{ ... }:
 {
-  home-manager.users.${username}.programs.nixvim.keymaps = [
+  programs.nixvim.keymaps = [
     { mode = "n"; key = "<leader>nh"; action = ":nohl<CR>"; options = { silent = true; desc = "Clear search"; }; }
     { mode = "n"; key = "<leader>f"; action = ":NvimTreeToggle<CR>"; options = { silent = true; desc = "Toggle file tree"; }; }
     { mode = "n"; key = "<leader>t"; action = ":Lspsaga term_toggle<CR>"; options = { silent = true; desc = "Toggle terminal"; }; }

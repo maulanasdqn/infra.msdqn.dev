@@ -1,6 +1,10 @@
-{ username, enableLaravel, lib, ... }:
 {
-  home-manager.users.${username}.programs.zsh.shellAliases = {
+  enableLaravel ? false,
+  lib,
+  ...
+}:
+{
+  programs.zsh.shellAliases = {
     c = "clear";
     v = "nvim";
     t = "~/.local/bin/tmux-startup";

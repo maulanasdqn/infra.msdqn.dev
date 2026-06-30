@@ -1,6 +1,6 @@
-{ username, pkgs, ... }:
+{ pkgs, ... }:
 {
-  home-manager.users.${username}.programs.nixvim = {
+  programs.nixvim = {
     extraPackages = with pkgs; [
       phpactor
       php83Packages.php-cs-fixer

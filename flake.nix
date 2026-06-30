@@ -469,12 +469,14 @@
             {
               hostModule,
               pkgsSrc ? nixpkgs,
+              extraSpecialArgs ? { },
             }:
             nix-on-droid.lib.nixOnDroidConfiguration {
               pkgs = import pkgsSrc {
                 system = "aarch64-linux";
                 overlays = [ nix-on-droid.overlays.default ];
               };
+              inherit extraSpecialArgs;
               modules = [ hostModule ];
             };
         in
@@ -485,6 +487,7 @@
           honor = mkNixOnDroid {
             hostModule = ./hosts/android/honor;
             pkgsSrc = nixpkgs-droid;
+            extraSpecialArgs = { inherit nixvim; };
           };
         };
 

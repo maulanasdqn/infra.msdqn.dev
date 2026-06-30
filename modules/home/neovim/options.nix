@@ -1,6 +1,6 @@
-{ username, ... }:
+{ ... }:
 {
-  home-manager.users.${username}.programs.nixvim = {
+  programs.nixvim = {
     globals = {
       mapleader = " ";
       loaded_netrw = 1;
