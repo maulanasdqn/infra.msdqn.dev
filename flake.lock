@@ -291,21 +291,6 @@
         "type": "github"
       }
     },
-    "crane_6": {
-      "locked": {
-        "lastModified": 1773189535,
-        "narHash": "sha256-E1G/Or6MWeP+L6mpQ0iTFLpzSzlpGrITfU2220Gq47g=",
-        "owner": "ipetkov",
-        "repo": "crane",
-        "rev": "6fa2fb4cf4a89ba49fc9dd5a3eb6cde99d388269",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ipetkov",
-        "repo": "crane",
-        "type": "github"
-      }
-    },
     "crate2nix": {
       "inputs": {
         "cachix": "cachix_2",
@@ -953,24 +938,6 @@
     "flake-utils_7": {
       "inputs": {
         "systems": "systems_11"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_8": {
-      "inputs": {
-        "systems": "systems_12"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -2042,28 +2009,6 @@
         "type": "gitlab"
       }
     },
-    "personal-website": {
-      "inputs": {
-        "flake-utils": "flake-utils_5",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1775395459,
-        "narHash": "sha256-SJx1uQHzWwNX1RXTeDwh9jRzYNtbz8WU6IabTnVV7wc=",
-        "owner": "maulanasdqn",
-        "repo": "personal-website",
-        "rev": "8ed019b27284610dd6c6edbb25c74154d582ae15",
-        "type": "github"
-      },
-      "original": {
-        "owner": "maulanasdqn",
-        "ref": "develop",
-        "repo": "personal-website",
-        "type": "github"
-      }
-    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": [
@@ -2125,7 +2070,7 @@
     "rag-app": {
       "inputs": {
         "crane": "crane_3",
-        "flake-utils": "flake-utils_6",
+        "flake-utils": "flake-utils_5",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -2148,7 +2093,7 @@
     },
     "rkm-admin-frontend": {
       "inputs": {
-        "flake-utils": "flake-utils_7",
+        "flake-utils": "flake-utils_6",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -2215,7 +2160,7 @@
     "roasting-startup": {
       "inputs": {
         "crane": "crane_5",
-        "flake-utils": "flake-utils_8",
+        "flake-utils": "flake-utils_7",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -2260,14 +2205,12 @@
         "nixpkgs": "nixpkgs_12",
         "nixpkgs-stable": "nixpkgs-stable",
         "nixvim": "nixvim",
-        "personal-website": "personal-website",
         "rag-app": "rag-app",
         "rkm-admin-frontend": "rkm-admin-frontend",
         "rkm-backend": "rkm-backend",
         "rkm-frontend": "rkm-frontend",
         "roasting-startup": "roasting-startup",
-        "sops-nix": "sops-nix_3",
-        "warehouse-management": "warehouse-management"
+        "sops-nix": "sops-nix_3"
       }
     },
     "rust-overlay": {
@@ -2393,27 +2336,6 @@
         "type": "github"
       }
     },
-    "rust-overlay_7": {
-      "inputs": {
-        "nixpkgs": [
-          "warehouse-management",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1773803479,
-        "narHash": "sha256-GD6i1F2vrSxbsmbS92+8+x3DbHOJ+yrS78Pm4xigW4M=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "f17186f52e82ec5cf40920b58eac63b78692ac7c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
     "scss-reset": {
       "flake": false,
       "locked": {
@@ -2524,21 +2446,6 @@
       }
     },
     "systems_11": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_12": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
@@ -2751,29 +2658,6 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "type": "github"
-      }
-    },
-    "warehouse-management": {
-      "inputs": {
-        "crane": "crane_6",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "rust-overlay": "rust-overlay_7"
-      },
-      "locked": {
-        "lastModified": 1776654279,
-        "narHash": "sha256-aqmb9SGOpXiMQ+zFkHZnhAwY/z4n849iVl1aw0JoB2A=",
-        "ref": "main",
-        "rev": "3e29e481f9646c6fbd82bd20254363762a13b3fe",
-        "revCount": 148,
-        "type": "git",
-        "url": "ssh://git@github.com/maulanasdqn/warehouse-management.git"
-      },
-      "original": {
-        "ref": "main",
-        "type": "git",
-        "url": "ssh://git@github.com/maulanasdqn/warehouse-management.git"
       }
     },
     "zig": {

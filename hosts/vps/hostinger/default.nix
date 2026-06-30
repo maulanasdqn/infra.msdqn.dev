@@ -7,7 +7,6 @@
   pkgs,
   rkm-frontend,
   rkm-admin-frontend,
-  warehouse-management,
   ...
 }:
 let
@@ -27,12 +26,10 @@ in
     ./disk-config.nix
     ../../../profiles/server.nix
     ../../../modules/nixos/sops.nix
-    ./services/personal-website.nix
     ./services/rkm-backend.nix
     ./services/rkm-frontend.nix
     ./services/rkm-admin-frontend.nix
     # ./services/roasting-startup.nix
-    ./services/warehouse-management.nix
     ./services/backup.nix
     ./services/yes-date-me-backup.nix
     ./services/minio.nix
@@ -59,46 +56,6 @@ in
       extraConfig = "client_max_body_size 1g;";
       locations."/" = {
         proxyPass = "http://127.0.0.1:9000";
-      };
-    };
-
-    # api-warehouse.msdqn.dev — Warehouse Management API
-    virtualHosts."api-warehouse.msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:8090";
-      };
-    };
-
-    # warehouse.msdqn.dev — Warehouse Management Frontend
-    virtualHosts."warehouse.msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      root = "${warehouse-management.packages.${system}.wm-web}";
-      extraConfig = securityHeaders;
-      locations."/" = {
-        tryFiles = "$uri $uri/ /index.html";
-      };
-      locations."~* \\.(js|css|woff|woff2)$" = {
-        tryFiles = "$uri =404";
-        extraConfig = ''
-          expires 1y;
-          add_header Cache-Control "public, immutable";
-          ${securityHeaders}
-        '';
-      };
-    };
-
-    # msdqn.dev — personal website
-    virtualHosts."msdqn.dev" = {
-      enableACME = true;
-      forceSSL = true;
-      serverAliases = [ "www.msdqn.dev" ];
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:4321";
       };
     };
 

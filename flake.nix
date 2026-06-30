@@ -55,11 +55,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    personal-website = {
-      url = "github:maulanasdqn/personal-website/develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     hpyd = {
       url = "github:maulanasdqn/high-performance-youtube-downloader/develop";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -92,11 +87,6 @@
 
     roasting-startup = {
       url = "github:maulanasdqn/roasting-startup/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    warehouse-management = {
-      url = "git+ssh://git@github.com/maulanasdqn/warehouse-management.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -156,7 +146,6 @@
       homebrew-core,
       homebrew-cask,
       disko,
-      personal-website,
       hpyd,
       rkm-backend,
       rkm-frontend,
@@ -164,7 +153,6 @@
       nix-pilot,
       rag-app,
       roasting-startup,
-      warehouse-management,
       bsm-landing,
       kolaborium,
       clan-core,
@@ -300,7 +288,7 @@
         ipAddress = config.vpsHostingerIP;
         gateway = config.vpsHostingerGateway;
         enableLaravel = false;
-        inherit nixvim sshKeys acmeEmail sops-nix secretsFile warehouse-management;
+        inherit nixvim sshKeys acmeEmail sops-nix secretsFile;
         inherit rkm-frontend rkm-admin-frontend;
       };
 
@@ -377,12 +365,10 @@
             nixpkgs.hostPlatform = "x86_64-linux";
             imports = [
               # disko and sops-nix are provided by clan-core
-              personal-website.nixosModules.default
               rkm-backend.nixosModules.default
               rkm-frontend.nixosModules.default
               rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
-              warehouse-management.nixosModules.default
               bsm-landing.nixosModules.default
               kolaborium.nixosModules.default
               # rag-app.nixosModules.default  # Temporarily disabled
