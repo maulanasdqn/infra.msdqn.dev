@@ -2,6 +2,7 @@
   config,
   pkgs,
   nixvim,
+  nixpkgs,
   ...
 }:
 
@@ -13,6 +14,13 @@
 
   # Use zsh as the login shell.
   user.shell = "${pkgs.zsh}/bin/zsh";
+
+  # Make `nixpkgs` resolve for both flakes and legacy commands, pinned to the
+  # same 25.11 nixpkgs honor is built from:
+  #   nix shell nixpkgs#fastfetch   (flakes)
+  #   nix-shell -p fastfetch        (needs <nixpkgs> in NIX_PATH)
+  nix.registry.nixpkgs.flake = nixpkgs;
+  nix.nixPath = [ "nixpkgs=${nixpkgs}" ];
 
   # Reuse the same home-manager modules as the NixOS/Darwin hosts (zsh +
   # starship + neovim/nixvim) via their plain home-manager ./hm.nix entrypoints.

@@ -484,7 +484,10 @@
           honor = mkNixOnDroid {
             hostModule = ./hosts/android/honor;
             pkgsSrc = nixpkgs-stable;
-            extraSpecialArgs = { inherit nixvim; };
+            extraSpecialArgs = {
+              inherit nixvim;
+              nixpkgs = nixpkgs-stable;
+            };
           };
         };
 
