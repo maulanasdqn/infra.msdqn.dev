@@ -3,6 +3,12 @@
   system.stateVersion = 5;
   system.primaryUser = username;
 
+  # Skip building the nix-darwin manual/man pages. Their options.json is generated
+  # by nixpkgs' nixosOptionsDoc, which on current nixpkgs-unstable references the
+  # nixpkgs source path without string context and emits a build-time warning.
+  # We don't use `man darwin-configuration`/darwin-help, so disable it entirely.
+  documentation.enable = false;
+
   # ── Single-owner machine tweaks (MacBook) — gated by enableAggressiveTweaks ──
   # These change firmware (NVRAM), global power management, and the HID keymap
   # (which applies to ALL users incl. the login window), so they are NOT applied on

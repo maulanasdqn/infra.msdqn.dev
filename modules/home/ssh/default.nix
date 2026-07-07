@@ -4,16 +4,14 @@
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks = {
+      settings = {
         "*" = {
-          extraOptions = {
-            AddKeysToAgent = "yes";
-          };
+          AddKeysToAgent = "yes";
         };
         "jl" = {
-          hostname = "192.168.201.28";
-          user = "mrscrapersupport";
-          port = 22;
+          HostName = "192.168.201.28";
+          User = "mrscrapersupport";
+          Port = 22;
         };
       };
     };
