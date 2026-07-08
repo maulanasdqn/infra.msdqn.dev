@@ -247,6 +247,12 @@
               { ... }:
               {
                 _module.args = mkDarwinSpecialArgs aggressive;
+                # Pass the same specialArgs into home-manager so nixvim (and the
+                # other shared inputs) are available to HM submodules at
+                # import-resolution time. Without this, neovim/hm.nix references
+                # `nixvim` in its `imports` list but can only see it via
+                # `_module.args`, which triggers an infinite recursion.
+                home-manager.extraSpecialArgs = mkDarwinSpecialArgs aggressive;
                 # Local machine - requires SSH enabled on Mac (System Settings > Sharing > Remote Login)
                 clan.core.networking.targetHost = "ms@localhost";
               }
