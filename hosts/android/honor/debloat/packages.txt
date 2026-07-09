@@ -1,0 +1,45 @@
+# MagicOS debloat list for HONOR X9c (BRP-NX1 / codename HNBRP-Q1).
+# One package per line; blank lines and lines starting with `#` are ignored.
+# Applied with: pm disable-user --user 0 <pkg>   (no root, reversible)
+# See ./debloat.sh and ./README.md.
+
+# --- Tier 1: pure bloat, zero functional downside ---
+com.hihonor.autoinstallapkfrommcc      # auto-installs apps pushed by the carrier (MCC)
+com.hihonor.popularapps                # "popular apps" promo installer
+com.hihonor.magazine                   # magazine/ad lockscreen carousel
+com.hihonor.browserhomepage            # browser homepage news/ads
+com.hihonor.android.clone              # Phone Clone migration tool (one-time use)
+com.hihonor.android.upgradeguide       # upgrade guide
+com.hihonor.hnstartupguide             # first-boot startup guide
+com.hihonor.assistant                  # leftmost "-1" feed screen
+com.hihonor.hnmagicportal              # Magic Portal
+com.hihonor.parallelspace              # app twin / parallel space
+com.hihonor.pcassistant                # PC suite connectivity
+com.hihonor.linktowindowsservice       # Link to Windows
+com.hihonor.videoeditor                # bundled video editor
+com.hihonor.magictranslate             # Magic translate
+com.hihonor.magicvoice                 # Magic voice
+com.hihonor.aipluginengine             # AI plugin engine
+com.hihonor.magichome                  # Honor smart home (Xiaomi Home used instead)
+
+# --- Tier 2: preference-based (Google/Proton user; safe to disable) ---
+com.hihonor.hncloud                    # Honor Cloud
+com.hihonor.koBackup                   # Honor cloud backup
+com.hihonor.assetsync                  # Honor cloud asset sync
+com.hihonor.assetsyncservice           # Honor cloud asset sync service
+com.hihonor.appmarket                  # Honor AppMarket (Play Store used instead)
+com.hihonor.android.thememanager       # Themes
+com.hihonor.wallpapereditor            # wallpaper editor
+com.hihonor.livewallpaper.paradise     # live wallpaper
+com.hihonor.wallet                     # Honor Wallet
+com.hihonor.hnpanpayservice            # Honor Pay service
+com.hihonor.gameassistant              # game space overlay
+com.hihonor.game.kitserver             # game kit server
+
+# --- NOTES ---
+# Kept on purpose (user's call): com.hihonor.prayerassistant, com.hihonor.aod
+# Protected / cannot disable: com.hihonor.android.hnaps (reverts to default)
+#
+# DO NOT add com.hihonor.hnoffice here — it is the Yozo/WPS render backend for
+# PDF/Office preview in Honor Files. Disabling it makes every PDF open fail with
+# "Unsupported File Type". It must stay ENABLED.
