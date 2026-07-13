@@ -425,10 +425,22 @@ lib.mkIf enableTilingWM {
       # The /usr/local copy is rm -f'd and re-cp'd at every boot by the
       # activate-system daemon; if this agent's RunAtLoad fires during that
       # window it execs a missing/partial binary → blank bar after reboot.
-      # The store path always exists, so startup is race-free. (The /usr/local
-      # copy still exists below for the aerospace trigger + bare `sketchybar`
-      # calls inside the config, both of which run later.)
-      ProgramArguments = [ "${pkgs.sketchybar}/bin/sketchybar" ];
+      # (The /usr/local copy still exists below for the aerospace trigger +
+      # bare `sketchybar` calls inside the config, both of which run later.)
+      #
+      # But the store path has its own boot race: /nix is a separate APFS
+      # volume mounted by the darwin-store daemon, and this agent's RunAtLoad
+      # can fire before that mount lands. launchd then fails the spawn with
+      # EX_CONFIG (78) and penalty-boxes the agent — KeepAlive never retries,
+      # so the bar stays dead for the whole session. Wrap in /bin/sh (root
+      # volume, always present) + /bin/wait4path, which blocks until the
+      # store path is reachable, then exec. Same pattern org.nixos.nix-daemon
+      # uses for exactly this reason.
+      ProgramArguments = [
+        "/bin/sh"
+        "-c"
+        "/bin/wait4path ${pkgs.sketchybar}/bin/sketchybar && exec ${pkgs.sketchybar}/bin/sketchybar"
+      ];
       EnvironmentVariables = {
         PATH = "/usr/local/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
       };
