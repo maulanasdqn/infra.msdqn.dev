@@ -20,6 +20,10 @@
 
   environment.etcBackupExtension = ".bak";
 
+  # JetBrainsMono Nerd Font for the terminal app (same family as the
+  # desktop/hyprland setup); Mono variant keeps icon glyphs cell-width.
+  terminal.font = "${pkgs.nerd-fonts.jetbrains-mono}/share/fonts/truetype/NerdFonts/JetBrainsMono/JetBrainsMonoNerdFontMono-Regular.ttf";
+
   # NOTE: a previous `fixNixEnvPty` activation hack wrapped nix-env with
   # `</dev/null`, which made the user-environment build fail with
   # "unexpected EOF reading a line" on first switch. Plain nix-on-droid
