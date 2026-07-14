@@ -7,27 +7,10 @@
       settings = {
         highlight.enable = true;
         indent.enable = true;
-        ensure_installed = [
-          # JS/TS family
-          "javascript"
-          "typescript"
-          "tsx"
-          "jsdoc"
-          "json"
-          "jsonc"
-          "graphql"
-          "mdx"
-          "svelte"
-          "vue"
-          "prisma"
-          # Web
-          "astro"
-          "css"
-          "scss"
-          "html"
-          # Other
-          "swift"
-        ];
+        # No ensure_installed: with nixGrammars all parsers ship via Nix.
+        # A runtime list makes nvim-treesitter git-clone/compile parsers at
+        # startup — blocks first draw for minutes under proot (honor), and
+        # mdx/swift can never install (no parser / needs tree-sitter CLI).
       };
     };
 
