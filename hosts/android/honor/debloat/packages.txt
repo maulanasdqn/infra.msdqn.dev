@@ -6,6 +6,10 @@
 # --- Tier 1: pure bloat, zero functional downside ---
 com.hihonor.autoinstallapkfrommcc      # auto-installs apps pushed by the carrier (MCC)
 com.hihonor.popularapps                # "popular apps" promo installer
+com.aura.oobe.honor                    # IronSource/Aura "AppCloud" — 3rd-party app recommender
+                                       # + installer (the pinjol/junk "Recommendations" source);
+                                       # self-updates, keeps running long after OOBE
+android.autoinstalls.config.honor.device  # Play Auto Installs preload config
 com.hihonor.magazine                   # magazine/ad lockscreen carousel
 com.hihonor.browserhomepage            # browser homepage news/ads
 com.hihonor.android.clone              # Phone Clone migration tool (one-time use)
