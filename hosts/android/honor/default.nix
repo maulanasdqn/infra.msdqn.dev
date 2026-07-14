@@ -41,8 +41,6 @@
         ../../../modules/home/packages/cli.nix
       ];
       home.stateVersion = "24.05";
-      # home-manager (unstable) paired with nixpkgs 25.11 — silence the mismatch.
-      home.enableNixpkgsReleaseCheck = false;
     };
   };
 }

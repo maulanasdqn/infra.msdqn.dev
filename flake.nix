@@ -15,6 +15,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Stable home-manager for nix-on-droid (honor): hm master requires
+    # nixpkgs-unstable internals (lib/services), which nixpkgs 25.11 lacks.
+    home-manager-stable = {
+      url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
+
     mac-app-util.url = "github:hraban/mac-app-util";
 
     determinate = {
@@ -25,6 +32,14 @@
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Stable nixvim for nix-on-droid (honor): nixvim main pins neovim 0.12
+    # from nixpkgs-unstable (glibc 2.42), which freezes at TUI startup under
+    # proot (nix-on-droid #495/#539).
+    nixvim-stable = {
+      url = "github:nix-community/nixvim/nixos-25.11";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
     sops-nix = {
@@ -117,7 +132,7 @@
     nix-on-droid = {
       url = "github:maulanasdqn/nix-on-droid/master";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
+      inputs.home-manager.follows = "home-manager-stable";
     };
 
     nixos-wsl = {
@@ -142,6 +157,7 @@
       mac-app-util,
       determinate,
       nixvim,
+      nixvim-stable,
       sops-nix,
       nix-homebrew,
       homebrew-core,
@@ -196,6 +212,7 @@
         enableTilingWM = config.darwinEnableTilingWM;
         inherit
           nixvim
+          nixpkgs-stable
           enableLaravel
           enableRust
           enableVolta
@@ -492,7 +509,10 @@
             hostModule = ./hosts/android/honor;
             pkgsSrc = nixpkgs-stable;
             extraSpecialArgs = {
-              inherit nixvim claude-code;
+              inherit claude-code;
+              # Stable nixvim: nixvim main brings neovim 0.12/glibc 2.42,
+              # which freezes under proot — see nixvim-stable input comment.
+              nixvim = nixvim-stable;
               nixpkgs = nixpkgs-stable;
             };
           };

@@ -3,9 +3,14 @@
   lib,
   username,
   enableTilingWM,
+  nixpkgs-stable,
   ...
 }:
 let
+  # sketchybar 2.24.0 fails to link on current nixpkgs-unstable: cctools ld
+  # 1010.6 crashes (SIGTRAP) on the private-frameworks link. Ride the cached
+  # 25.11 build (2.23.0) until the unstable darwin toolchain recovers.
+  sketchybarPkg = nixpkgs-stable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.sketchybar;
   # Workspace indicator — responds to aerospace_workspace_change event.
   # $NAME  is set by sketchybar (e.g. "space.3")
   # $AEROSPACE_FOCUSED_WORKSPACE is passed via the trigger payload
@@ -402,12 +407,12 @@ print(int(val.value * 100))
   '';
 in
 lib.mkIf enableTilingWM {
-  environment.systemPackages = [ pkgs.sketchybar ];
+  environment.systemPackages = [ sketchybarPkg ];
 
   system.activationScripts.postActivation.text = ''
     mkdir -p /usr/local/bin
     rm -f /usr/local/bin/sketchybar
-    cp ${pkgs.sketchybar}/bin/sketchybar /usr/local/bin/sketchybar
+    cp ${sketchybarPkg}/bin/sketchybar /usr/local/bin/sketchybar
     chmod +x /usr/local/bin/sketchybar
     echo "Copied sketchybar to /usr/local/bin"
   '';
@@ -439,7 +444,7 @@ lib.mkIf enableTilingWM {
       ProgramArguments = [
         "/bin/sh"
         "-c"
-        "/bin/wait4path ${pkgs.sketchybar}/bin/sketchybar && exec ${pkgs.sketchybar}/bin/sketchybar"
+        "/bin/wait4path ${sketchybarPkg}/bin/sketchybar && exec ${sketchybarPkg}/bin/sketchybar"
       ];
       EnvironmentVariables = {
         PATH = "/usr/local/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin";
