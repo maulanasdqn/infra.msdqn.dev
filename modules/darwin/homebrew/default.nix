@@ -15,6 +15,9 @@
       # Swift 6, but nixpkgs' swift toolchain is still 5.10.1 (even on master),
       # so it can only build xcodegen 2.44.1. Homebrew ships the current release.
       "xcodegen"
+      # swiftlint lives in Homebrew too: Xcode run-script phases only look in
+      # /opt/homebrew/bin, so a nix-store install would never be found there.
+      "swiftlint"
     ]
     ++ lib.optionals enableLaravel [
       "mysql"
