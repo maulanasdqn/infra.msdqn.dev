@@ -26,7 +26,7 @@ in
     ./disk-config.nix
     ../../../profiles/server.nix
     ../../../modules/nixos/sops.nix
-    ./services/rkm-backend.nix
+    # ./services/rkm-backend.nix  # Disabled — Rust app, excluded from clan VPS build to skip cargo compile
     ./services/rkm-frontend.nix
     ./services/rkm-admin-frontend.nix
     # ./services/roasting-startup.nix
@@ -79,15 +79,17 @@ in
       };
     };
 
-    # api.rajawalikaryamulya.co.id — RKM backend
-    virtualHosts."api.rajawalikaryamulya.co.id" = {
-      enableACME = true;
-      forceSSL = true;
-      extraConfig = securityHeaders;
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:3300";
-      };
-    };
+    # api.rajawalikaryamulya.co.id — RKM backend (Rust)
+    # Disabled — rkm-backend excluded from the VPS build (no cargo compile);
+    # re-enable this vhost together with ./services/rkm-backend.nix.
+    # virtualHosts."api.rajawalikaryamulya.co.id" = {
+    #   enableACME = true;
+    #   forceSSL = true;
+    #   extraConfig = securityHeaders;
+    #   locations."/" = {
+    #     proxyPass = "http://127.0.0.1:3300";
+    #   };
+    # };
 
     # cms.rajawalikaryamulya.co.id — RKM admin frontend
     virtualHosts."cms.rajawalikaryamulya.co.id" = {

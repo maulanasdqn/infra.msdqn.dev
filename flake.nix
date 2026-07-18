@@ -364,7 +364,6 @@
         meta.domain = "msdqn.dev";
 
         inventory = {
-          services = { };
           machines.macmini-mrscraper.machineClass = "darwin";
           machines.macbook-mrscraper.machineClass = "darwin";
           machines.beast.machineClass = "darwin";
@@ -408,7 +407,7 @@
             nixpkgs.hostPlatform = "x86_64-linux";
             imports = [
               # disko and sops-nix are provided by clan-core
-              rkm-backend.nixosModules.default
+              # rkm-backend.nixosModules.default  # Disabled — Rust build, excluded from VPS build to skip cargo compile
               rkm-frontend.nixosModules.default
               rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
