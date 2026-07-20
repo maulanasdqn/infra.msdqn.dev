@@ -3,14 +3,10 @@
   lib,
   username,
   enableTilingWM,
-  nixpkgs-stable,
   ...
 }:
 let
-  # sketchybar 2.24.0 fails to link on current nixpkgs-unstable: cctools ld
-  # 1010.6 crashes (SIGTRAP) on the private-frameworks link. Ride the cached
-  # 25.11 build (2.23.0) until the unstable darwin toolchain recovers.
-  sketchybarPkg = nixpkgs-stable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.sketchybar;
+  sketchybarPkg = pkgs.sketchybar;
   # Workspace indicator — responds to aerospace_workspace_change event.
   # $NAME  is set by sketchybar (e.g. "space.3")
   # $AEROSPACE_FOCUSED_WORKSPACE is passed via the trigger payload
