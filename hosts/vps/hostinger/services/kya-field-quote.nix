@@ -92,6 +92,8 @@
     };
   };
 
+  # Served at kya-fq.stynx.app (Cloudflare DNS → A record to 72.62.125.38,
+  # DNS-only/grey-cloud so ACME HTTP-01 reaches the origin).
   services.nginx.virtualHosts."kya-fq.stynx.app" = {
     enableACME = true;
     forceSSL = true;
