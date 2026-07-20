@@ -1,4 +1,30 @@
 { pkgs, ... }:
+let
+  # CI/CD deploy: GitHub Actions (s52ai/kya-group, deploy-field-quote.yml) pipes
+  # `git archive HEAD` over SSH into this forced-command script — it rebuilds the
+  # image on the VPS and restarts the app. The CI key can run ONLY this script
+  # (restrict + command=), never an arbitrary root shell.
+  kyaCiDeploy = pkgs.writeShellScript "kya-fq-ci-deploy" ''
+    set -euo pipefail
+    umask 077
+    rm -rf /opt/kya-group
+    mkdir -p /opt/kya-group
+    ${pkgs.gnutar}/bin/tar -xf - -C /opt/kya-group
+    cd /opt/kya-group
+    ${pkgs.podman}/bin/podman build --net=host \
+      -f apps/field-quote/Dockerfile -t localhost/kya-field-quote:latest .
+    ${pkgs.systemd}/bin/systemctl restart kya-fq.service
+    for _ in $(seq 1 30); do
+      if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:3003/healthz >/dev/null 2>&1; then
+        echo "kya-fq deploy OK"
+        exit 0
+      fi
+      sleep 2
+    done
+    echo "kya-fq healthcheck failed after restart" >&2
+    exit 1
+  '';
+in
 {
   # KYA field-quote — self-hosted on the VPS (migrated off DigitalOcean App
   # Platform). The app image is built ON the VPS from /opt/kya-group via
@@ -8,6 +34,12 @@
   # created on the VPS (0600), mirroring the glitchtip/n8n pattern:
   #   /etc/kya-fq-postgres.env  POSTGRES_USER/PASSWORD/DB
   #   /etc/kya-fq.env           DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN, admin bootstrap
+
+  # Scoped CI/CD key (forced command → kyaCiDeploy). Merges with root's normal
+  # keys from profiles/base.nix; this one can only trigger a deploy.
+  users.users.root.openssh.authorizedKeys.keys = [
+    ''restrict,command="${kyaCiDeploy}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICCO3MNbnYv2drZtsFt1c1Z4ytDoIhAKGjiLdB/h3CQG kya-fq-ci-deploy''
+  ];
 
   virtualisation.oci-containers.containers.kya-fq-postgres = {
     image = "postgres:17-alpine";
