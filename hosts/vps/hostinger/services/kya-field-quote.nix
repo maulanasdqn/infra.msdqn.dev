@@ -13,6 +13,10 @@ let
     cd /opt/kya-group
     ${pkgs.podman}/bin/podman build --net=host \
       -f apps/field-quote/Dockerfile -t localhost/kya-field-quote:latest .
+    # Apply DB migrations + bootstrap with the freshly-built image BEFORE rolling
+    # the app. restart re-runs the oneshot and blocks on it — a failed migration
+    # aborts here (set -e) and leaves the old app running.
+    ${pkgs.systemd}/bin/systemctl restart kya-fq-migrate.service
     ${pkgs.systemd}/bin/systemctl restart kya-fq.service
     for _ in $(seq 1 30); do
       if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:3003/healthz >/dev/null 2>&1; then
@@ -40,6 +44,22 @@ in
   users.users.root.openssh.authorizedKeys.keys = [
     ''restrict,command="${kyaCiDeploy}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICCO3MNbnYv2drZtsFt1c1Z4ytDoIhAKGjiLdB/h3CQG kya-fq-ci-deploy''
   ];
+
+  # Self-hosted GitHub Actions runner (s52ai org's GitHub-hosted minutes are
+  # billing-blocked). Runs as an unprivileged dynamic user; the deploy-field-quote
+  # workflow (runs-on: [self-hosted, kya-fq]) triggers the root deploy only via
+  # the forced-command SSH key above. Registration token in /etc/github-runner-kya.token
+  # (0600, created on the VPS; refresh with:
+  #   gh api -X POST repos/s52ai/kya-group/actions/runners/registration-token --jq .token).
+  services.github-runners.kya-fq = {
+    enable = true;
+    name = "kya-fq-vps";
+    url = "https://github.com/s52ai/kya-group";
+    tokenFile = "/etc/github-runner-kya.token";
+    extraLabels = [ "kya-fq" ];
+    replace = true;
+    extraPackages = with pkgs; [ git openssh ];
+  };
 
   virtualisation.oci-containers.containers.kya-fq-postgres = {
     image = "postgres:17-alpine";
