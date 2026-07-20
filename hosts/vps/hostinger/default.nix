@@ -32,6 +32,7 @@ in
     ./services/aysiem-heartbeat.nix
     ./services/kya-field-quote.nix
     ./services/kya-sales-reporting.nix
+    ./services/kya-bond-closeout.nix
   ];
 
   # NixOS nginx as the sole reverse proxy + static file server
