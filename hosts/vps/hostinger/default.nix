@@ -39,6 +39,7 @@ in
     ./services/aysiem-heartbeat.nix
     ./services/bsm-landing.nix
     ./services/kolaborium.nix
+    ./services/kya-field-quote.nix
   ];
 
   # NixOS nginx as the sole reverse proxy + static file server
