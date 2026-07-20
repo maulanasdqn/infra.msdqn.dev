@@ -70,7 +70,7 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/kya-fq 0755 root root -"
-    "d /var/lib/kya-fq/postgres 0700 999 999 -"
+    "d /var/lib/kya-fq/postgres 0700 70 70 -"
   ];
 
   # Private podman network so the app resolves the DB by container name.

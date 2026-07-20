@@ -64,7 +64,7 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/kya-sr 0755 root root -"
-    "d /var/lib/kya-sr/postgres 0700 999 999 -"
+    "d /var/lib/kya-sr/postgres 0700 70 70 -"
   ];
 
   systemd.services.kya-sr-network = {
