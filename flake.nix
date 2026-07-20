@@ -70,48 +70,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hpyd = {
-      url = "github:maulanasdqn/high-performance-youtube-downloader/develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     rkm-backend = {
       url = "git+ssh://git@github.com/rajawalikaryamulya/rkm-backend.git?ref=develop";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    rkm-frontend = {
-      url = "git+ssh://git@github.com/rajawalikaryamulya/rkm-frontend.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    rkm-admin-frontend = {
-      url = "git+ssh://git@github.com/rajawalikaryamulya/rkm-admin-frontend.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nix-pilot = {
-      url = "github:maulanasdqn/nix-pilot/develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    rag-app = {
-      url = "github:maulanasdqn/rust-rag-example/develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     roasting-startup = {
       url = "github:maulanasdqn/roasting-startup/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    bsm-landing = {
-      url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/bsm-landing.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    kolaborium = {
-      url = "git+ssh://git@github.com/bsmart-cerdas-indonesia/kolaborium.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -163,15 +128,8 @@
       homebrew-core,
       homebrew-cask,
       disko,
-      hpyd,
       rkm-backend,
-      rkm-frontend,
-      rkm-admin-frontend,
-      nix-pilot,
-      rag-app,
       roasting-startup,
-      bsm-landing,
-      kolaborium,
       clan-core,
       claude-code,
       claude-desktop,
@@ -230,9 +188,12 @@
       #   firmware NVRAM boot-args, HID keyboard remap, global power management,
       #   performance LaunchDaemons, system-wide PostgreSQL, and brew cleanup=zap.
       # true  -> MacBook (sole owner)        false -> shared Mac mini (safe defaults)
-      mkDarwinSpecialArgs = aggressive: darwinBaseSpecialArgs // {
-        enableAggressiveTweaks = aggressive;
-      };
+      mkDarwinSpecialArgs =
+        aggressive:
+        darwinBaseSpecialArgs
+        // {
+          enableAggressiveTweaks = aggressive;
+        };
 
       mkDarwinMachine =
         { hostModule, aggressive }:
@@ -294,7 +255,11 @@
         };
 
       mkWorkstationMachine =
-        { hostModule, username, enableTilingWM }:
+        {
+          hostModule,
+          username,
+          enableTilingWM,
+        }:
         let
           specialArgs = mkWorkstationSpecialArgs { inherit username enableTilingWM; };
         in
@@ -341,8 +306,13 @@
         ipAddress = config.vpsHostingerIP;
         gateway = config.vpsHostingerGateway;
         enableLaravel = false;
-        inherit nixvim sshKeys acmeEmail sops-nix secretsFile;
-        inherit rkm-frontend rkm-admin-frontend;
+        inherit
+          nixvim
+          sshKeys
+          acmeEmail
+          sops-nix
+          secretsFile
+          ;
       };
 
       digitaloceanSpecialArgs = {
@@ -408,13 +378,7 @@
             imports = [
               # disko and sops-nix are provided by clan-core
               # rkm-backend.nixosModules.default  # Disabled — Rust build, excluded from VPS build to skip cargo compile
-              rkm-frontend.nixosModules.default
-              rkm-admin-frontend.nixosModules.default
               # roasting-startup.nixosModules.default
-              bsm-landing.nixosModules.default
-              kolaborium.nixosModules.default
-              # rag-app.nixosModules.default  # Temporarily disabled
-              # nix-pilot.nixosModules.default  # Disabled - needs recursion_limit fix in np-ui
               ./hosts/vps/hostinger
               (
                 { ... }:

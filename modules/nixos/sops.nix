@@ -1,4 +1,9 @@
-{ config, secretsFile, pkgs, ... }:
+{
+  config,
+  secretsFile,
+  pkgs,
+  ...
+}:
 {
   # Ensure .ssh directory exists for root
   system.activationScripts.sshDir = ''
@@ -8,7 +13,8 @@
 
   # Add GitHub to known_hosts
   programs.ssh.knownHosts = {
-    "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+    "github.com".publicKey =
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
   };
 
   sops = {
@@ -66,12 +72,6 @@
         owner = "root";
       };
 
-      # MinIO credentials (root user/password)
-      "minio_credentials" = {
-        mode = "0400";
-        owner = "minio";
-      };
-
       # MinIO environment (access key/secret key for apps)
       "minio_env" = {
         mode = "0400";
@@ -80,12 +80,6 @@
 
       # Warehouse Management environment (JWT_SECRET)
       "warehouse_env" = {
-        mode = "0400";
-        owner = "root";
-      };
-
-      # Nix-pilot password
-      "nix_pilot_password" = {
         mode = "0400";
         owner = "root";
       };
