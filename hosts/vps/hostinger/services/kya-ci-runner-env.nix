@@ -18,7 +18,18 @@ let
         libuv
       ]
     );
+    # moonrepo/setup-toolchain runs proto, which shells out to curl to fetch
+    # moon and needs a CA bundle to verify the download over TLS.
+    SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
   };
+  ciTools = with pkgs; [
+    curl
+    cacert
+    xz
+    gnutar
+    gzip
+    unzip
+  ];
 in
 {
   programs.nix-ld.enable = true;
@@ -27,5 +38,8 @@ in
     "github-runner-kya-fq"
     "github-runner-kya-sr"
     "github-runner-kya-bc"
-  ] (_: { environment = ldEnv; });
+  ] (_: {
+    environment = ldEnv;
+    path = ciTools;
+  });
 }
