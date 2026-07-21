@@ -33,6 +33,7 @@ in
     ./services/kya-field-quote.nix
     ./services/kya-sales-reporting.nix
     ./services/kya-bond-closeout.nix
+    ./services/kya-ci-runner-env.nix
   ];
 
   # NixOS nginx as the sole reverse proxy + static file server
