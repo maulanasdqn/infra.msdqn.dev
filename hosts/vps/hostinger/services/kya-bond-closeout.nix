@@ -56,6 +56,22 @@ in
     extraOptions = [ "--network=kya-bc-net" "--memory=512m" ];
   };
 
+  virtualisation.oci-containers.containers.kya-bc-redis = {
+    image = "redis:7-alpine";
+    cmd = [
+      "redis-server"
+      "--save"
+      ""
+      "--appendonly"
+      "no"
+      "--maxmemory"
+      "128mb"
+      "--maxmemory-policy"
+      "allkeys-lru"
+    ];
+    extraOptions = [ "--network=kya-bc-net" "--memory=192m" ];
+  };
+
   # postgres:17-alpine runs as uid 70, not the Debian images' 999. Getting this
   # wrong is silent until systemd-tmpfiles-resetup re-asserts ownership on an
   # unrelated rebuild, after which new backends cannot read the data directory.
@@ -70,6 +86,7 @@ in
     wantedBy = [ "multi-user.target" ];
     before = [
       "podman-kya-bc-postgres.service"
+      "podman-kya-bc-redis.service"
       "kya-bc-migrate.service"
       "kya-bc.service"
     ];
@@ -110,7 +127,11 @@ in
 
   systemd.services.kya-bc = {
     description = "KYA bond-closeout app";
-    after = [ "kya-bc-migrate.service" "kya-bc-network.service" ];
+    after = [
+      "kya-bc-migrate.service"
+      "kya-bc-network.service"
+      "podman-kya-bc-redis.service"
+    ];
     requires = [ "kya-bc-migrate.service" "kya-bc-network.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
@@ -123,6 +144,7 @@ in
           --network=kya-bc-net \
           -p 127.0.0.1:3004:3004 \
           --env-file /etc/kya-bc.env \
+          -e REDIS_URL=redis://kya-bc-redis:6379 \
           localhost/kya-bond-closeout:latest
       '';
       ExecStop = "${pkgs.podman}/bin/podman stop -t 10 kya-bc";
