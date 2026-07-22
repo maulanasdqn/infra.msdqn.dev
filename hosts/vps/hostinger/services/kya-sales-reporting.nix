@@ -63,6 +63,22 @@ in
     extraOptions = [ "--network=kya-sr-net" "--memory=512m" ];
   };
 
+  virtualisation.oci-containers.containers.kya-sr-redis = {
+    image = "redis:7-alpine";
+    cmd = [
+      "redis-server"
+      "--save"
+      ""
+      "--appendonly"
+      "no"
+      "--maxmemory"
+      "128mb"
+      "--maxmemory-policy"
+      "allkeys-lru"
+    ];
+    extraOptions = [ "--network=kya-sr-net" "--memory=192m" ];
+  };
+
   systemd.tmpfiles.rules = [
     "d /var/lib/kya-sr 0755 root root -"
     "d /var/lib/kya-sr/postgres 0700 70 70 -"
@@ -74,6 +90,7 @@ in
     wantedBy = [ "multi-user.target" ];
     before = [
       "podman-kya-sr-postgres.service"
+      "podman-kya-sr-redis.service"
       "kya-sr-migrate.service"
       "kya-sr.service"
     ];
@@ -114,7 +131,11 @@ in
 
   systemd.services.kya-sr = {
     description = "KYA sales-reporting app";
-    after = [ "kya-sr-migrate.service" "kya-sr-network.service" ];
+    after = [
+      "kya-sr-migrate.service"
+      "kya-sr-network.service"
+      "podman-kya-sr-redis.service"
+    ];
     requires = [ "kya-sr-migrate.service" "kya-sr-network.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
@@ -127,6 +148,7 @@ in
           --network=kya-sr-net \
           -p 127.0.0.1:3002:3002 \
           --env-file /etc/kya-sr.env \
+          -e REDIS_URL=redis://kya-sr-redis:6379 \
           localhost/kya-sales-reporting:latest
       '';
       ExecStop = "${pkgs.podman}/bin/podman stop -t 10 kya-sr";
