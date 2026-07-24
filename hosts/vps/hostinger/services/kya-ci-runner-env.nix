@@ -38,6 +38,7 @@ in
     "github-runner-kya-fq"
     "github-runner-kya-sr"
     "github-runner-kya-bc"
+    "github-runner-kya-bp"
   ] (_: {
     environment = ldEnv;
     path = ciTools;
