@@ -1,7 +1,7 @@
 { pkgs, username, ... }:
 let
-  colimaCpu = "6";
-  colimaMemory = "12";
+  colimaCpu = "4";
+  colimaMemory = "4";
   colimaDisk = "100";
   colimaStart = pkgs.writeShellScript "colima-autostart" ''
     export PATH=${pkgs.colima}/bin:/usr/bin:/bin:/usr/sbin:/sbin
@@ -20,7 +20,8 @@ in
       enable = true;
       config = {
         ProgramArguments = [ "${colimaStart}" ];
-        RunAtLoad = true;
+        # Don't burn a VM's worth of RAM at every login — start on demand with `colima-up`.
+        RunAtLoad = false;
         KeepAlive = false;
         StandardOutPath = "/tmp/colima.autostart.out.log";
         StandardErrorPath = "/tmp/colima.autostart.err.log";
