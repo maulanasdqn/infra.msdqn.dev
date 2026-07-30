@@ -30,6 +30,18 @@ let
     # Rosé Pine — Aerospace tiling WM
     # Keybinds mirror workstation (Hyprland/SUPER → macOS/cmd)
 
+    # config-version 2 has exactly one breaking change over the implicit v1:
+    # persistent-workspaces no longer falls back to the set AeroSpace infers by
+    # scanning `workspace X` on the right-hand side of key bindings — the fallback
+    # is now an empty array. So it has to be declared, or every empty workspace
+    # would be discarded the moment it lost its last window.
+    config-version = 2
+
+    # Exactly the set v1 inferred from the alt-1..9 bindings below (verified with
+    # `aerospace list-workspaces --all` before the migration). sketchybar only
+    # draws indicators for 1–6, but the bindings reach 9, so all nine stay.
+    persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
     # Startup is owned by the nix-managed launchd agent below (RunAtLoad +
     # KeepAlive), NOT AeroSpace's own login item. The login item is unreliable
     # across reboots (macOS can leave it unapproved/disabled → no gaps on boot).
@@ -59,8 +71,7 @@ let
     inner.vertical   = 8
     outer.left       = 10
     outer.bottom     = 10
-    # Host-specific — see topGap above. Notched MacBook clears the bar at 26px;
-    # only the Mac mini (auto-hidden menu bar, work area at screen-top) needs more.
+    # Host-specific and derived from the sketchybar geometry — see topGap above.
     outer.top        = ${toString topGap}
     outer.right      = 10
 
