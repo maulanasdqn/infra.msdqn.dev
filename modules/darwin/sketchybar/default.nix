@@ -198,10 +198,12 @@ print(int(val.value * 100))
     # no radius) and each logical group gets its own rounded background via a
     # bracket. blur_radius is a bar-level property, so it has nothing to act on
     # once the bar is transparent — islands are drawn opaque instead.
-    # height is kept only 4px over the 30px island height (2px above/below) and
-    # y_offset is 0 — with islands there is no bar chrome to inset, so any extra
-    # here reads as dead space above the pills. AeroSpace's outer.top is derived
-    # from y_offset + height, so the two must move together.
+    # Geometry: y_offset 8 + the 2px of slack from a 34px bar around a 30px island
+    # puts 10px above the islands, matching outer.left/right/bottom and the gap
+    # below them. height stays only 4px over the island so that slack can't grow
+    # into dead space — the offset does the spacing, not the bar.
+    # AeroSpace's outer.top is derived from y_offset + height, so the two must move
+    # together; see the topGap derivation in the aerospace module.
     sketchybar --bar \
       position=top \
       height=34 \
@@ -212,7 +214,7 @@ print(int(val.value * 100))
       margin=0 \
       padding_left=12 \
       padding_right=12 \
-      y_offset=0 \
+      y_offset=8 \
       topmost=window
 
     # Shared island chrome, applied to every bracket below. Left unquoted at the

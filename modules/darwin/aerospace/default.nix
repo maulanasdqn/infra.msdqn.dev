@@ -14,7 +14,7 @@ let
   #   topGap = islandBottom + desiredGap - workAreaTop
   #
   #   islandBottom = bar y_offset + (bar height + island height) / 2
-  #                = 0 + (34 + 30) / 2 = 32px   (see the sketchybar module)
+  #                = 8 + (34 + 30) / 2 = 40px   (see the sketchybar module)
   #   desiredGap   = 10px, to match outer.left/right/bottom below
   #   workAreaTop  = NSScreen visibleFrame inset, per host:
   #                  - Notched MacBook: menu bar stays reserved → 33px (measured).
@@ -22,10 +22,10 @@ let
   #                  - Mac mini on an external display: menu bar is auto-hidden,
   #                    so the work area starts at screen-top → 0px.
   #
-  # → MacBook: 32 + 10 - 33 = 9   → Mac mini: 32 + 10 - 0 = 42
+  # → MacBook: 40 + 10 - 33 = 17   → Mac mini: 40 + 10 - 0 = 50
   #
   # Retuning the bar's y_offset/height changes islandBottom, so recompute both.
-  topGap = if config.networking.hostName == "macmini-mrscraper" then 42 else 9;
+  topGap = if config.networking.hostName == "macmini-mrscraper" then 50 else 17;
   aerospaceConfig = pkgs.writeText "aerospace.toml" ''
     # Rosé Pine — Aerospace tiling WM
     # Keybinds mirror workstation (Hyprland/SUPER → macOS/cmd)
