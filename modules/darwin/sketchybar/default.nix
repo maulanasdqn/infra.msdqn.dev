@@ -194,17 +194,41 @@ print(int(val.value * 100))
   sketchybarrc = pkgs.writeShellScript "sketchybarrc" ''
     # Rosé Pine — sketchybar top bar (mirrors eww vertical bar)
 
+    # Island layout: the bar itself draws nothing (fully transparent, no border,
+    # no radius) and each logical group gets its own rounded background via a
+    # bracket. blur_radius is a bar-level property, so it has nothing to act on
+    # once the bar is transparent — islands are drawn opaque instead.
+    # height is kept only 4px over the 30px island height (2px above/below) and
+    # y_offset is 0 — with islands there is no bar chrome to inset, so any extra
+    # here reads as dead space above the pills. AeroSpace's outer.top is derived
+    # from y_offset + height, so the two must move together.
     sketchybar --bar \
       position=top \
-      height=40 \
-      blur_radius=20 \
-      color=0xdd191724 \
-      border_width=1 \
-      border_color=0x30c4a7e7 \
-      corner_radius=16 \
-      margin=12 \
-      y_offset=8 \
+      height=34 \
+      blur_radius=0 \
+      color=0x00000000 \
+      border_width=0 \
+      corner_radius=0 \
+      margin=0 \
+      padding_left=12 \
+      padding_right=12 \
+      y_offset=0 \
       topmost=window
+
+    # Shared island chrome, applied to every bracket below. Left unquoted at the
+    # call site so it word-splits into separate args.
+    ISLAND="background.drawing=on \
+      background.color=0xee191724 \
+      background.corner_radius=14 \
+      background.height=30 \
+      background.border_width=1 \
+      background.border_color=0x30c4a7e7"
+
+    # A bracket's background spans the bounding box of its members, and an item's
+    # own padding_left/right counts as part of that box — so item padding cannot
+    # separate two adjacent islands. The gaps have to come from items that belong
+    # to no bracket at all.
+    GAP="background.drawing=off icon.drawing=off label.drawing=off"
 
     sketchybar --default \
       updates=when_shown \
@@ -217,15 +241,35 @@ print(int(val.value * 100))
       label.padding_left=4 \
       label.padding_right=4
 
-    # Nix logo
+    # Nix logo — U+F313 (nf-linux-nixos), verified present in the patched
+    # JetBrainsMono Nerd Font this bar uses. Built with printf rather than pasted
+    # in literally: this item previously shipped as icon="" with an empty string,
+    # because the raw glyph was silently dropped somewhere in an edit and a blank
+    # icon renders as an empty island with no error. The escape can't be lost that
+    # way, and it keeps the codepoint greppable.
+    NIX_LOGO=$(printf '\uf313')
+
     sketchybar --add item logo left \
       --set logo \
-        icon="" \
+        icon="$NIX_LOGO" \
         icon.color=0xffc4a7e7 \
         icon.font="JetBrainsMono Nerd Font Mono:Regular:22.0" \
-        icon.padding_left=16 \
-        icon.padding_right=12 \
+        icon.padding_left=14 \
+        icon.padding_right=14 \
         label.drawing=off
+
+    # Gap between the logo island and the workspaces island
+    sketchybar --add item gap.1 left \
+      --set gap.1 width=10 $GAP
+
+    # Inner padding for the workspaces island. Unlike the gap.N items these ARE
+    # members of the is_spaces bracket, so the island background extends across
+    # them — that is what puts breathing room between the island edge and the
+    # first/last dot. Doing it with padding on space.1/space.6 instead would drift:
+    # spaceScript rewrites icon.padding (1 ↔ 10) on every focus change, so the
+    # island's inset would visibly jump whenever workspace 1 or 6 took focus.
+    sketchybar --add item ws_pad.l left \
+      --set ws_pad.l width=6 $GAP
 
     # Register Aerospace workspace change event
     sketchybar --add event aerospace_workspace_change
@@ -253,6 +297,10 @@ print(int(val.value * 100))
         --subscribe "space.''${i}" aerospace_workspace_change
     done
 
+    # Closing half of the workspaces-island padding — see ws_pad.l above.
+    sketchybar --add item ws_pad.r left \
+      --set ws_pad.r width=6 $GAP
+
     # Status items — consistent icon+label spacing
     sketchybar --add item wifi right \
       --set wifi \
@@ -265,6 +313,10 @@ print(int(val.value * 100))
         label="..." \
         label.padding_left=0 \
         label.padding_right=10
+
+    # Gap: network island │ hardware island
+    sketchybar --add item gap.2 right \
+      --set gap.2 width=10 $GAP
 
     sketchybar --add item volume right \
       --set volume \
@@ -304,6 +356,10 @@ print(int(val.value * 100))
         label="..." \
         label.padding_left=0 \
         label.padding_right=10
+
+    # Gap: hardware island │ system-metrics island
+    sketchybar --add item gap.3 right \
+      --set gap.3 width=10 $GAP
 
     # Swap pressure — icon colour = kernel pressure level, label = swap used.
     # Added first so the cpu/ram/swap block reads left→right CPU · RAM · SWAP.
@@ -345,6 +401,10 @@ print(int(val.value * 100))
         label.padding_left=0 \
         label.padding_right=10
 
+    # Gap: system-metrics island │ clock island
+    sketchybar --add item gap.4 right \
+      --set gap.4 width=10 $GAP
+
     # Clock — H · M   date Mon
     sketchybar --add item clock_month right \
       --set clock_month \
@@ -354,7 +414,7 @@ print(int(val.value * 100))
         label.font="JetBrainsMono Nerd Font:Bold:13.0" \
         label.color=0xff908caa \
         label.padding_left=2 \
-        label.padding_right=18
+        label.padding_right=12
 
     sketchybar --add item clock_date right \
       --set clock_date \
@@ -392,8 +452,22 @@ print(int(val.value * 100))
         icon.drawing=off \
         label.font="JetBrainsMono Nerd Font:Bold:18.0" \
         label.color=0xffebbcba \
-        label.padding_left=18 \
+        label.padding_left=12 \
         label.padding_right=0
+
+    # Islands. Each bracket wraps a contiguous run of items; the gap.N items
+    # deliberately sit outside every bracket so the backgrounds don't touch.
+    sketchybar \
+      --add bracket is_logo   logo \
+      --add bracket is_spaces ws_pad.l space.1 space.2 space.3 space.4 space.5 space.6 ws_pad.r \
+      --add bracket is_clock  clock_h clock_sep clock_m clock_date clock_month \
+      --add bracket is_sys    cpu ram swap \
+      --add bracket is_hw     battery brightness volume \
+      --add bracket is_net    wifi
+
+    for b in is_logo is_spaces is_clock is_sys is_hw is_net; do
+      sketchybar --set "$b" $ISLAND
+    done
 
     sketchybar --update
 
