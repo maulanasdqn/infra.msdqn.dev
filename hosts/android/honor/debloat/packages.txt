@@ -40,9 +40,85 @@ com.hihonor.hnpanpayservice            # Honor Pay service
 com.hihonor.gameassistant              # game space overlay
 com.hihonor.game.kitserver             # game kit server
 
+# Honor Push Service — the CURRENT source of the junk "Recommendations" ad
+# notifications (2026-07-29). Confirmed with `dumpsys notification --noredact`:
+#   pkg=com.hihonor.android.pushagent, android.extraAppName="Recommendations",
+#   channel push_T.com.hihonor.android.pushagent.RECOMMEND.03pnc
+# NOT Aura this time — com.aura.oobe.honor was already disabled and stayed disabled.
+# Also ~205MB resident across its two processes.
+# Blocking only the notification does NOT work: `cmd appops set <pkg>
+# POST_NOTIFICATION deny|ignore` silently stays "allow" on MagicOS (with or without
+# --user 0), so the package must be disabled outright. Its HiPushService process
+# survives `am force-stop` (system uid, alive since boot) and only clears on reboot;
+# the disable itself sticks. Safe here because every messaging app in use
+# (WhatsApp/Telegram/Gmail/Slack/Discord) rides FCM, not Honor Push.
+com.hihonor.android.pushagent
+
+# --- Tier 3: round 2 (Jul 2026) — big background-RAM offenders ---
+
+# Honor account + Honor's own app updater. Honor Cloud/AppMarket/Wallet are already
+# disabled above, so the account has nothing left to serve. System OTA is NOT this —
+# that's com.hihonor.ouc, which stays enabled.
+com.hihonor.systemappsupdater          # updater for Honor's preinstalled apps
+com.hihonor.android.honorsuite         # Honor Suite
+
+# Global search (swipe-down on homescreen) + its background indexer. ~200MB resident.
+com.hihonor.search
+com.hihonor.searchservice
+
+# Cross-device / multi-device collaboration stack — only useful with other Honor
+# devices or an Honor PC. Also removes wireless display / cast-to-TV (mirrorshare).
+com.hihonor.airlink
+com.hihonor.android.mirrorshare        # wireless display / Miracast — re-enable if you cast
+com.hihonor.android.instantshare       # Honor Share (nearby transfer)
+com.hihonor.handoff
+com.hihonor.synergy
+com.hihonor.crossdeviceserviceshare
+com.hihonor.trustcircle
+com.hihonor.devicegroupmanage
+com.hihonor.iconnect
+com.hihonor.dmsdp
+com.hihonor.nearby                     # cross-device discovery (~105MB resident)
+
+# Telemetry / diagnostics / carrier extras — background reporting, no user feature.
+com.hihonor.android.chr                # Customer Health Report telemetry
+com.hihonor.detectrepair               # Smart Care diagnostics
+com.hihonor.behaviorauth               # behavioural auth telemetry
+com.hihonor.carrierlocation
+com.hihonor.omacp                      # carrier provisioning over SMS
+com.google.android.partnersetup
+com.android.providers.partnerbookmarks
+com.android.email.partnerprovider
+
 # --- NOTES ---
 # Kept on purpose (user's call): com.hihonor.prayerassistant, com.hihonor.aod
-# Protected / cannot disable: com.hihonor.android.hnaps (reverts to default)
+# Protected / cannot disable (pm reports "new state: default" and they stay enabled):
+#   com.hihonor.android.hnaps
+#   com.hihonor.id  — Honor ID account; ~195MB resident, but the system re-enables it.
+#
+# DO NOT add com.hihonor.android.launcher here — it must stay ENABLED (2026-07-29).
+# Lawnchair IS the home screen; the stock launcher is kept enabled purely as the
+# recents host. SystemUI's config_recentsComponentName is fixed to the stock launcher
+# at build time, so it binds there regardless of which app is HOME — but only if the
+# package is enabled. Disabling it kills the app switcher entirely (and under gesture
+# nav kills swipe-up/back/home too, bricking navigation).
+#
+# The working launcher setup, for a fresh device — no disable step:
+#   adb shell cmd package set-home-activity \
+#     app.lawnchair.play/app.lawnchair.LawnchairLauncher
+#   adb shell am crash com.android.systemui     # forces rebind; re-locks the screen
+# Verify (must show the STOCK launcher bound, with client c:com.android.systemui):
+#   adb shell dumpsys activity services TouchInteractionService
+#   # good: com.hihonor.android.launcher/.quickstep... app=ProcessRecord{...} c:com.android.systemui
+#   # bad:  app.lawnchair.play/...  app=null  c:app.lawnchair.play  (self-bound, never attached)
+# Cost of leaving it enabled is only ~134MB (background service host) vs ~287MB when it
+# was also drawing the home screen.
+#
+# Why Lawnchair can never host recents itself: SystemUI binds only to a
+# TouchInteractionService declared with android.permission.STATUS_BAR_SERVICE, a
+# signature|privileged permission. `pm grant app.lawnchair.play
+# android.permission.STATUS_BAR_SERVICE` fails outright with "not a changeable
+# permission type". It would need /system/priv-app => root => unlocked bootloader.
 #
 # DO NOT add com.hihonor.hnoffice here — it is the Yozo/WPS render backend for
 # PDF/Office preview in Honor Files. Disabling it makes every PDF open fail with
