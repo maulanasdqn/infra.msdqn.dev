@@ -107,8 +107,12 @@
 
           jsonls.enable = true;
 
+          # Swift/ObjC only: `cmd` is the Xcode toolchain's sourcekit-lsp, which
+          # only exists on Darwin. On Linux hosts (vivobook, pc, wsl, honor) the
+          # server would just fail to spawn on every swift/objc buffer, so keep
+          # it off there.
           sourcekit = {
-            enable = true;
+            enable = pkgs.stdenv.hostPlatform.isDarwin;
             cmd = [ "/usr/bin/sourcekit-lsp" ];
             filetypes = [ "swift" "objc" "objcpp" ];
           };
