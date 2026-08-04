@@ -163,6 +163,7 @@
   virtualisation.docker = {
     enable = true;
     enableOnBoot = true;
+    package = pkgs.docker_29;
   };
 
   programs.nix-ld = {
