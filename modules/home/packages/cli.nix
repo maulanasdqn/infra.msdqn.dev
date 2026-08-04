@@ -8,7 +8,7 @@
   # Shared CLI toolset (no GUI). Imported by the workstation home config and
   # directly by nix-on-droid/honor so both get the same command-line tools.
   home.packages =
-    (lib.optional (claude-code != null) claude-code.packages.${pkgs.system}.default)
+    (lib.optional (claude-code != null) claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default)
     ++ (with pkgs; [
       # modern coreutils / search
       eza
