@@ -89,11 +89,6 @@
       url = "github:sadjow/claude-code-nix";
     };
 
-    claude-desktop = {
-      url = "github:k3d3/claude-desktop-linux-flake";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
-
     nix-on-droid = {
       url = "github:maulanasdqn/nix-on-droid/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -132,7 +127,6 @@
       roasting-startup,
       clan-core,
       claude-code,
-      claude-desktop,
       nix-on-droid,
       nixos-wsl,
       ...
@@ -250,7 +244,6 @@
             enableGolang
             sshKeys
             claude-code
-            claude-desktop
             ;
         };
 
