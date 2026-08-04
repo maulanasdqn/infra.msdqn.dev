@@ -5,7 +5,7 @@
 }:
 {
   # Reusable neovim config (editor + LSP). Imported by the NixOS/Darwin wrapper
-  # (./default.nix, which also adds stynx) and directly by nix-on-droid/honor.
+  # (./default.nix) and directly by nix-on-droid/honor.
   imports = [
     nixvim.homeModules.nixvim
     ./options.nix
