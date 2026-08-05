@@ -45,6 +45,39 @@ with foreground work. Logs to `/var/log/nix-gc.log`.
 Thirty days is deliberate: a month of rollback points, without generations
 accumulating forever.
 
+### Binary caches and trust
+
+`extra-substituters` carries three caches beyond `cache.nixos.org`:
+
+| Cache | Why |
+|---|---|
+| `msdqn.cachix.org` | Your own. `profiles/server.nix` has always used it; the Macs did not, so they rebuilt from source what the cache already had. |
+| `devenv.cachix.org` | Every `templates/*/flake.nix` declares it. |
+| `nix-on-droid.cachix.org` | aarch64 substitutes for the phone host. |
+
+Public keys are copied from the authoritative places in this repo —
+`profiles/server.nix` for msdqn, the templates for devenv. Do not retype a
+cache key from memory; a wrong key does not error loudly, it just silently
+fails signature checks and the machine builds from source instead.
+
+**`trusted-users` must include the primary user.** With only `root` trusted, a
+flake's own `extra-substituters` are silently ignored — so the devenv caches
+declared in `templates/` never applied, and every clan invocation needed
+`--option accept-flake-config true` to work around it. `nix store ping --json`
+reports `trusted: false` when this is wrong.
+
+Two things to know:
+
+- The daemon reads `trusted-users` **at startup**. After changing it, restart
+  with `sudo launchctl kickstart -k system/systems.determinate.nix-daemon`, or
+  the setting appears in `nix config show` while still not taking effect.
+- A trusted user can add substituters and insert store paths. On a single-owner
+  Mac that is no escalation — they already have sudo. On the shared Mac mini
+  only that machine's own primary user becomes trusted, not the second account.
+
+`connect-timeout = 5` (down from 15) so an unreachable substituter fails over
+quickly instead of stalling every fetch.
+
 ### Performance settings
 
 `eval-cores = 0` plus the `parallel-eval` and `build-time-fetch-tree`
