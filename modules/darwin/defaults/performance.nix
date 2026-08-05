@@ -1,7 +1,6 @@
 { lib, enableAggressiveTweaks ? false, ... }:
 {
-  # Whole-machine performance daemons (disable Spotlight/Time Machine on ALL volumes,
-  # kernel/network sysctl, pmset, weekly storage cleanup). Single-owner machines only.
+
   launchd.daemons = lib.mkIf enableAggressiveTweaks {
     disable-tm-local = {
       serviceConfig = {
@@ -27,7 +26,6 @@
       };
     };
 
-    # Weekly storage cleanup — runs every Sunday at 03:00
     storage-cleanup = {
       serviceConfig = {
         Label = "com.local.storage-cleanup";
@@ -88,7 +86,6 @@
       };
     };
 
-    # Max performance pmset — battery drain acceptable
     pmset-performance = {
       serviceConfig = {
         Label = "com.local.pmset-performance";
@@ -114,7 +111,6 @@
       };
     };
 
-    # Kernel performance tuning via sysctl
     sysctl-performance = {
       serviceConfig = {
         Label = "com.local.sysctl-performance";

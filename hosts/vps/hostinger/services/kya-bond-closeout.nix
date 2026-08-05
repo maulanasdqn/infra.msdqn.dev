@@ -1,9 +1,6 @@
 { pkgs, ... }:
 let
-  # CI/CD deploy: GitHub Actions (s52ai/kya-group, deploy-bond-closeout.yml)
-  # pipes `git archive HEAD` over SSH into this forced-command script — it
-  # rebuilds the image on the VPS and restarts the app. The CI key can run ONLY
-  # this script (restrict + command=), never an arbitrary root shell.
+
   kyaBcCiDeploy = pkgs.writeShellScript "kya-bc-ci-deploy" ''
     set -euo pipefail
     umask 077
@@ -28,12 +25,6 @@ let
   '';
 in
 {
-  # KYA bond-closeout — surety bond closeout automation for the bond
-  # administrator. Same shape as kya-field-quote.nix and kya-sales-reporting.nix,
-  # on port 3004 with its own Postgres, podman network, runner and
-  # forced-command key. Secrets are read from env files created on the VPS (0600):
-  #   /etc/kya-bc-postgres.env  POSTGRES_USER/PASSWORD/DB
-  #   /etc/kya-bc.env           DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN, admin bootstrap
 
   users.users.root.openssh.authorizedKeys.keys = [
     ''restrict,command="${kyaBcCiDeploy}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHSGiOb1gvXdNYWKXJizrm3NtZBxddBUIaNA52L3HAFF kya-bc-ci-deploy''
@@ -72,9 +63,6 @@ in
     extraOptions = [ "--network=kya-bc-net" "--memory=192m" ];
   };
 
-  # postgres:17-alpine runs as uid 70, not the Debian images' 999. Getting this
-  # wrong is silent until systemd-tmpfiles-resetup re-asserts ownership on an
-  # unrelated rebuild, after which new backends cannot read the data directory.
   systemd.tmpfiles.rules = [
     "d /var/lib/kya-bc 0755 root root -"
     "d /var/lib/kya-bc/postgres 0700 70 70 -"
@@ -151,8 +139,6 @@ in
     };
   };
 
-  # Served at kya-bc.stynx.app (Cloudflare DNS → A record to 72.62.125.38,
-  # DNS-only/grey-cloud so ACME HTTP-01 reaches the origin).
   services.nginx.virtualHosts."kya-bc.stynx.app" = {
     enableACME = true;
     forceSSL = true;

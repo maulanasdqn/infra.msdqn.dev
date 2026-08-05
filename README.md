@@ -466,3 +466,56 @@ nix develop --command rebuild
 ## License
 
 MIT
+
+## Design notes (flake.nix)
+
+Decisions in `flake.nix` that are not obvious from the code.
+
+### `enableAggressiveTweaks`
+
+Gates machine-wide, single-owner behaviour: firmware NVRAM boot-args, HID
+keyboard remap, global power management, performance LaunchDaemons, system-wide
+PostgreSQL, and Homebrew `cleanup = "zap"`.
+
+```
+true  -> MacBook (sole owner)
+false -> shared Mac mini (safe defaults)
+```
+
+### specialArgs must reach home-manager
+
+The same `specialArgs` are passed into home-manager so `nixvim` and the other
+shared inputs are available to HM submodules **at import-resolution time**.
+Without this, `neovim/hm.nix` references `nixvim` in its `imports` list but can
+only see it via `_module.args`, which triggers an infinite recursion.
+
+### Stable pins for `honor` (nix-on-droid)
+
+`honor` uses the **25.11 release** of nixpkgs, home-manager and nixvim, not
+unstable:
+
+- 25.11 predates the glibc 2.42 / nix 2.31.3 change that broke nix-on-droid
+  proot builds (nix-on-droid #495).
+- Its aarch64 binaries — vim plugins, treesitter grammars, LSPs — are fully
+  cached by Hydra, so the phone substitutes instead of compiling on-device.
+- nixvim `main` pins neovim 0.12 (glibc 2.42), which **freezes at TUI startup**
+  under proot (#495/#539).
+- home-manager `master` requires nixpkgs-unstable internals (lib/services) that
+  25.11 lacks.
+
+### Hosts
+
+Darwin: shared Mac mini (trimmed, safe for the second account), personal MacBook
+and "beast" (both full single-owner). NixOS: `vivobook` laptop, `pc` desktop.
+VPS: Hostinger and DigitalOcean — `disko` and `sops-nix` come from clan-core
+(DigitalOcean takes only `disko`).
+
+### Excluded modules
+
+`rkm-backend` is excluded from the VPS build so no cargo compile runs on the
+box; `roasting-startup` likewise. `dinix` is disabled until that repo gains a
+`flake.nix`.
+
+### Local Mac deploys
+
+Require SSH enabled on the Mac: System Settings → Sharing → Remote Login.

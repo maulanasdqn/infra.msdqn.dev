@@ -6,7 +6,7 @@
   ...
 }:
 {
-  # Ensure config is valid
+
   assertions = [
     {
       assertion = sshKeys != [];
@@ -46,7 +46,6 @@
 
   users.mutableUsers = true;
 
-  # Only create non-root user if username is not "root"
   users.users = lib.mkMerge [
     (lib.mkIf (username != "root") {
       ${username} = {

@@ -15,8 +15,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Stable home-manager for nix-on-droid (honor): hm master requires
-    # nixpkgs-unstable internals (lib/services), which nixpkgs 25.11 lacks.
     home-manager-stable = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs-stable";
@@ -34,9 +32,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Stable nixvim for nix-on-droid (honor): nixvim main pins neovim 0.12
-    # from nixpkgs-unstable (glibc 2.42), which freezes at TUI startup under
-    # proot (nix-on-droid #495/#539).
     nixvim-stable = {
       url = "github:nix-community/nixvim/nixos-25.11";
       inputs.nixpkgs.follows = "nixpkgs-stable";
@@ -105,11 +100,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # dinix - disabled until flake.nix is added to repo
-    # dinix = {
-    #   url = "github:lillecarl/dinix";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
   };
 
   outputs =
@@ -184,10 +174,6 @@
           ;
       };
 
-      # enableAggressiveTweaks gates machine-wide / single-owner behavior:
-      #   firmware NVRAM boot-args, HID keyboard remap, global power management,
-      #   performance LaunchDaemons, system-wide PostgreSQL, and brew cleanup=zap.
-      # true  -> MacBook (sole owner)        false -> shared Mac mini (safe defaults)
       mkDarwinSpecialArgs =
         aggressive:
         darwinBaseSpecialArgs
@@ -225,13 +211,9 @@
               { ... }:
               {
                 _module.args = mkDarwinSpecialArgs aggressive;
-                # Pass the same specialArgs into home-manager so nixvim (and the
-                # other shared inputs) are available to HM submodules at
-                # import-resolution time. Without this, neovim/hm.nix references
-                # `nixvim` in its `imports` list but can only see it via
-                # `_module.args`, which triggers an infinite recursion.
+
                 home-manager.extraSpecialArgs = mkDarwinSpecialArgs aggressive;
-                # Local machine - requires SSH enabled on Mac (System Settings > Sharing > Remote Login)
+
                 clan.core.networking.targetHost = "ms@localhost";
               }
             )
@@ -340,45 +322,38 @@
         };
 
         machines = {
-          # Darwin (macOS) — shared Mac mini: trimmed, safe for the second account
+
           macmini-mrscraper = mkDarwinMachine {
             hostModule = ./hosts/darwin/macmini-mrscraper;
             aggressive = false;
           };
 
-          # Darwin (macOS) — personal MacBook: full single-owner config
           macbook-mrscraper = mkDarwinMachine {
             hostModule = ./hosts/darwin/macbook-mrscraper;
             aggressive = true;
           };
 
-          # Darwin (macOS) — beast: full single-owner config
           beast = mkDarwinMachine {
             hostModule = ./hosts/darwin/beast;
             aggressive = true;
           };
 
-          # NixOS Workstation — Asus Vivobook laptop
           ${config.workstationVivobookHostname} = mkWorkstationMachine {
             hostModule = ./hosts/workstation/vivobook;
             username = config.workstationVivobookUsername;
             enableTilingWM = config.workstationVivobookEnableTilingWM;
           };
 
-          # NixOS Workstation — desktop PC
           ${config.workstationPcHostname} = mkWorkstationMachine {
             hostModule = ./hosts/workstation/pc;
             username = config.workstationPcUsername;
             enableTilingWM = config.workstationPcEnableTilingWM;
           };
 
-          # Hostinger VPS
           hostinger = {
             nixpkgs.hostPlatform = "x86_64-linux";
             imports = [
-              # disko and sops-nix are provided by clan-core
-              # rkm-backend.nixosModules.default  # Disabled — Rust build, excluded from VPS build to skip cargo compile
-              # roasting-startup.nixosModules.default
+
               ./hosts/vps/hostinger
               (
                 { ... }:
@@ -390,11 +365,10 @@
             ];
           };
 
-          # DigitalOcean VPS
           digitalocean = {
             nixpkgs.hostPlatform = "x86_64-linux";
             imports = [
-              # disko is provided by clan-core
+
               ./hosts/vps/digitalocean
               home-manager.nixosModules.home-manager
               {
@@ -418,7 +392,7 @@
       };
     in
     {
-      # Inherit configurations from clan
+
       inherit (clan.config) darwinConfigurations clanInternals;
       clan = clan.config;
 
@@ -455,7 +429,7 @@
               pkgs = import pkgsSrc {
                 system = "aarch64-linux";
                 overlays = [ nix-on-droid.overlays.default ];
-                config.allowUnfree = true; # unrar and friends
+                config.allowUnfree = true;
               };
               inherit extraSpecialArgs;
               modules = [ hostModule ];
@@ -464,17 +438,13 @@
         {
           default = mkNixOnDroid { hostModule = ./hosts/android; };
           android = mkNixOnDroid { hostModule = ./hosts/android; };
-          # Use the 25.11 release nixpkgs: it predates the glibc 2.42 / nix 2.31.3
-          # change that broke nix-on-droid proot builds (#495), AND its aarch64
-          # binaries (vim plugins, treesitter grammars, LSPs) are fully cached by
-          # Hydra — so honor substitutes them instead of compiling on-device.
+
           honor = mkNixOnDroid {
             hostModule = ./hosts/android/honor;
             pkgsSrc = nixpkgs-stable;
             extraSpecialArgs = {
               inherit claude-code;
-              # Stable nixvim: nixvim main brings neovim 0.12/glibc 2.42,
-              # which freezes under proot — see nixvim-stable input comment.
+
               nixvim = nixvim-stable;
               nixpkgs = nixpkgs-stable;
             };

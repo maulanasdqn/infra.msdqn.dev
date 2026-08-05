@@ -20,7 +20,7 @@ in
       enable = true;
       config = {
         ProgramArguments = [ "${colimaStart}" ];
-        # Don't burn a VM's worth of RAM at every login — start on demand with `colima-up`.
+
         RunAtLoad = false;
         KeepAlive = false;
         StandardOutPath = "/tmp/colima.autostart.out.log";

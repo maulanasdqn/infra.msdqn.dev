@@ -11,10 +11,6 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  # TODO: replace the placeholders below with the output of
-  #   nixos-generate-config --show-hardware-config
-  # run on the actual PC (kernel modules, filesystem UUIDs, swap, CPU vendor).
-
   boot.initrd.availableKernelModules = [
     "nvme"
     "xhci_pci"

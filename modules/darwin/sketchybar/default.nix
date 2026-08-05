@@ -7,9 +7,7 @@
 }:
 let
   sketchybarPkg = pkgs.sketchybar;
-  # Workspace indicator — responds to aerospace_workspace_change event.
-  # $NAME  is set by sketchybar (e.g. "space.3")
-  # $AEROSPACE_FOCUSED_WORKSPACE is passed via the trigger payload
+
   spaceScript = pkgs.writeShellScript "sb-space" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     WS_NUM="''${NAME#space.}"
@@ -47,10 +45,6 @@ let
     sketchybar --set clock_month label="$(date +'%b')"
   '';
 
-  # CPU load. Single instantaneous `top` sample (user+sys), normalised to 100%
-  # across all cores. `-n 0` skips the process list so this stays cheap. Colour
-  # ramps foam → gold (≥50%) → love (≥85%). Hardcode /usr/bin/top: the procps
-  # `top` on PATH (from nixpkgs) is a Linux build that can't sample on macOS.
   cpuScript = pkgs.writeShellScript "sb-cpu" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     USED=$(/usr/bin/top -l 1 -n 0 2>/dev/null | awk '/CPU usage/ {u=$3; s=$5; gsub(/%/,"",u); gsub(/%/,"",s); printf "%.0f", u+s}')
@@ -65,10 +59,6 @@ let
     sketchybar --set cpu icon="󰻠" icon.color="$COLOR" label="''${USED}%"
   '';
 
-  # RAM usage. Activity-Monitor-style "memory used" = (active + wired +
-  # compressed) pages over hw.memsize, shown as a percentage. Pure vm_stat +
-  # sysctl reads, cheap at a 5s refresh. Colour ramps foam → gold (≥70%) →
-  # love (≥90%).
   ramScript = pkgs.writeShellScript "sb-ram" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     TOTAL=$(sysctl -n hw.memsize 2>/dev/null || echo 0)
@@ -92,11 +82,6 @@ let
     sketchybar --set ram icon="󰍛" icon.color="$COLOR" label="''${PCT}%"
   '';
 
-  # Swap-pressure early-warning. Uses the kernel's own pressure level
-  # (kern.memorystatus_vm_pressure_level: 1=normal 2=warn 4=critical) for the
-  # icon colour, and live swap usage (vm.swapusage) as the label — swap growing
-  # is the concrete "about to lag" signal on this machine. Both are instant
-  # sysctl reads, so this stays cheap at a 5s refresh.
   swapScript = pkgs.writeShellScript "sb-swap" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     LEVEL=$(sysctl -n kern.memorystatus_vm_pressure_level 2>/dev/null || echo 1)
@@ -136,10 +121,6 @@ let
     fi
   '';
 
-  # Event-driven (volume_change), so this fires only when the volume/mute
-  # actually changes — not on a poll. One osascript call returns both the level
-  # and the mute state (two calls = two AppleScript runtime spawns, the single
-  # most expensive repeated process churn on this machine).
   volumeScript = pkgs.writeShellScript "sb-volume" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
     RES=$(osascript -e "set s to (get volume settings)" \
@@ -498,21 +479,7 @@ lib.mkIf enableTilingWM {
 
   launchd.user.agents.sketchybar = {
     serviceConfig = {
-      # Point at the immutable nix store binary, NOT /usr/local/bin/sketchybar.
-      # The /usr/local copy is rm -f'd and re-cp'd at every boot by the
-      # activate-system daemon; if this agent's RunAtLoad fires during that
-      # window it execs a missing/partial binary → blank bar after reboot.
-      # (The /usr/local copy still exists below for the aerospace trigger +
-      # bare `sketchybar` calls inside the config, both of which run later.)
-      #
-      # But the store path has its own boot race: /nix is a separate APFS
-      # volume mounted by the darwin-store daemon, and this agent's RunAtLoad
-      # can fire before that mount lands. launchd then fails the spawn with
-      # EX_CONFIG (78) and penalty-boxes the agent — KeepAlive never retries,
-      # so the bar stays dead for the whole session. Wrap in /bin/sh (root
-      # volume, always present) + /bin/wait4path, which blocks until the
-      # store path is reachable, then exec. Same pattern org.nixos.nix-daemon
-      # uses for exactly this reason.
+
       ProgramArguments = [
         "/bin/sh"
         "-c"

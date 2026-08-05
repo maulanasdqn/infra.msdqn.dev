@@ -8,7 +8,7 @@
   ...
 }:
 let
-  # Security headers shared across all vhosts
+
   securityHeaders = ''
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
@@ -22,14 +22,7 @@ in
     ./disk-config.nix
     ../../../profiles/server.nix
     ../../../modules/nixos/sops.nix
-    # ./services/rkm-backend.nix  # Disabled — Rust app, excluded from clan VPS build to skip cargo compile
-    # ./services/roasting-startup.nix
-    # Disabled — both dumped host-local Postgres via `sudo -u postgres`, but the
-    # databases they targeted are gone (rkm-backend is excluded from this build,
-    # and Postgres now only runs inside per-app containers). The timers failed
-    # every night with "unknown user postgres".
-    # ./services/backup.nix
-    # ./services/yes-date-me-backup.nix
+
     ./services/kya-field-quote.nix
     ./services/kya-sales-reporting.nix
     ./services/kya-bond-closeout.nix
@@ -37,7 +30,6 @@ in
     ./services/kya-ci-runner-env.nix
   ];
 
-  # NixOS nginx as the sole reverse proxy + static file server
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
@@ -45,21 +37,8 @@ in
     recommendedTlsSettings = true;
     recommendedGzipSettings = true;
 
-    # api.rajawalikaryamulya.co.id — RKM backend (Rust)
-    # Disabled — rkm-backend excluded from the VPS build (no cargo compile);
-    # re-enable this vhost together with ./services/rkm-backend.nix.
-    # virtualHosts."api.rajawalikaryamulya.co.id" = {
-    #   enableACME = true;
-    #   forceSSL = true;
-    #   extraConfig = securityHeaders;
-    #   locations."/" = {
-    #     proxyPass = "http://127.0.0.1:3300";
-    #   };
-    # };
-
   };
 
-  # ACME (Let's Encrypt) configuration
   security.acme = {
     acceptTerms = true;
     defaults.email = acmeEmail;
@@ -68,11 +47,10 @@ in
   swapDevices = [
     {
       device = "/swapfile";
-      size = 2048; # 2GB
+      size = 2048;
     }
   ];
 
-  # Open HTTP/HTTPS for nginx
   networking.firewall.allowedTCPPorts = [
     80
     443

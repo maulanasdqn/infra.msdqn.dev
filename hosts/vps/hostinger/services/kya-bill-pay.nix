@@ -1,9 +1,6 @@
 { pkgs, ... }:
 let
-  # CI/CD deploy: GitHub Actions (s52ai/kya-group, deploy-bill-pay.yml) pipes
-  # `git archive HEAD` over SSH into this forced-command script — it rebuilds the
-  # image on the VPS and restarts the app + its BullMQ worker. The CI key can run
-  # ONLY this script (restrict + command=), never an arbitrary root shell.
+
   kyaBpCiDeploy = pkgs.writeShellScript "kya-bp-ci-deploy" ''
     set -euo pipefail
     umask 077
@@ -32,27 +29,11 @@ let
   '';
 in
 {
-  # KYA bill-pay ("AP Invoice Automation") — same shape as kya-sales-reporting.nix,
-  # on port 3005 with its own Postgres, Redis, podman network, runner and
-  # forced-command key, PLUS a second app container running the BullMQ worker
-  # (worker.ts). Nothing is shared with the other kya apps except the box.
-  # Secrets are read from env files created on the VPS (0600):
-  #   /etc/kya-bp-postgres.env  POSTGRES_USER/PASSWORD/DB (DB = bill_pay)
-  #   /etc/kya-bp.env           DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN, and the
-  #                             optional ANTHROPIC / GMAIL_* / SAGE_* / SHEETS_* /
-  #                             PHASE2_BILLS_ENABLED integration secrets.
 
-  # NOTE: replace the placeholder below with the real kya-bp CI deploy PUBLIC key
-  # (ssh-keygen -t ed25519 -C kya-bp-ci-deploy); its private half goes into the
-  # GitHub Actions secret VPS_SSH_KEY_BP on s52ai/kya-group.
   users.users.root.openssh.authorizedKeys.keys = [
     ''restrict,command="${kyaBpCiDeploy}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICucFpY4kNeawx8trOIq6ZRSeUMLU6esPAaPdqFuClRP kya-bp-ci-deploy''
   ];
 
-  # Self-hosted runner, labelled kya-bp so deploy-bill-pay.yml lands here.
-  # Registration token in /etc/github-runner-kya-bp.token (0600, created on the
-  # VPS; refresh with:
-  #   gh api -X POST repos/s52ai/kya-group/actions/runners/registration-token --jq .token).
   services.github-runners.kya-bp = {
     enable = true;
     name = "kya-bp-vps";
@@ -189,8 +170,6 @@ in
     };
   };
 
-  # Served at kya-bp.stynx.app (Cloudflare DNS → A record to 72.62.125.38,
-  # DNS-only/grey-cloud so ACME HTTP-01 reaches the origin).
   services.nginx.virtualHosts."kya-bp.stynx.app" = {
     enableACME = true;
     forceSSL = true;

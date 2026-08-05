@@ -4,10 +4,7 @@
   ...
 }:
 let
-  # Caffeine toggle — flip a "never lock/sleep" mode on or off.
-  # hypridle is the only thing that drives auto lock / dpms-off / suspend,
-  # so stopping it = screen never locks or sleeps on idle. Manual $mod+X
-  # (hyprlock) and the lid switch still work.
+
   caffeine = pkgs.writeShellScriptBin "caffeine" ''
     if ${pkgs.systemd}/bin/systemctl --user -q is-active hypridle; then
       ${pkgs.systemd}/bin/systemctl --user stop hypridle
@@ -36,16 +33,16 @@ in
 
         listener = [
           {
-            timeout = 300;                                   # 5 min — lock
+            timeout = 300;
             on-timeout = "loginctl lock-session";
           }
           {
-            timeout = 420;                                   # 7 min — screen off
+            timeout = 420;
             on-timeout = "hyprctl dispatch dpms off";
             on-resume = "hyprctl dispatch dpms on";
           }
           {
-            timeout = 900;                                   # 15 min — suspend
+            timeout = 900;
             on-timeout = "systemctl suspend";
           }
         ];

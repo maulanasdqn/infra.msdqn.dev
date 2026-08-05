@@ -1,6 +1,6 @@
 { pkgs, ... }:
 let
-  # Shared source for both the editor plugin and the `stynx` CLI it drives.
+
   stynxSrc = pkgs.fetchFromGitHub {
     owner = "maulanasdqn";
     repo = "stynx-code";
@@ -8,7 +8,6 @@ let
     hash = "sha256-AWKSeiC/tkR2XdBr46rdI0QVNVF8eUaj7tnSJSEVOb8=";
   };
 
-  # The `stynx` binary (workspace member `stynx-code`) the plugin shells out to.
   stynx-cli = pkgs.rustPlatform.buildRustPackage {
     pname = "stynx";
     version = "3.12.1";
@@ -29,7 +28,6 @@ let
     };
   };
 
-  # The Neovim plugin, living in the stynx-code-nvim/ subdir of the repo.
   stynx-nvim = pkgs.vimUtils.buildVimPlugin {
     pname = "stynx-code-nvim";
     version = "3.12.1";
@@ -40,7 +38,6 @@ in
   programs.nixvim = {
     extraPlugins = [ stynx-nvim ];
 
-    # Put `stynx` on Neovim's PATH so the plugin's job runner can find it.
     extraPackages = [ stynx-cli ];
 
     extraConfigLua = ''

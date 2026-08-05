@@ -6,11 +6,11 @@
 }:
 {
   home-manager.users.${username} = {
-    # Shared CLI tools (also used by nix-on-droid/honor).
+
     imports = [ ./cli.nix ];
 
     home = {
-      # GUI / desktop-only apps (workstation-specific).
+
       packages = with pkgs; [
         claude-desktop.packages.${pkgs.system}.claude-desktop-with-fhs
         (callPackage ../../../pkgs/helium-browser { })

@@ -86,7 +86,5 @@
       };
     };
 
-    # TODO: Add wallpaper.jpg to repo root to enable this
-    # home.file.".config/hypr/wallpaper.jpg".source = ../../../wallpaper.jpg;
   };
 }

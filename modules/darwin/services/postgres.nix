@@ -1,12 +1,10 @@
 { pkgs, lib, enableAggressiveTweaks ? false, ... }:
 let
-  # Off: dev databases live in containers under Colima, and this daemon was failing
-  # to start anyway (org.nixos.postgresql exited 2 at every login). Flip to true to
-  # bring the system-wide server back.
+
   enablePostgres = false;
 in
 {
-  # System-wide PostgreSQL (port 5433, trust auth) — single-owner machines only.
+
   services.postgresql = lib.mkIf (enableAggressiveTweaks && enablePostgres) {
     enable = true;
     package = pkgs.postgresql_17;

@@ -27,7 +27,6 @@ in
 {
   environment.systemPackages = [ pkgs.rclone backupScript ];
 
-  # Systemd service for backup
   systemd.services.rkm-backup = {
     description = "RKM Database Backup to Google Drive";
     after = [ "postgresql.service" "network-online.target" ];
@@ -39,7 +38,6 @@ in
     };
   };
 
-  # Daily timer at 2 AM
   systemd.timers.rkm-backup = {
     description = "Daily RKM Database Backup";
     wantedBy = [ "timers.target" ];
@@ -50,12 +48,10 @@ in
     };
   };
 
-  # Create backup directory
   systemd.tmpfiles.rules = [
     "d /var/lib/backup 0700 root root -"
   ];
 
-  # Add rclone config to sops secrets
   sops.secrets."rclone_config" = {
     mode = "0400";
     owner = "root";

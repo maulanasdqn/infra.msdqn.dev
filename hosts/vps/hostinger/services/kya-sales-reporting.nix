@@ -1,9 +1,6 @@
 { pkgs, ... }:
 let
-  # CI/CD deploy: GitHub Actions (s52ai/kya-group, deploy-sales-reporting.yml)
-  # pipes `git archive HEAD` over SSH into this forced-command script — it
-  # rebuilds the image on the VPS and restarts the app. The CI key can run ONLY
-  # this script (restrict + command=), never an arbitrary root shell.
+
   kyaSrCiDeploy = pkgs.writeShellScript "kya-sr-ci-deploy" ''
     set -euo pipefail
     umask 077
@@ -31,21 +28,11 @@ let
   '';
 in
 {
-  # KYA sales-reporting ("Sales Reconciliation & Commission Dashboard") — same
-  # shape as kya-field-quote.nix, on port 3002 with its own Postgres, podman
-  # network, runner and forced-command key. Nothing is shared with kya-fq except
-  # the box. Secrets are read from env files created on the VPS (0600):
-  #   /etc/kya-sr-postgres.env  POSTGRES_USER/PASSWORD/DB
-  #   /etc/kya-sr.env           DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN, admin bootstrap
 
   users.users.root.openssh.authorizedKeys.keys = [
     ''restrict,command="${kyaSrCiDeploy}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH1QIz+011BymMfk/f3sxZ5HzUAI0M3jxMtlpdryQEI4 kya-sr-ci-deploy''
   ];
 
-  # Second self-hosted runner, labelled kya-sr so deploy-sales-reporting.yml
-  # lands here and not on the field-quote runner. Registration token in
-  # /etc/github-runner-kya-sr.token (0600, created on the VPS; refresh with:
-  #   gh api -X POST repos/s52ai/kya-group/actions/runners/registration-token --jq .token).
   services.github-runners.kya-sr = {
     enable = true;
     name = "kya-sr-vps";
@@ -155,8 +142,6 @@ in
     };
   };
 
-  # Served at kya-sr.stynx.app (Cloudflare DNS → A record to 72.62.125.38,
-  # DNS-only/grey-cloud so ACME HTTP-01 reaches the origin).
   services.nginx.virtualHosts."kya-sr.stynx.app" = {
     enableACME = true;
     forceSSL = true;

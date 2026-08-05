@@ -10,17 +10,15 @@
     ./base.nix
   ];
 
-  # Enable zram swap to prevent OOM during builds
   zramSwap = {
     enable = true;
     algorithm = "zstd";
-    memoryPercent = 50;  # Use 50% of RAM as compressed swap
+    memoryPercent = 50;
   };
 
-  # Limit Nix build parallelism to prevent OOM
   nix.settings = {
-    max-jobs = 1;  # Only 1 build job at a time
-    cores = 2;     # Use max 2 cores per build
+    max-jobs = 1;
+    cores = 2;
     substituters = [
       "https://cache.nixos.org"
       "https://msdqn.cachix.org"
@@ -39,13 +37,13 @@
 
     firewall = {
       enable = true;
-      allowPing = lib.mkForce false;  # Security: disable ping responses
+      allowPing = lib.mkForce false;
       logReversePathDrops = true;
       logRefusedConnections = true;
       allowedTCPPorts = [
-        22   # SSH
-        80   # HTTP (nginx)
-        443  # HTTPS (nginx)
+        22
+        80
+        443
       ];
       allowedUDPPorts = [ ];
     };
@@ -72,13 +70,13 @@
 
   services.nginx = {
     enable = true;
-    additionalModules = [ pkgs.nginxModules.brotli ]; # Load brotli module for app modules that use it
-    recommendedGzipSettings = lib.mkForce false; # Force disabled - app modules add their own gzip settings
+    additionalModules = [ pkgs.nginxModules.brotli ];
+    recommendedGzipSettings = lib.mkForce false;
     recommendedOptimisation = true;
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
-    clientMaxBodySize = "100m"; # Max upload size
-    recommendedBrotliSettings = lib.mkForce false; # Force disabled - app modules add their own brotli settings
+    clientMaxBodySize = "100m";
+    recommendedBrotliSettings = lib.mkForce false;
     sslCiphers = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
     proxyTimeout = "300s";
     appendHttpConfig = ''
@@ -138,11 +136,11 @@
     bantime = "1h";
     bantime-increment = {
       enable = true;
-      maxtime = "168h";  # 1 week max ban
+      maxtime = "168h";
       multipliers = "1 2 4 8 16 32 64";
     };
     jails = {
-      # Authentication failures
+
       nginx-http-auth = {
         settings = {
           enabled = true;
@@ -152,7 +150,7 @@
           bantime = "1h";
         };
       };
-      # Bot detection
+
       nginx-botsearch = {
         settings = {
           enabled = true;
@@ -162,7 +160,7 @@
           bantime = "1h";
         };
       };
-      # Rate limit violations (429 responses)
+
       nginx-limit-req = {
         settings = {
           enabled = true;
@@ -173,7 +171,7 @@
           bantime = "10m";
         };
       };
-      # Bad requests (400 errors - potential scanner)
+
       nginx-bad-request = {
         settings = {
           enabled = true;
@@ -184,7 +182,7 @@
           bantime = "30m";
         };
       };
-      # Repeated 403/404 - potential scanner
+
       nginx-req-limit = {
         settings = {
           enabled = true;
@@ -198,7 +196,6 @@
     };
   };
 
-  # Custom fail2ban filters
   environment.etc = {
     "fail2ban/filter.d/nginx-bad-request.local".text = ''
       [Definition]
@@ -213,7 +210,7 @@
   };
 
   boot.kernel.sysctl = {
-    # Network hardening
+
     "net.ipv4.conf.all.rp_filter" = 1;
     "net.ipv4.conf.default.rp_filter" = 1;
     "net.ipv4.conf.all.accept_redirects" = 0;
@@ -228,13 +225,11 @@
     "net.ipv4.conf.all.log_martians" = 1;
     "net.ipv4.conf.default.log_martians" = 1;
 
-    # Disable source routing
     "net.ipv4.conf.all.accept_source_route" = 0;
     "net.ipv4.conf.default.accept_source_route" = 0;
     "net.ipv6.conf.all.accept_source_route" = 0;
     "net.ipv6.conf.default.accept_source_route" = 0;
 
-    # Kernel hardening
     "kernel.kptr_restrict" = 2;
     "kernel.dmesg_restrict" = 1;
     "kernel.perf_event_paranoid" = 3;
@@ -242,7 +237,6 @@
     "kernel.unprivileged_bpf_disabled" = 1;
     "net.core.bpf_jit_harden" = 2;
 
-    # TCP hardening
     "net.ipv4.tcp_rfc1337" = 1;
     "net.ipv4.tcp_timestamps" = 0;
   };
@@ -262,7 +256,6 @@
     }
   ];
 
-  # Use podman instead of docker
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
@@ -273,39 +266,29 @@
     defaultNetwork.settings.dns_enabled = true;
   };
 
-  # Enable container networking
   virtualisation.oci-containers.backend = "podman";
 
-  # Disable auto-upgrade - use manual deploys from GitHub
   system.autoUpgrade.enable = false;
 
   services.logrotate.enable = true;
   services.avahi.enable = false;
   services.printing.enable = false;
 
-  # Additional security hardening
   security.protectKernelImage = true;
-  security.lockKernelModules = false;  # Required for containers
+  security.lockKernelModules = false;
 
-  # Audit logging removed along with the SIEM/SOAR stack. The `-S execve` rule
-  # logged every process execution on the box (5 records per exec) and NixOS
-  # generates an auditd.conf with no max_log_file/num_logs/max_log_file_action,
-  # so /var/log/audit/audit.log grew unbounded to 68 GB. Its only consumers were
-  # fluent-bit and the wazuh agent, both of which are gone.
   security.auditd.enable = false;
   security.audit.enable = false;
 
-  # Disable unnecessary services
   services.xserver.enable = false;
 
   environment.systemPackages = with pkgs; [
-    # System monitoring
+
     htop
     iotop
     ncdu
     bottom
 
-    # Utilities
     tmux
     ripgrep
     fd
@@ -315,12 +298,10 @@
     wget
     git
 
-    # Container management
     podman-compose
 
-    # Security tools
-    lynis        # Security auditing
-    unhide       # Forensic tool to find hidden processes
+    lynis
+    unhide
   ];
 
 }

@@ -27,7 +27,6 @@ in
 {
   environment.systemPackages = [ backupScript ];
 
-  # Systemd service for backup
   systemd.services.yes-date-me-backup = {
     description = "Yes Date Me Database Backup to Google Drive";
     after = [ "postgresql.service" "network-online.target" ];
@@ -39,7 +38,6 @@ in
     };
   };
 
-  # Daily timer at 2:30 AM (staggered from rkm-backup)
   systemd.timers.yes-date-me-backup = {
     description = "Daily Yes Date Me Database Backup";
     wantedBy = [ "timers.target" ];
