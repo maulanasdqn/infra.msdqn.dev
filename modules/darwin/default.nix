@@ -1,9 +1,5 @@
 {
-  config,
-  pkgs,
-  lib,
   username,
-  enableTilingWM ? false,
   sshKeys ? [ ],
   ...
 }:

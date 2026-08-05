@@ -1,4 +1,8 @@
-{ lib, enableAggressiveTweaks ? false, ... }:
+{
+  lib,
+  enableAggressiveTweaks ? false,
+  ...
+}:
 {
 
   launchd.daemons = lib.mkIf enableAggressiveTweaks {

@@ -1,4 +1,9 @@
-{ username, lib, enableAggressiveTweaks ? false, ... }:
+{
+  username,
+  lib,
+  enableAggressiveTweaks ? false,
+  ...
+}:
 {
   system.stateVersion = 5;
   system.primaryUser = username;

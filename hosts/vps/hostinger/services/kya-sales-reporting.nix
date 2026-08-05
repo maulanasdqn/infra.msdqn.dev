@@ -10,9 +10,6 @@ let
     cd /opt/kya-sales-reporting
     ${pkgs.podman}/bin/podman build --net=host \
       -f apps/sales-reporting/Dockerfile -t localhost/kya-sales-reporting:latest .
-    # Apply DB migrations + bootstrap with the freshly-built image BEFORE rolling
-    # the app. restart re-runs the oneshot and blocks on it — a failed migration
-    # aborts here (set -e) and leaves the old app running.
     ${pkgs.systemd}/bin/systemctl restart kya-sr-migrate.service
     ${pkgs.systemd}/bin/systemctl restart kya-sr.service
     for _ in $(seq 1 45); do
@@ -40,14 +37,20 @@ in
     tokenFile = "/etc/github-runner-kya-sr.token";
     extraLabels = [ "kya-sr" ];
     replace = true;
-    extraPackages = with pkgs; [ git openssh ];
+    extraPackages = with pkgs; [
+      git
+      openssh
+    ];
   };
 
   virtualisation.oci-containers.containers.kya-sr-postgres = {
     image = "postgres:17-alpine";
     volumes = [ "/var/lib/kya-sr/postgres:/var/lib/postgresql/data" ];
     environmentFiles = [ "/etc/kya-sr-postgres.env" ];
-    extraOptions = [ "--network=kya-sr-net" "--memory=512m" ];
+    extraOptions = [
+      "--network=kya-sr-net"
+      "--memory=512m"
+    ];
   };
 
   virtualisation.oci-containers.containers.kya-sr-redis = {
@@ -63,7 +66,10 @@ in
       "--maxmemory-policy"
       "allkeys-lru"
     ];
-    extraOptions = [ "--network=kya-sr-net" "--memory=192m" ];
+    extraOptions = [
+      "--network=kya-sr-net"
+      "--memory=192m"
+    ];
   };
 
   systemd.tmpfiles.rules = [
@@ -90,8 +96,14 @@ in
 
   systemd.services.kya-sr-migrate = {
     description = "KYA sales-reporting DB migrate + bootstrap admin";
-    after = [ "podman-kya-sr-postgres.service" "kya-sr-network.service" ];
-    requires = [ "podman-kya-sr-postgres.service" "kya-sr-network.service" ];
+    after = [
+      "podman-kya-sr-postgres.service"
+      "kya-sr-network.service"
+    ];
+    requires = [
+      "podman-kya-sr-postgres.service"
+      "kya-sr-network.service"
+    ];
     before = [ "kya-sr.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
@@ -123,7 +135,10 @@ in
       "kya-sr-network.service"
       "podman-kya-sr-redis.service"
     ];
-    requires = [ "kya-sr-migrate.service" "kya-sr-network.service" ];
+    requires = [
+      "kya-sr-migrate.service"
+      "kya-sr-network.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Restart = "always";

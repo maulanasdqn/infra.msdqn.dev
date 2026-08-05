@@ -103,8 +103,6 @@ let
 
   wifiScript = pkgs.writeShellScript "sb-network" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
-    # Use the active default-route interface, not a hardcoded en0 — the Mac mini
-    # is on en1 (Wi-Fi), MacBooks vary. Pick whichever carries the default route.
     IFACE=$(route -n get default 2>/dev/null | awk '/interface:/{print $2}')
     IP=""
     [ -n "$IFACE" ] && IP=$(ipconfig getifaddr "$IFACE" 2>/dev/null)
@@ -135,23 +133,22 @@ let
   '';
 
   brightnessScript = pkgs.writeShellScript "sb-brightness" ''
-    export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
-    BRIGHT=$(python3 -c "
-import ctypes, sys
-ds = ctypes.CDLL('/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices')
-ds.DisplayServicesGetBrightness.restype = ctypes.c_int
-val = ctypes.c_float()
-ret = ds.DisplayServicesGetBrightness(1, ctypes.byref(val))
-if ret != 0:
-    sys.exit(1)
-print(int(val.value * 100))
-" 2>/dev/null)
-    # No controllable internal display (Mac mini → external-only, ret!=0) — hide it.
-    if [ -z "$BRIGHT" ]; then
-      sketchybar --set brightness drawing=off
-      exit 0
-    fi
-    sketchybar --set brightness drawing=on icon="󰖨" icon.color=0xfff6c177 label="''${BRIGHT}"
+        export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
+        BRIGHT=$(python3 -c "
+    import ctypes, sys
+    ds = ctypes.CDLL('/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices')
+    ds.DisplayServicesGetBrightness.restype = ctypes.c_int
+    val = ctypes.c_float()
+    ret = ds.DisplayServicesGetBrightness(1, ctypes.byref(val))
+    if ret != 0:
+        sys.exit(1)
+    print(int(val.value * 100))
+    " 2>/dev/null)
+        if [ -z "$BRIGHT" ]; then
+          sketchybar --set brightness drawing=off
+          exit 0
+        fi
+        sketchybar --set brightness drawing=on icon="󰖨" icon.color=0xfff6c177 label="''${BRIGHT}"
   '';
 
   batteryScript = pkgs.writeShellScript "sb-battery" ''
@@ -173,18 +170,6 @@ print(int(val.value * 100))
   '';
 
   sketchybarrc = pkgs.writeShellScript "sketchybarrc" ''
-    # Rosé Pine — sketchybar top bar (mirrors eww vertical bar)
-
-    # Island layout: the bar itself draws nothing (fully transparent, no border,
-    # no radius) and each logical group gets its own rounded background via a
-    # bracket. blur_radius is a bar-level property, so it has nothing to act on
-    # once the bar is transparent — islands are drawn opaque instead.
-    # Geometry: y_offset 8 + the 2px of slack from a 34px bar around a 30px island
-    # puts 10px above the islands, matching outer.left/right/bottom and the gap
-    # below them. height stays only 4px over the island so that slack can't grow
-    # into dead space — the offset does the spacing, not the bar.
-    # AeroSpace's outer.top is derived from y_offset + height, so the two must move
-    # together; see the topGap derivation in the aerospace module.
     sketchybar --bar \
       position=top \
       height=34 \
@@ -198,8 +183,6 @@ print(int(val.value * 100))
       y_offset=8 \
       topmost=window
 
-    # Shared island chrome, applied to every bracket below. Left unquoted at the
-    # call site so it word-splits into separate args.
     ISLAND="background.drawing=on \
       background.color=0xee191724 \
       background.corner_radius=14 \
@@ -207,10 +190,6 @@ print(int(val.value * 100))
       background.border_width=1 \
       background.border_color=0x30c4a7e7"
 
-    # A bracket's background spans the bounding box of its members, and an item's
-    # own padding_left/right counts as part of that box — so item padding cannot
-    # separate two adjacent islands. The gaps have to come from items that belong
-    # to no bracket at all.
     GAP="background.drawing=off icon.drawing=off label.drawing=off"
 
     sketchybar --default \
@@ -224,12 +203,6 @@ print(int(val.value * 100))
       label.padding_left=4 \
       label.padding_right=4
 
-    # Nix logo — U+F313 (nf-linux-nixos), verified present in the patched
-    # JetBrainsMono Nerd Font this bar uses. Built with printf rather than pasted
-    # in literally: this item previously shipped as icon="" with an empty string,
-    # because the raw glyph was silently dropped somewhere in an edit and a blank
-    # icon renders as an empty island with no error. The escape can't be lost that
-    # way, and it keeps the codepoint greppable.
     NIX_LOGO=$(printf '\uf313')
 
     sketchybar --add item logo left \
@@ -241,23 +214,14 @@ print(int(val.value * 100))
         icon.padding_right=14 \
         label.drawing=off
 
-    # Gap between the logo island and the workspaces island
     sketchybar --add item gap.1 left \
       --set gap.1 width=10 $GAP
 
-    # Inner padding for the workspaces island. Unlike the gap.N items these ARE
-    # members of the is_spaces bracket, so the island background extends across
-    # them — that is what puts breathing room between the island edge and the
-    # first/last dot. Doing it with padding on space.1/space.6 instead would drift:
-    # spaceScript rewrites icon.padding (1 ↔ 10) on every focus change, so the
-    # island's inset would visibly jump whenever workspace 1 or 6 took focus.
     sketchybar --add item ws_pad.l left \
       --set ws_pad.l width=6 $GAP
 
-    # Register Aerospace workspace change event
     sketchybar --add event aerospace_workspace_change
 
-    # Workspaces 1–6 (matches eww)
     for i in 1 2 3 4 5 6; do
       sketchybar --add item "space.''${i}" left \
         --set "space.''${i}" \
@@ -280,11 +244,9 @@ print(int(val.value * 100))
         --subscribe "space.''${i}" aerospace_workspace_change
     done
 
-    # Closing half of the workspaces-island padding — see ws_pad.l above.
     sketchybar --add item ws_pad.r left \
       --set ws_pad.r width=6 $GAP
 
-    # Status items — consistent icon+label spacing
     sketchybar --add item wifi right \
       --set wifi \
         update_freq=10 \
@@ -297,7 +259,6 @@ print(int(val.value * 100))
         label.padding_left=0 \
         label.padding_right=10
 
-    # Gap: network island │ hardware island
     sketchybar --add item gap.2 right \
       --set gap.2 width=10 $GAP
 
@@ -313,8 +274,6 @@ print(int(val.value * 100))
         label.padding_right=10 \
       --subscribe volume volume_change
 
-    # Poll slowly (30s) as a fallback, but mainly react to brightness_change —
-    # python3 startup is heavy, so we want this firing on change, not every 5s.
     sketchybar --add item brightness right \
       --set brightness \
         update_freq=30 \
@@ -340,12 +299,9 @@ print(int(val.value * 100))
         label.padding_left=0 \
         label.padding_right=10
 
-    # Gap: hardware island │ system-metrics island
     sketchybar --add item gap.3 right \
       --set gap.3 width=10 $GAP
 
-    # Swap pressure — icon colour = kernel pressure level, label = swap used.
-    # Added first so the cpu/ram/swap block reads left→right CPU · RAM · SWAP.
     sketchybar --add item swap right \
       --set swap \
         update_freq=5 \
@@ -358,7 +314,6 @@ print(int(val.value * 100))
         label.padding_left=0 \
         label.padding_right=10
 
-    # RAM usage — (active + wired + compressed) / total, as a percentage
     sketchybar --add item ram right \
       --set ram \
         update_freq=5 \
@@ -371,7 +326,6 @@ print(int(val.value * 100))
         label.padding_left=0 \
         label.padding_right=10
 
-    # CPU load — user + sys, normalised to 100% across all cores
     sketchybar --add item cpu right \
       --set cpu \
         update_freq=10 \
@@ -384,11 +338,9 @@ print(int(val.value * 100))
         label.padding_left=0 \
         label.padding_right=10
 
-    # Gap: system-metrics island │ clock island
     sketchybar --add item gap.4 right \
       --set gap.4 width=10 $GAP
 
-    # Clock — H · M   date Mon
     sketchybar --add item clock_month right \
       --set clock_month \
         update_freq=1800 \
@@ -438,8 +390,6 @@ print(int(val.value * 100))
         label.padding_left=12 \
         label.padding_right=0
 
-    # Islands. Each bracket wraps a contiguous run of items; the gap.N items
-    # deliberately sit outside every bracket so the backgrounds don't touch.
     sketchybar \
       --add bracket is_logo   logo \
       --add bracket is_spaces ws_pad.l space.1 space.2 space.3 space.4 space.5 space.6 ws_pad.r \
@@ -454,7 +404,6 @@ print(int(val.value * 100))
 
     sketchybar --update
 
-    # Trigger initial workspace highlight
     INIT_WS=$(aerospace list-workspaces --focused 2>/dev/null || echo "1")
     sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE="$INIT_WS"
   '';

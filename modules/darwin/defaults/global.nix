@@ -3,8 +3,12 @@
   system.defaults.CustomUserPreferences = {
     "com.apple.symbolichotkeys" = {
       AppleSymbolicHotKeys = {
-        "64" = { enabled = true; };
-        "65" = { enabled = true; };
+        "64" = {
+          enabled = true;
+        };
+        "65" = {
+          enabled = true;
+        };
       };
     };
 

@@ -37,14 +37,20 @@ in
     tokenFile = "/etc/github-runner-kya-bc.token";
     extraLabels = [ "kya-bc" ];
     replace = true;
-    extraPackages = with pkgs; [ git openssh ];
+    extraPackages = with pkgs; [
+      git
+      openssh
+    ];
   };
 
   virtualisation.oci-containers.containers.kya-bc-postgres = {
     image = "postgres:17-alpine";
     volumes = [ "/var/lib/kya-bc/postgres:/var/lib/postgresql/data" ];
     environmentFiles = [ "/etc/kya-bc-postgres.env" ];
-    extraOptions = [ "--network=kya-bc-net" "--memory=512m" ];
+    extraOptions = [
+      "--network=kya-bc-net"
+      "--memory=512m"
+    ];
   };
 
   virtualisation.oci-containers.containers.kya-bc-redis = {
@@ -60,7 +66,10 @@ in
       "--maxmemory-policy"
       "allkeys-lru"
     ];
-    extraOptions = [ "--network=kya-bc-net" "--memory=192m" ];
+    extraOptions = [
+      "--network=kya-bc-net"
+      "--memory=192m"
+    ];
   };
 
   systemd.tmpfiles.rules = [
@@ -87,8 +96,14 @@ in
 
   systemd.services.kya-bc-migrate = {
     description = "KYA bond-closeout DB migrate + bootstrap admin";
-    after = [ "podman-kya-bc-postgres.service" "kya-bc-network.service" ];
-    requires = [ "podman-kya-bc-postgres.service" "kya-bc-network.service" ];
+    after = [
+      "podman-kya-bc-postgres.service"
+      "kya-bc-network.service"
+    ];
+    requires = [
+      "podman-kya-bc-postgres.service"
+      "kya-bc-network.service"
+    ];
     before = [ "kya-bc.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
@@ -120,7 +135,10 @@ in
       "kya-bc-network.service"
       "podman-kya-bc-redis.service"
     ];
-    requires = [ "kya-bc-migrate.service" "kya-bc-network.service" ];
+    requires = [
+      "kya-bc-migrate.service"
+      "kya-bc-network.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Restart = "always";

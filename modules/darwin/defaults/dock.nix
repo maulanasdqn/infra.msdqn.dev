@@ -11,7 +11,7 @@
     minimize-to-application = true;
     tilesize = 1;
     static-only = true;
-    persistent-apps = [];
-    persistent-others = [];
+    persistent-apps = [ ];
+    persistent-others = [ ];
   };
 }

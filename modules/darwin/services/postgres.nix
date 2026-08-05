@@ -1,4 +1,9 @@
-{ pkgs, lib, enableAggressiveTweaks ? false, ... }:
+{
+  pkgs,
+  lib,
+  enableAggressiveTweaks ? false,
+  ...
+}:
 let
 
   enablePostgres = false;

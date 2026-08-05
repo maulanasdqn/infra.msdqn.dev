@@ -27,13 +27,16 @@ in
 {
   programs.nix-ld.enable = true;
 
-  systemd.services = lib.genAttrs [
-    "github-runner-kya-fq"
-    "github-runner-kya-sr"
-    "github-runner-kya-bc"
-    "github-runner-kya-bp"
-  ] (_: {
-    environment = ldEnv;
-    path = ciTools;
-  });
+  systemd.services =
+    lib.genAttrs
+      [
+        "github-runner-kya-fq"
+        "github-runner-kya-sr"
+        "github-runner-kya-bc"
+        "github-runner-kya-bp"
+      ]
+      (_: {
+        environment = ldEnv;
+        path = ciTools;
+      });
 }

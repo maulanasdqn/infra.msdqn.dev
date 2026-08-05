@@ -1,17 +1,19 @@
-{ enableLaravel, enableAggressiveTweaks ? false, lib, ... }:
+{
+  enableLaravel,
+  enableAggressiveTweaks ? false,
+  lib,
+  ...
+}:
 {
   homebrew = {
     enable = true;
     onActivation = {
       autoUpdate = true;
-
       cleanup = if enableAggressiveTweaks then "zap" else "none";
     };
 
     brews = [
-
       "xcodegen"
-
       "swiftlint"
     ]
     ++ lib.optionals enableLaravel [

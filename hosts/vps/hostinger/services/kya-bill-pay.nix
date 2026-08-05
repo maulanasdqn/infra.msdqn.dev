@@ -10,9 +10,6 @@ let
     cd /opt/kya-bill-pay
     ${pkgs.podman}/bin/podman build --net=host \
       -f apps/bill-pay/Dockerfile -t localhost/kya-bill-pay:latest .
-    # Apply DB migrations with the freshly-built image BEFORE rolling the app.
-    # restart re-runs the oneshot and blocks on it — a failed migration aborts
-    # here (set -e) and leaves the old app + worker running.
     ${pkgs.systemd}/bin/systemctl restart kya-bp-migrate.service
     ${pkgs.systemd}/bin/systemctl restart kya-bp.service
     ${pkgs.systemd}/bin/systemctl restart kya-bp-worker.service
@@ -41,14 +38,20 @@ in
     tokenFile = "/etc/github-runner-kya-bp.token";
     extraLabels = [ "kya-bp" ];
     replace = true;
-    extraPackages = with pkgs; [ git openssh ];
+    extraPackages = with pkgs; [
+      git
+      openssh
+    ];
   };
 
   virtualisation.oci-containers.containers.kya-bp-postgres = {
     image = "postgres:17-alpine";
     volumes = [ "/var/lib/kya-bp/postgres:/var/lib/postgresql/data" ];
     environmentFiles = [ "/etc/kya-bp-postgres.env" ];
-    extraOptions = [ "--network=kya-bp-net" "--memory=512m" ];
+    extraOptions = [
+      "--network=kya-bp-net"
+      "--memory=512m"
+    ];
   };
 
   virtualisation.oci-containers.containers.kya-bp-redis = {
@@ -64,7 +67,10 @@ in
       "--maxmemory-policy"
       "noeviction"
     ];
-    extraOptions = [ "--network=kya-bp-net" "--memory=256m" ];
+    extraOptions = [
+      "--network=kya-bp-net"
+      "--memory=256m"
+    ];
   };
 
   systemd.tmpfiles.rules = [
@@ -92,9 +98,18 @@ in
 
   systemd.services.kya-bp-migrate = {
     description = "KYA bill-pay DB migrate + bootstrap admin";
-    after = [ "podman-kya-bp-postgres.service" "kya-bp-network.service" ];
-    requires = [ "podman-kya-bp-postgres.service" "kya-bp-network.service" ];
-    before = [ "kya-bp.service" "kya-bp-worker.service" ];
+    after = [
+      "podman-kya-bp-postgres.service"
+      "kya-bp-network.service"
+    ];
+    requires = [
+      "podman-kya-bp-postgres.service"
+      "kya-bp-network.service"
+    ];
+    before = [
+      "kya-bp.service"
+      "kya-bp-worker.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
@@ -125,7 +140,10 @@ in
       "kya-bp-network.service"
       "podman-kya-bp-redis.service"
     ];
-    requires = [ "kya-bp-migrate.service" "kya-bp-network.service" ];
+    requires = [
+      "kya-bp-migrate.service"
+      "kya-bp-network.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Restart = "always";
@@ -151,7 +169,10 @@ in
       "kya-bp-network.service"
       "podman-kya-bp-redis.service"
     ];
-    requires = [ "kya-bp-migrate.service" "kya-bp-network.service" ];
+    requires = [
+      "kya-bp-migrate.service"
+      "kya-bp-network.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Restart = "always";

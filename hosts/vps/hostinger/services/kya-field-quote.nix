@@ -10,9 +10,6 @@ let
     cd /opt/kya-group
     ${pkgs.podman}/bin/podman build --net=host \
       -f apps/field-quote/Dockerfile -t localhost/kya-field-quote:latest .
-    # Apply DB migrations + bootstrap with the freshly-built image BEFORE rolling
-    # the app. restart re-runs the oneshot and blocks on it — a failed migration
-    # aborts here (set -e) and leaves the old app running.
     ${pkgs.systemd}/bin/systemctl restart kya-fq-migrate.service
     ${pkgs.systemd}/bin/systemctl restart kya-fq.service
     for _ in $(seq 1 45); do
@@ -40,14 +37,20 @@ in
     tokenFile = "/etc/github-runner-kya.token";
     extraLabels = [ "kya-fq" ];
     replace = true;
-    extraPackages = with pkgs; [ git openssh ];
+    extraPackages = with pkgs; [
+      git
+      openssh
+    ];
   };
 
   virtualisation.oci-containers.containers.kya-fq-postgres = {
     image = "postgres:17-alpine";
     volumes = [ "/var/lib/kya-fq/postgres:/var/lib/postgresql/data" ];
     environmentFiles = [ "/etc/kya-fq-postgres.env" ];
-    extraOptions = [ "--network=kya-fq-net" "--memory=512m" ];
+    extraOptions = [
+      "--network=kya-fq-net"
+      "--memory=512m"
+    ];
   };
 
   systemd.tmpfiles.rules = [
@@ -73,8 +76,14 @@ in
 
   systemd.services.kya-fq-migrate = {
     description = "KYA field-quote DB migrate + bootstrap admin";
-    after = [ "podman-kya-fq-postgres.service" "kya-fq-network.service" ];
-    requires = [ "podman-kya-fq-postgres.service" "kya-fq-network.service" ];
+    after = [
+      "podman-kya-fq-postgres.service"
+      "kya-fq-network.service"
+    ];
+    requires = [
+      "podman-kya-fq-postgres.service"
+      "kya-fq-network.service"
+    ];
     before = [ "kya-fq.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
@@ -84,7 +93,6 @@ in
     script = ''
       set -eu
       PODMAN=${pkgs.podman}/bin/podman
-      # Wait for Postgres to accept connections.
       for _ in $(seq 1 60); do
         if $PODMAN exec kya-fq-postgres pg_isready -U kya -d field_quote >/dev/null 2>&1; then
           break
@@ -102,8 +110,14 @@ in
 
   systemd.services.kya-fq = {
     description = "KYA field-quote app";
-    after = [ "kya-fq-migrate.service" "kya-fq-network.service" ];
-    requires = [ "kya-fq-migrate.service" "kya-fq-network.service" ];
+    after = [
+      "kya-fq-migrate.service"
+      "kya-fq-network.service"
+    ];
+    requires = [
+      "kya-fq-migrate.service"
+      "kya-fq-network.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Restart = "always";
