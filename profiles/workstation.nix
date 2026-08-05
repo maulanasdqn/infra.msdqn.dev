@@ -234,49 +234,11 @@
     }];
   }];
 
-  systemd.services.touchpad-watchdog = {
-    description = "Auto-recover ASUP1303 touchpad after firmware lockup";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "multi-user.target" ];
-    path = with pkgs; [ gawk gnugrep coreutils util-linux ];
-    serviceConfig = {
-      Type = "simple";
-      Restart = "always";
-      RestartSec = "10s";
-      ExecStart = pkgs.writeShellScript "touchpad-watchdog" ''
-        IRQ_FILE=/proc/interrupts
-        DRV=/sys/bus/platform/drivers/i2c_designware
-        DEV=AMDI0010:03
-        STUCK=0
-        LAST=$(grep ASUP1303 "$IRQ_FILE" | awk '{s=0; for(i=2;i<=NF-2;i++)s+=$i; print s}')
-        while true; do
-          sleep 30
-          CUR=$(grep ASUP1303 "$IRQ_FILE" | awk '{s=0; for(i=2;i<=NF-2;i++)s+=$i; print s}')
-          if [ -z "$CUR" ] || [ -z "$LAST" ]; then
-            LAST=$CUR
-            continue
-          fi
-          if [ "$CUR" = "$LAST" ]; then
-            STUCK=$((STUCK + 1))
-          else
-            STUCK=0
-          fi
-          # 4 consecutive 30s windows with zero IRQ delta = 2 minutes idle
-          # while logged in. Heuristic; tune as needed.
-          if [ "$STUCK" -ge 4 ]; then
-            who | grep -q . && {
-              logger -t touchpad-watchdog "no IRQ activity for 2min, rebinding"
-              echo "$DEV" > "$DRV/unbind" 2>/dev/null || true
-              sleep 1
-              echo "$DEV" > "$DRV/bind" 2>/dev/null || true
-              STUCK=0
-            }
-          fi
-          LAST=$CUR
-        done
-      '';
-    };
-  };
+  # No touchpad-watchdog here on purpose. It rebound i2c_designware whenever
+  # the ASUP1303 went 2 minutes without an IRQ, but an idle touchpad produces
+  # no IRQs, so it fired ~every 150s during normal use and tore the input
+  # device down mid-session. The firmware lockup it was written for has no
+  # trace in the logs on 7.x. Recovery is manual now: fix-touchpad / $mod+SHIFT+T.
 
   systemd.services.touchpad-resume-fix = {
     description = "Reset I2C touchpad after resume";
