@@ -94,6 +94,11 @@
     '';
   };
 
+  services.greetd.settings.initial_session = lib.mkIf enableTilingWM {
+    command = "${config.programs.hyprland.package}/bin/Hyprland";
+    user = username;
+  };
+
   systemd.services.greetd.environment.XDG_DATA_DIRS = lib.concatStringsSep ":" [
     "${config.services.displayManager.sessionData.desktops}/share"
     "/run/current-system/sw/share"
@@ -268,6 +273,8 @@
     HandlePowerKeyLongPress = "poweroff";
   };
 
+  services.udev.packages = lib.optionals enableTilingWM [ pkgs.swayosd ];
+
   services.udev.extraRules = ''
     # ASUP1303 touchpad firmware locks up if power-gated. Keep it fully powered.
     SUBSYSTEM=="i2c", KERNEL=="i2c-ASUP1303:00", ATTR{device/power/control}="on"
@@ -354,6 +361,8 @@
     ]
     ++ lib.optionals enableTilingWM [
       swaybg
+      swayosd
+      brightnessctl
       hyprlock
       hypridle
       hyprpicker
