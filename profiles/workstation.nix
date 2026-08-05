@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   username,
@@ -40,14 +41,64 @@
     };
   };
 
-  services.displayManager.ly = {
+  services.displayManager.regreet = {
     enable = true;
-    settings = {
-      animation = "matrix";
-      hide_borders = true;
-      clock = "%H:%M";
+
+    theme = {
+      name = "adw-gtk3-dark";
+      package = pkgs.adw-gtk3;
     };
+    iconTheme = {
+      name = "rose-pine";
+      package = pkgs.rose-pine-icon-theme;
+    };
+    cursorTheme = {
+      name = "macOS";
+      package = pkgs.apple-cursor;
+    };
+    font = {
+      name = "Quicksand";
+      package = pkgs.quicksand;
+      size = 12;
+    };
+
+    settings = {
+      appearance.greeting_msg = "Welcome back";
+      commands = {
+        reboot = [
+          "systemctl"
+          "reboot"
+        ];
+        poweroff = [
+          "systemctl"
+          "poweroff"
+        ];
+      };
+    };
+
+    extraCss = ''
+      window {
+        background-color: #000000;
+      }
+
+      #main-box {
+        background-color: rgba(31, 29, 46, 0.88);
+        border: 1px solid rgba(196, 167, 231, 0.35);
+        border-radius: 16px;
+        padding: 28px;
+      }
+
+      button, entry {
+        border-radius: 10px;
+      }
+    '';
   };
+
+  systemd.services.greetd.environment.XDG_DATA_DIRS = lib.concatStringsSep ":" [
+    "${config.services.displayManager.sessionData.desktops}/share"
+    "/run/current-system/sw/share"
+  ];
+
   services.displayManager.defaultSession = lib.mkIf enableTilingWM "hyprland";
 
   programs.hyprland = lib.mkIf enableTilingWM {
@@ -234,12 +285,6 @@
     }];
   }];
 
-  # No touchpad-watchdog here on purpose. It rebound i2c_designware whenever
-  # the ASUP1303 went 2 minutes without an IRQ, but an idle touchpad produces
-  # no IRQs, so it fired ~every 150s during normal use and tore the input
-  # device down mid-session. The firmware lockup it was written for has no
-  # trace in the logs on 7.x. Recovery is manual now: fix-touchpad / $mod+SHIFT+T.
-
   systemd.services.touchpad-resume-fix = {
     description = "Reset I2C touchpad after resume";
     wantedBy = [ "post-resume.target" ];
@@ -259,6 +304,16 @@
   };
 
   security.polkit.enable = true;
+
+  services.fprintd.enable = true;
+
+  programs.hyprlock.enable = true;
+
+  security.pam.services = {
+    sudo.fprintAuth = true;
+    hyprlock.fprintAuth = true;
+    login.fprintAuth = true;
+  };
 
   systemd.packages = [ pkgs.pritunl-client ];
   systemd.services.pritunl-client.wantedBy = [ "multi-user.target" ];
