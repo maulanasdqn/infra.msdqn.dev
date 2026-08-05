@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 let
 
   kyaCiDeploy = pkgs.writeShellScript "kya-fq-ci-deploy" ''
@@ -36,6 +36,14 @@ in
     url = "https://github.com/s52ai/kya-group";
     tokenFile = "/etc/github-runner-kya.token";
     extraLabels = [ "kya-fq" ];
+    workDir = "/var/lib/github-runner-work/kya-fq";
+    serviceOverrides = {
+      StateDirectory = lib.mkForce [
+        "github-runner/kya-fq"
+        "github-runner-work/kya-fq"
+      ];
+      BindPaths = lib.mkForce [ ];
+    };
     replace = true;
     extraPackages = with pkgs; [
       git
