@@ -287,14 +287,13 @@
   security.protectKernelImage = true;
   security.lockKernelModules = false;  # Required for containers
 
-  # Audit logging
-  security.auditd.enable = true;
-  security.audit = {
-    enable = true;
-    rules = [
-      "-a exit,always -F arch=b64 -S execve"  # Log all executions
-    ];
-  };
+  # Audit logging removed along with the SIEM/SOAR stack. The `-S execve` rule
+  # logged every process execution on the box (5 records per exec) and NixOS
+  # generates an auditd.conf with no max_log_file/num_logs/max_log_file_action,
+  # so /var/log/audit/audit.log grew unbounded to 68 GB. Its only consumers were
+  # fluent-bit and the wazuh agent, both of which are gone.
+  security.auditd.enable = false;
+  security.audit.enable = false;
 
   # Disable unnecessary services
   services.xserver.enable = false;

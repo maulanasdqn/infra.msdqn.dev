@@ -30,10 +30,6 @@ in
     # every night with "unknown user postgres".
     # ./services/backup.nix
     # ./services/yes-date-me-backup.nix
-    ./services/fluentbit.nix
-    ./services/wazuh-agent.nix
-    ./services/suricata.nix
-    ./services/aysiem-heartbeat.nix
     ./services/kya-field-quote.nix
     ./services/kya-sales-reporting.nix
     ./services/kya-bond-closeout.nix
@@ -99,8 +95,5 @@ in
       "8.8.8.8"
       "1.1.1.1"
     ];
-    extraHosts = ''
-      103.31.205.209 ingest-aysiem.msdqn.dev
-    '';
   };
 }
