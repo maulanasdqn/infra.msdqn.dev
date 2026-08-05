@@ -108,7 +108,7 @@
           jsonls.enable = true;
 
           sourcekit = {
-            enable = true;
+            enable = pkgs.stdenv.hostPlatform.isDarwin;
             cmd = [ "/usr/bin/sourcekit-lsp" ];
             filetypes = [ "swift" "objc" "objcpp" ];
           };

@@ -2,23 +2,16 @@
 
 `default.nix` is the shared plugin set (editor UX + LSP), safe on mobile.
 
-**stynx is intentionally not here.** It compiles a Rust CLI from source, so it
-is added only by the desktop wrapper (`../default.nix`) and skipped on
-nix-on-droid, which imports `../hm.nix` directly.
+## lsp.nix — sourcekit-lsp is Darwin-only
 
-## stynx.nix
+The Swift/ObjC server's `cmd` points at the Xcode toolchain's `sourcekit-lsp`,
+which only exists on macOS. It is gated behind Darwin because on the Linux hosts
+(vivobook, pc, wsl, honor) the server would fail to spawn on every swift or objc
+buffer.
 
-Shared source for both halves of stynx:
+## treesitter.nix — no `ensure_installed`
 
-- the `stynx` binary — workspace member `stynx-code`, which the plugin shells
-  out to
-- the Neovim plugin — lives in the repo's `stynx-code-nvim/` subdir
-
-The module puts `stynx` on Neovim's PATH so the plugin's job runner can find it.
-
-## treesitter.nix
-
-**No `ensure_installed`.** With `nixGrammars`, every parser ships via Nix.
+With `nixGrammars`, every parser ships via Nix.
 
 A runtime list makes nvim-treesitter git-clone and compile parsers at startup.
 That blocks the first draw for minutes under proot on nix-on-droid, and `mdx` /

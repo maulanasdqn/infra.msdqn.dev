@@ -15,6 +15,7 @@
     wayland.windowManager.hyprland = {
       enable = true;
       xwayland.enable = true;
+      configType = "hyprlang";
 
       settings = {
         "$base" = "rgb(191724)";
@@ -38,8 +39,8 @@
         ];
 
         exec-once = [
-          "hyprctl setcursor Bibata-Modern-Classic 32"
-          "swaybg -i /home/${username}/Downloads/2109.jpg -m fill"
+          "hyprctl setcursor macOS 40"
+          "swaybg -c 000000"
           "eww open bar"
           "swayosd-server"
           "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
@@ -134,8 +135,8 @@
         };
 
         env = [
-          "XCURSOR_THEME,Bibata-Modern-Classic"
-          "XCURSOR_SIZE,32"
+          "XCURSOR_THEME,macOS"
+          "XCURSOR_SIZE,40"
           "NIXOS_OZONE_WL,1"
           "ELECTRON_OZONE_PLATFORM_HINT,auto"
           "MOZ_ENABLE_WAYLAND,1"
@@ -162,7 +163,7 @@
           "blur on, ignore_alpha 0.3, match:namespace wofi"
         ];
 
-        "$mod" = "SUPER";
+        "$mod" = "ALT";
         "$terminal" = "kitty";
         "$menu" = "wofi --show drun";
         "$browser" = "helium-browser";
@@ -269,14 +270,8 @@
 
       background {
         monitor =
-        path = ~/Downloads/2109.jpg
-        blur_passes = 4
-        blur_size = 9
-        noise = 0.012
-        contrast = 0.95
-        brightness = 0.65
-        vibrancy = 0.18
-        vibrancy_darkness = 0.05
+        color = rgba(000000ff)
+        blur_passes = 0
       }
 
       label {

@@ -1,7 +1,6 @@
 {
   pkgs,
   username,
-  claude-desktop,
   ...
 }:
 {
@@ -12,7 +11,6 @@
     home = {
 
       packages = with pkgs; [
-        claude-desktop.packages.${pkgs.system}.claude-desktop-with-fhs
         (callPackage ../../../pkgs/helium-browser { })
         slack
         discord

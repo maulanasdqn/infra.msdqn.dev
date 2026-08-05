@@ -3,15 +3,19 @@
   username,
   ...
 }:
+let
+
+  gtkTheme = {
+    name = "adw-gtk3-dark";
+    package = pkgs.adw-gtk3;
+  };
+in
 {
   home-manager.users.${username} = {
     gtk = {
       enable = true;
 
-      theme = {
-        name = "rose-pine";
-        package = pkgs.rose-pine-gtk-theme;
-      };
+      theme = gtkTheme;
 
       iconTheme = {
         name = "rose-pine";
@@ -19,9 +23,9 @@
       };
 
       cursorTheme = {
-        name = "Bibata-Modern-Classic";
-        package = pkgs.bibata-cursors;
-        size = 32;
+        name = "macOS";
+        package = pkgs.apple-cursor;
+        size = 40;
       };
 
       font = {
@@ -34,6 +38,8 @@
         gtk-decoration-layout = "appmenu:none";
       };
 
+      gtk4.theme = gtkTheme;
+
       gtk4.extraConfig = {
         gtk-application-prefer-dark-theme = true;
         gtk-decoration-layout = "appmenu:none";
@@ -42,7 +48,7 @@
 
     qt = {
       enable = true;
-      platformTheme.name = "gtk";
+      platformTheme.name = "gtk3";
       style = {
         name = "kvantum";
       };
@@ -61,25 +67,26 @@
     '';
 
     home.pointerCursor = {
-      name = "Bibata-Modern-Classic";
-      package = pkgs.bibata-cursors;
-      size = 32;
+      enable = true;
+      name = "macOS";
+      package = pkgs.apple-cursor;
+      size = 40;
       gtk.enable = true;
       x11.enable = true;
     };
 
     home.sessionVariables = {
-      XCURSOR_SIZE = "32";
-      XCURSOR_THEME = "Bibata-Modern-Classic";
-      GTK_THEME = "rose-pine:dark";
+      XCURSOR_SIZE = "40";
+      XCURSOR_THEME = "macOS";
+      GTK_THEME = "adw-gtk3-dark";
     };
 
     dconf.settings = {
       "org/gnome/desktop/interface" = {
         color-scheme = "prefer-dark";
-        gtk-theme = "rose-pine";
+        gtk-theme = "adw-gtk3-dark";
         icon-theme = "rose-pine";
-        cursor-theme = "Bibata-Modern-Classic";
+        cursor-theme = "macOS";
         font-name = "Quicksand 11";
         document-font-name = "Quicksand 11";
         monospace-font-name = "JetBrainsMono Nerd Font 11";

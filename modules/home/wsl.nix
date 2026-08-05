@@ -60,7 +60,7 @@
         imagemagick
         ffmpeg
 
-        claude-code.packages.${pkgs.system}.default
+        claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
 
       sessionVariables = {

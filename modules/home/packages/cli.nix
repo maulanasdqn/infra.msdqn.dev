@@ -7,7 +7,7 @@
 {
 
   home.packages =
-    (lib.optional (claude-code != null) claude-code.packages.${pkgs.system}.default)
+    (lib.optional (claude-code != null) claude-code.packages.${pkgs.stdenv.hostPlatform.system}.default)
     ++ (with pkgs; [
 
       eza

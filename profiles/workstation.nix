@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   username,
@@ -40,14 +41,64 @@
     };
   };
 
-  services.displayManager.ly = {
+  services.displayManager.regreet = {
     enable = true;
-    settings = {
-      animation = "matrix";
-      hide_borders = true;
-      clock = "%H:%M";
+
+    theme = {
+      name = "adw-gtk3-dark";
+      package = pkgs.adw-gtk3;
     };
+    iconTheme = {
+      name = "rose-pine";
+      package = pkgs.rose-pine-icon-theme;
+    };
+    cursorTheme = {
+      name = "macOS";
+      package = pkgs.apple-cursor;
+    };
+    font = {
+      name = "Quicksand";
+      package = pkgs.quicksand;
+      size = 12;
+    };
+
+    settings = {
+      appearance.greeting_msg = "Welcome back";
+      commands = {
+        reboot = [
+          "systemctl"
+          "reboot"
+        ];
+        poweroff = [
+          "systemctl"
+          "poweroff"
+        ];
+      };
+    };
+
+    extraCss = ''
+      window {
+        background-color: #000000;
+      }
+
+      #main-box {
+        background-color: rgba(31, 29, 46, 0.88);
+        border: 1px solid rgba(196, 167, 231, 0.35);
+        border-radius: 16px;
+        padding: 28px;
+      }
+
+      button, entry {
+        border-radius: 10px;
+      }
+    '';
   };
+
+  systemd.services.greetd.environment.XDG_DATA_DIRS = lib.concatStringsSep ":" [
+    "${config.services.displayManager.sessionData.desktops}/share"
+    "/run/current-system/sw/share"
+  ];
+
   services.displayManager.defaultSession = lib.mkIf enableTilingWM "hyprland";
 
   programs.hyprland = lib.mkIf enableTilingWM {
@@ -163,6 +214,7 @@
   virtualisation.docker = {
     enable = true;
     enableOnBoot = true;
+    package = pkgs.docker_29;
   };
 
   programs.nix-ld = {
@@ -233,50 +285,6 @@
     }];
   }];
 
-  systemd.services.touchpad-watchdog = {
-    description = "Auto-recover ASUP1303 touchpad after firmware lockup";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "multi-user.target" ];
-    path = with pkgs; [ gawk gnugrep coreutils util-linux ];
-    serviceConfig = {
-      Type = "simple";
-      Restart = "always";
-      RestartSec = "10s";
-      ExecStart = pkgs.writeShellScript "touchpad-watchdog" ''
-        IRQ_FILE=/proc/interrupts
-        DRV=/sys/bus/platform/drivers/i2c_designware
-        DEV=AMDI0010:03
-        STUCK=0
-        LAST=$(grep ASUP1303 "$IRQ_FILE" | awk '{s=0; for(i=2;i<=NF-2;i++)s+=$i; print s}')
-        while true; do
-          sleep 30
-          CUR=$(grep ASUP1303 "$IRQ_FILE" | awk '{s=0; for(i=2;i<=NF-2;i++)s+=$i; print s}')
-          if [ -z "$CUR" ] || [ -z "$LAST" ]; then
-            LAST=$CUR
-            continue
-          fi
-          if [ "$CUR" = "$LAST" ]; then
-            STUCK=$((STUCK + 1))
-          else
-            STUCK=0
-          fi
-          # 4 consecutive 30s windows with zero IRQ delta = 2 minutes idle
-          # while logged in. Heuristic; tune as needed.
-          if [ "$STUCK" -ge 4 ]; then
-            who | grep -q . && {
-              logger -t touchpad-watchdog "no IRQ activity for 2min, rebinding"
-              echo "$DEV" > "$DRV/unbind" 2>/dev/null || true
-              sleep 1
-              echo "$DEV" > "$DRV/bind" 2>/dev/null || true
-              STUCK=0
-            }
-          fi
-          LAST=$CUR
-        done
-      '';
-    };
-  };
-
   systemd.services.touchpad-resume-fix = {
     description = "Reset I2C touchpad after resume";
     wantedBy = [ "post-resume.target" ];
@@ -296,6 +304,16 @@
   };
 
   security.polkit.enable = true;
+
+  services.fprintd.enable = true;
+
+  programs.hyprlock.enable = true;
+
+  security.pam.services = {
+    sudo.fprintAuth = true;
+    hyprlock.fprintAuth = true;
+    login.fprintAuth = true;
+  };
 
   systemd.packages = [ pkgs.pritunl-client ];
   systemd.services.pritunl-client.wantedBy = [ "multi-user.target" ];

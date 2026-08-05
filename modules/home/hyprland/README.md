@@ -22,3 +22,11 @@ Manual locking is unaffected: `$mod+X` (hyprlock) and the lid switch still work.
 `theme.nix` has a commented-out `home.file` entry for
 `~/.config/hypr/wallpaper.jpg`. **TODO:** add `wallpaper.jpg` to the repo root
 to enable it.
+
+## GTK theme
+
+`rose-pine-gtk-theme` was dropped from nixpkgs along with `gtk-engine-murrine`
+(GTK2). `adw-gtk3-dark` is the maintained stand-in for GTK apps.
+
+rose-pine is still used everywhere else it survives — icons, Kvantum/Qt, and the
+editors — so the palette stays consistent despite the GTK swap.
