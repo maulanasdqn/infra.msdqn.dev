@@ -62,11 +62,13 @@ its log while it is running frees nothing — the daemon holds the inode open, a
 `df` will not move until the process is killed directly. Check `/proc/*/fd` for
 `(deleted)` handles before believing space was reclaimed.
 
-**rkm-backend (excluded).** A Rust app; kept out of the clan VPS build so no
-cargo compile happens on the box. Its `api.rajawalikaryamulya.co.id` vhost is
-commented out in `default.nix` and must be re-enabled together with the module.
+**rkm-backend (removed).** A Rust app, kept out of the clan VPS build so no
+cargo compile happened on the box. The module, its flake input and its
+`rkm_backend_env` sops secret are all deleted. Its
+`api.rajawalikaryamulya.co.id` vhost is gone from `default.nix` — restoring the
+app means restoring the input, module, secret and vhost together.
 
-**Backups (disabled).** See the services README.
+**Backups (removed).** See the services README.
 
 ## Retained
 

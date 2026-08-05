@@ -65,16 +65,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    rkm-backend = {
-      url = "git+ssh://git@github.com/rajawalikaryamulya/rkm-backend.git?ref=develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    roasting-startup = {
-      url = "github:maulanasdqn/roasting-startup/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     clan-core = {
       url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -118,8 +108,6 @@
       homebrew-core,
       homebrew-cask,
       disko,
-      rkm-backend,
-      roasting-startup,
       clan-core,
       claude-code,
       claude-desktop,

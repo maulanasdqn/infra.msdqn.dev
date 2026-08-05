@@ -34,11 +34,6 @@
         owner = "root";
       };
 
-      "rkm_backend_env" = {
-        mode = "0400";
-        owner = "root";
-      };
-
       "rclone_config" = {
         mode = "0400";
         owner = "root";

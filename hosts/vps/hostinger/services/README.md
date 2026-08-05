@@ -113,12 +113,20 @@ including Postgres, and each app's `*-migrate.service` is a `requires` + `before
 dependency that must wait for Postgres, migrate, and bootstrap before the app may
 start. Budget roughly **two minutes of 502s** on all four apps per deploy.
 
-## Disabled
+## Removed
 
-`backup.nix` and `yes-date-me-backup.nix` are no longer imported. Both dumped a
-host-local Postgres via `sudo -u postgres`, but that user does not exist here —
-Postgres runs only inside containers, and `rkm-backend` is excluded from the
-build. They failed nightly with `unknown user postgres`, backing up nothing.
+Only the five modules above remain; everything else in this directory was
+deleted as dead config.
+
+`backup.nix` / `yes-date-me-backup.nix` dumped a host-local Postgres via
+`sudo -u postgres`, but that user does not exist here — Postgres runs only
+inside containers. They failed nightly with `unknown user postgres`, backing up
+nothing.
+
+`rkm-backend.nix` (Rust — kept off the box to avoid a cargo compile),
+`roasting-startup.nix` and `n8n.nix` were all unimported. The `rkm-backend` and
+`roasting-startup` flake inputs went with them; the former was a `git+ssh://`
+URL, so evaluation no longer needs SSH auth to that private repo.
 
 The SIEM/SOAR stack (fluent-bit, wazuh agent, suricata, aysiem heartbeat) was
 removed entirely, along with auditd. See `../README.md`.
