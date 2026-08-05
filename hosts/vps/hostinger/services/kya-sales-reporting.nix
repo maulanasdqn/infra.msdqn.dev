@@ -43,6 +43,7 @@ in
         "github-runner-work/kya-sr"
       ];
       BindPaths = lib.mkForce [ ];
+      ExecPaths = [ "/var/lib/github-runner-work/kya-sr" ];
     };
     replace = true;
     extraPackages = with pkgs; [

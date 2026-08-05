@@ -43,6 +43,7 @@ in
         "github-runner-work/kya-fq"
       ];
       BindPaths = lib.mkForce [ ];
+      ExecPaths = [ "/var/lib/github-runner-work/kya-fq" ];
     };
     replace = true;
     extraPackages = with pkgs; [
