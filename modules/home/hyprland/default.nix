@@ -40,7 +40,7 @@
 
         exec-once = [
           "hyprctl setcursor Bibata-Modern-Classic 32"
-          "swaybg -i /home/${username}/Downloads/2109.jpg -m fill"
+          "swaybg -c 000000"
           "eww open bar"
           "swayosd-server"
           "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
@@ -270,14 +270,8 @@
 
       background {
         monitor =
-        path = ~/Downloads/2109.jpg
-        blur_passes = 4
-        blur_size = 9
-        noise = 0.012
-        contrast = 0.95
-        brightness = 0.65
-        vibrancy = 0.18
-        vibrancy_darkness = 0.05
+        color = rgba(000000ff)
+        blur_passes = 0
       }
 
       label {
