@@ -58,6 +58,11 @@ in
     url = "https://github.com/s52ai/kya-group";
     tokenFile = "/etc/github-runner-kya.token";
     extraLabels = [ "kya-fq" ];
+    # Real disk, not the default systemd RuntimeDirectory: /run is a 4G tmpfs,
+    # so a checkout + pnpm install ran in RAM and CI died with ENOSPC while
+    # ~79G sat free on /. Changing this re-registers the runner, which needs a
+    # fresh token in tokenFile (they expire after an hour).
+    workDir = "/var/lib/github-runner/kya-fq";
     replace = true;
     extraPackages = with pkgs; [ git openssh ];
   };

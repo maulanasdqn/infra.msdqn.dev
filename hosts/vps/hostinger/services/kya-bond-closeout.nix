@@ -45,6 +45,8 @@ in
     url = "https://github.com/s52ai/kya-group";
     tokenFile = "/etc/github-runner-kya-bc.token";
     extraLabels = [ "kya-bc" ];
+    # See kya-field-quote.nix — keeps the work tree off the /run tmpfs.
+    workDir = "/var/lib/github-runner/kya-bc";
     replace = true;
     extraPackages = with pkgs; [ git openssh ];
   };
