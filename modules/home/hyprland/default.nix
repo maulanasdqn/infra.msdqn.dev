@@ -163,7 +163,7 @@
           "blur on, ignore_alpha 0.3, match:namespace wofi"
         ];
 
-        "$mod" = "SUPER";
+        "$mod" = "ALT";
         "$terminal" = "kitty";
         "$menu" = "wofi --show drun";
         "$browser" = "helium-browser";
