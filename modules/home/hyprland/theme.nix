@@ -25,9 +25,9 @@ in
       };
 
       cursorTheme = {
-        name = "Bibata-Modern-Classic";
-        package = pkgs.bibata-cursors;
-        size = 32;
+        name = "macOS";
+        package = pkgs.apple-cursor;
+        size = 40;
       };
 
       font = {
@@ -70,16 +70,16 @@ in
 
     home.pointerCursor = {
       enable = true;
-      name = "Bibata-Modern-Classic";
-      package = pkgs.bibata-cursors;
-      size = 32;
+      name = "macOS";
+      package = pkgs.apple-cursor;
+      size = 40;
       gtk.enable = true;
       x11.enable = true;
     };
 
     home.sessionVariables = {
-      XCURSOR_SIZE = "32";
-      XCURSOR_THEME = "Bibata-Modern-Classic";
+      XCURSOR_SIZE = "40";
+      XCURSOR_THEME = "macOS";
       GTK_THEME = "adw-gtk3-dark";
     };
 
@@ -88,7 +88,7 @@ in
         color-scheme = "prefer-dark";
         gtk-theme = "adw-gtk3-dark";
         icon-theme = "rose-pine";
-        cursor-theme = "Bibata-Modern-Classic";
+        cursor-theme = "macOS";
         font-name = "Quicksand 11";
         document-font-name = "Quicksand 11";
         monospace-font-name = "JetBrainsMono Nerd Font 11";

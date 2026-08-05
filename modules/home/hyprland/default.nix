@@ -39,7 +39,7 @@
         ];
 
         exec-once = [
-          "hyprctl setcursor Bibata-Modern-Classic 32"
+          "hyprctl setcursor macOS 40"
           "swaybg -c 000000"
           "eww open bar"
           "swayosd-server"
@@ -135,8 +135,8 @@
         };
 
         env = [
-          "XCURSOR_THEME,Bibata-Modern-Classic"
-          "XCURSOR_SIZE,32"
+          "XCURSOR_THEME,macOS"
+          "XCURSOR_SIZE,40"
           "NIXOS_OZONE_WL,1"
           "ELECTRON_OZONE_PLATFORM_HINT,auto"
           "MOZ_ENABLE_WAYLAND,1"
