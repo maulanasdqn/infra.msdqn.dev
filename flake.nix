@@ -183,7 +183,7 @@
                 enable = true;
                 enableRosetta = true;
                 user = config.darwinUsername;
-                autoMigrate = true;
+                autoMigrate = false;
                 mutableTaps = false;
                 taps = {
                   "homebrew/homebrew-core" = homebrew-core;

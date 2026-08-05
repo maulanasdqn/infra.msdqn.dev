@@ -1,4 +1,5 @@
 {
+  config,
   enableLaravel,
   enableAggressiveTweaks ? false,
   lib,
@@ -7,6 +8,7 @@
 {
   homebrew = {
     enable = true;
+    taps = builtins.attrNames config.nix-homebrew.taps;
     onActivation = {
       autoUpdate = true;
       cleanup = if enableAggressiveTweaks then "zap" else "none";
