@@ -24,8 +24,12 @@ in
     ../../../modules/nixos/sops.nix
     # ./services/rkm-backend.nix  # Disabled — Rust app, excluded from clan VPS build to skip cargo compile
     # ./services/roasting-startup.nix
-    ./services/backup.nix
-    ./services/yes-date-me-backup.nix
+    # Disabled — both dumped host-local Postgres via `sudo -u postgres`, but the
+    # databases they targeted are gone (rkm-backend is excluded from this build,
+    # and Postgres now only runs inside per-app containers). The timers failed
+    # every night with "unknown user postgres".
+    # ./services/backup.nix
+    # ./services/yes-date-me-backup.nix
     ./services/fluentbit.nix
     ./services/wazuh-agent.nix
     ./services/suricata.nix
