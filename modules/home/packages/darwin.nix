@@ -29,6 +29,7 @@
         bear
         android-tools
         xcodes
+        protobuf
       ]
       ++ lib.optionals enableRust [ rustup ]
       ++ lib.optionals enableVolta [ volta ]

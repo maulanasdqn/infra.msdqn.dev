@@ -285,6 +285,16 @@
         inherit nixvim sshKeys acmeEmail;
       };
 
+      raspiSpecialArgs = {
+        username = "ms";
+        enableLaravel = false;
+        inherit
+          nixvim
+          sshKeys
+          claude-code
+          ;
+      };
+
       isDarwin =
         system:
         builtins.elem system [
@@ -365,6 +375,31 @@
                 { ... }:
                 {
                   _module.args = digitaloceanSpecialArgs;
+                }
+              )
+            ];
+          };
+
+          raspi = {
+            nixpkgs.hostPlatform = "aarch64-linux";
+            imports = [
+
+              ./hosts/raspi
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = raspiSpecialArgs;
+                  backupFileExtension = "backup";
+                };
+              }
+              ./modules/home/nixos-raspi.nix
+              (
+                { ... }:
+                {
+                  _module.args = raspiSpecialArgs;
+                  clan.core.networking.targetHost = "ms@raspi.local";
                 }
               )
             ];
