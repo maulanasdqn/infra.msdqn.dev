@@ -12,5 +12,5 @@
     ../../../profiles/workstation.nix
   ];
 
-  networking.hostName = "nixos";
+  networking.hostName = "vivobook";
 }

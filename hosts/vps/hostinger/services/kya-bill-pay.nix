@@ -14,7 +14,7 @@ let
     ${pkgs.systemd}/bin/systemctl restart kya-bp.service
     ${pkgs.systemd}/bin/systemctl restart kya-bp-worker.service
     for _ in $(seq 1 45); do
-      if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:3005/healthz >/dev/null 2>&1; then
+      if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:3001/healthz >/dev/null 2>&1; then
         ${pkgs.podman}/bin/podman image prune -f >/dev/null 2>&1 || true
         echo "kya-bp deploy OK"
         exit 0
@@ -162,7 +162,7 @@ in
       ExecStart = ''
         ${pkgs.podman}/bin/podman run --rm --name kya-bp \
           --network=kya-bp-net \
-          -p 127.0.0.1:3005:3001 \
+          -p 127.0.0.1:3001:3001 \
           --env-file /etc/kya-bp.env \
           -e REDIS_URL=redis://kya-bp-redis:6379 \
           localhost/kya-bill-pay:latest
@@ -205,7 +205,7 @@ in
     forceSSL = true;
     extraConfig = "client_max_body_size 25m;";
     locations."/" = {
-      proxyPass = "http://127.0.0.1:3005";
+      proxyPass = "http://127.0.0.1:3001";
       proxyWebsockets = true;
     };
   };
