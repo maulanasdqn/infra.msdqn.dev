@@ -27,6 +27,7 @@ in
     ./services/kya-sales-reporting.nix
     ./services/kya-bond-closeout.nix
     ./services/kya-bill-pay.nix
+    ./services/kya-entity-license-renewal.nix
     ./services/kya-ci-runner-env.nix
   ];
 
