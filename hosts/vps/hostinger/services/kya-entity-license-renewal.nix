@@ -135,7 +135,7 @@ in
         /app/api/node_modules/.bin/tsx /app/api/src/migrate.ts
       $PODMAN run --rm --network=kya-el-net --env-file /etc/kya-el.env \
         localhost/kya-entity-license-renewal:latest \
-        /app/api/node_modules/.bin/tsx /app/api/src/bootstrap-admin.ts
+        /app/api/node_modules/.bin/tsx /app/api/src/bootstrap-admin.ts || true
     '';
   };
 
