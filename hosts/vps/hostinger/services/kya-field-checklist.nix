@@ -92,7 +92,7 @@ in
       "--maxmemory"
       "128mb"
       "--maxmemory-policy"
-      "allkeys-lru"
+      "noeviction"
     ];
     extraOptions = [
       "--network=kya-fc-net"
