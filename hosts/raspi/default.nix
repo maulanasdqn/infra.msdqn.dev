@@ -18,13 +18,13 @@
     useDHCP = false;
     nameservers = [ "127.0.0.1" ];
     defaultGateway = {
-      address = "192.168.110.1";
+      address = "192.168.100.1";
       interface = "end0";
     };
     interfaces.end0 = {
       ipv4.addresses = [
         {
-          address = "192.168.110.139";
+          address = "192.168.100.139";
           prefixLength = 24;
         }
       ];
@@ -39,6 +39,7 @@
         80
         443
         3000
+        8082
       ];
       allowedUDPPorts = [
         53
@@ -112,6 +113,121 @@
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "msdqn.cachix.org-1:I5z8egjNf2iKYLwLGF2REfpELlFoUdaSLsh7dQk1a+o="
+    ];
+  };
+
+  services.homepage-dashboard = {
+    enable = true;
+    listenPort = 8082;
+    allowedHosts = "raspi.local:8082,192.168.100.139:8082";
+    settings = {
+      title = "msdqn homelab";
+      favicon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/heimdall.png";
+      theme = "dark";
+      color = "slate";
+      headerStyle = "clean";
+      layout = {
+        Network = {
+          style = "row";
+          columns = 3;
+        };
+        Servers = {
+          style = "row";
+          columns = 3;
+        };
+        CCTV = {
+          style = "row";
+          columns = 2;
+        };
+        Cloud = {
+          style = "row";
+          columns = 2;
+        };
+      };
+    };
+    services = [
+      {
+        Network = [
+          {
+            "AdGuard Home" = {
+              icon = "adguard-home";
+              href = "http://raspi.local:3000";
+              description = "DNS Ad Blocker";
+              server = "raspi";
+              container = "adguard";
+              widget = {
+                type = "adguard";
+                url = "http://127.0.0.1:3000";
+              };
+            };
+          }
+          {
+            "Ruijie Router" = {
+              icon = "router";
+              href = "http://192.168.100.1";
+              description = "Huawei ONT Gateway";
+            };
+          }
+        ];
+      }
+      {
+        Servers = [
+          {
+            "Raspberry Pi" = {
+              icon = "raspberry-pi";
+              href = "http://raspi.local:8082";
+              description = "NixOS — DNS + Dashboard";
+            };
+          }
+          {
+            "Vivobook" = {
+              icon = "proxmox";
+              href = "http://192.168.100.200:8080";
+              description = "NixOS — CCTV + Home Server";
+            };
+          }
+          {
+            "Hostinger VPS" = {
+              icon = "vps";
+              href = "http://72.62.125.38";
+              description = "msdqn.dev";
+            };
+          }
+        ];
+      }
+      {
+        CCTV = [
+          {
+            "Webcam Vivobook" = {
+              icon = "frigate";
+              href = "http://192.168.100.200:8081";
+              description = "Motion CCTV — 720p Live Stream";
+            };
+          }
+          {
+            "Xiaomi C302N" = {
+              icon = "frigate";
+              href = "http://192.168.100.119";
+              description = "192.168.100.119 — Enable RTSP via Mi Home app";
+            };
+          }
+        ];
+      }
+    ];
+    widgets = [
+      {
+        resources = {
+          cpu = true;
+          memory = true;
+          disk = "/";
+        };
+      }
+      {
+        search = {
+          provider = "google";
+          target = "_blank";
+        };
+      }
     ];
   };
 
