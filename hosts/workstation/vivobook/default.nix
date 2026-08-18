@@ -14,40 +14,37 @@
 
   networking.hostName = "vivobook";
 
-  services.logind = {
-    lidSwitch = lib.mkForce "ignore";
-    lidSwitchExternalPower = lib.mkForce "ignore";
-    lidSwitchDocked = lib.mkForce "ignore";
-  };
+  services.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.displayManager.defaultSession = lib.mkForce "gnome";
+  services.displayManager.regreet.enable = lib.mkForce false;
+  services.greetd.enable = lib.mkForce false;
 
-  services.motion = {
-    enable = true;
-    extraConfig = ''
-      videodevice /dev/video0
-      v4l2_palette 8
-      width 1280
-      height 720
-      framerate 15
-      threshold 3000
-      minimum_motion_frames 3
-      event_gap 10
-      pre_capture 3
-      post_capture 5
-      picture_output best
-      picture_filename %Y%m%d/%H%M%S-%q
-      movie_output on
-      movie_filename %Y%m%d/%H%M%S
-      movie_codec mkv
-      movie_quality 75
-      target_dir /var/lib/motion
-      stream_port 8081
-      stream_quality 75
-      stream_maxrate 15
-      stream_localhost off
-      webcontrol_port 8080
-      webcontrol_localhost off
-    '';
-  };
+  security.pam.services.login.fprintAuth = lib.mkForce false;
 
-  networking.firewall.allowedTCPPorts = [ 8080 8081 ];
+  programs.hyprland.enable = lib.mkForce false;
+
+  environment.systemPackages = with pkgs; [
+    rpi-imager
+    minicom
+    picocom
+    nmap
+    libgpiod
+    esptool
+    espflash
+    cargo-generate
+    ldproxy
+    openocd
+    probe-rs-tools
+    usbutils
+    screen
+  ];
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", MODE="0666"
+    SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", MODE="0666"
+    SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", MODE="0666"
+  '';
+
+  users.users.${username}.extraGroups = [ "dialout" ];
 }
