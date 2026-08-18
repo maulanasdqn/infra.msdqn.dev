@@ -1,18 +1,20 @@
 # Hostinger VPS — services
 
-Per-app modules for the Hostinger box (`72.62.125.38`). Four KYA apps run here,
+Per-app modules for the Hostinger box (`72.62.125.38`). Six KYA apps run here,
 each fully self-contained: its own Postgres, podman network, GitHub Actions
 runner, forced-command SSH key and nginx vhost. **Nothing is shared between them
 except the machine.**
 
-## The four apps
+## The six apps
 
 | Module | App | Port | Domain | Extras |
 |---|---|---|---|---|
 | `kya-field-quote.nix` | Field Quote | 3003 | `kya-fq.stynx.app` | — |
 | `kya-sales-reporting.nix` | Sales Reconciliation & Commission Dashboard | 3002 | `kya-sr.stynx.app` | Redis |
 | `kya-bond-closeout.nix` | Surety bond closeout automation | 3004 | `kya-bc.stynx.app` | Redis |
-| `kya-bill-pay.nix` | AP Invoice Automation | 3005 (container 3001) | `kya-bp.stynx.app` | Redis + BullMQ worker |
+| `kya-bill-pay.nix` | AP Invoice Automation | 3001 | `kya-bp.stynx.app` | Redis + BullMQ worker |
+| `kya-entity-license-renewal.nix` | Entity License Renewal | 3005 | `kya-el.stynx.app` | Redis db 4 + BullMQ worker |
+| `kya-field-checklist.nix` | Field PM Checklist | 3006 | `kya-fc.stynx.app` | Redis db 5 + BullMQ worker |
 
 Field-quote was migrated off DigitalOcean App Platform. Its image is built **on
 the VPS** from `/opt/kya-group` and tagged `localhost/kya-field-quote:latest`.
@@ -35,7 +37,7 @@ deploy (`set -e`) and leaves the old app running.
 ## Runners
 
 One self-hosted runner per app, labelled `kya-fq` / `kya-sr` / `kya-bc` /
-`kya-bp` so each workflow lands on its own. They exist because the s52ai org's
+`kya-bp` / `kya-elr` / `kya-fc` so each workflow lands on its own. They exist because the s52ai org's
 GitHub-hosted minutes are billing-blocked. Each runs as an unprivileged dynamic
 user and can only trigger a root deploy through the forced-command key above.
 
@@ -79,9 +81,9 @@ empty. Deploy workflows are unaffected: they only `git archive | ssh`.
 Read from env files created on the VPS by hand, mode 0600 — never in git:
 
 ```
-/etc/kya-{fq,sr,bc,bp}-postgres.env   POSTGRES_USER / PASSWORD / DB
-/etc/kya-{fq,sr,bc,bp}.env            DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN,
-                                      admin bootstrap
+/etc/kya-{fq,sr,bc,bp,el,fc}-postgres.env   POSTGRES_USER / PASSWORD / DB
+/etc/kya-{fq,sr,bc,bp,el,fc}.env            DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN,
+                                            admin bootstrap
 ```
 
 `kya-bp.env` additionally carries the optional `ANTHROPIC` / `GMAIL_*` /
@@ -103,7 +105,7 @@ by container name.
 
 **Migrations are idempotent** and safe to re-run on every deploy.
 
-**DNS is grey-cloud.** All four domains are Cloudflare A records straight to
+**DNS is grey-cloud.** All six domains are Cloudflare A records straight to
 `72.62.125.38`, DNS-only, so ACME HTTP-01 reaches the origin. A side effect is
 that nginx sees real client IPs, so fail2ban bans real users rather than
 Cloudflare edges.
@@ -111,11 +113,11 @@ Cloudflare edges.
 **Activation downtime.** A `nixos-rebuild switch` stops every container,
 including Postgres, and each app's `*-migrate.service` is a `requires` + `before`
 dependency that must wait for Postgres, migrate, and bootstrap before the app may
-start. Budget roughly **two minutes of 502s** on all four apps per deploy.
+start. Budget roughly **two minutes of 502s** on all six apps per deploy.
 
 ## Removed
 
-Only the five modules above remain; everything else in this directory was
+Only the modules above remain; everything else in this directory was
 deleted as dead config.
 
 `backup.nix` / `yes-date-me-backup.nix` dumped a host-local Postgres via

@@ -1,6 +1,6 @@
 # Hostinger VPS (`msdqn`)
 
-Production box at `72.62.125.38`. Runs the four KYA business apps behind nginx.
+Production box at `72.62.125.38`. Runs the six KYA business apps behind nginx.
 Per-app detail lives in [`services/README.md`](services/README.md).
 
 ## Layout
@@ -39,7 +39,7 @@ clan machines update hostinger \
   --target-host root@72.62.125.38
 ```
 
-Every switch costs ~2 minutes of 502s across all four apps; see the services
+Every switch costs ~2 minutes of 502s across all six apps; see the services
 README for why.
 
 ## Removed subsystems

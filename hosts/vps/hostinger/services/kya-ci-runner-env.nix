@@ -34,6 +34,8 @@ in
         "github-runner-kya-sr"
         "github-runner-kya-bc"
         "github-runner-kya-bp"
+        "github-runner-kya-el"
+        "github-runner-kya-fc"
       ]
       (_: {
         environment = ldEnv;
