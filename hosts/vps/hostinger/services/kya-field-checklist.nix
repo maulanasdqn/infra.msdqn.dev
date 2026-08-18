@@ -13,15 +13,33 @@ let
     ${pkgs.systemd}/bin/systemctl restart kya-fc-migrate.service
     ${pkgs.systemd}/bin/systemctl restart kya-fc.service
     ${pkgs.systemd}/bin/systemctl restart kya-fc-worker.service
+    app_ok=0
     for _ in $(seq 1 45); do
       if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:3006/healthz >/dev/null 2>&1; then
-        ${pkgs.podman}/bin/podman image prune -f >/dev/null 2>&1 || true
-        echo "kya-fc deploy OK"
-        exit 0
+        app_ok=1
+        break
       fi
       sleep 2
     done
-    echo "kya-fc healthcheck failed after restart" >&2
+    if [ "$app_ok" != 1 ]; then
+      echo "kya-fc healthcheck failed after restart" >&2
+      exit 1
+    fi
+    for _ in $(seq 1 30); do
+      if [ "$(${pkgs.podman}/bin/podman inspect -f '{{.State.Running}}' kya-fc-worker 2>/dev/null)" = "true" ]; then
+        worker_id=$(${pkgs.podman}/bin/podman inspect -f '{{.Id}}' kya-fc-worker 2>/dev/null)
+        sleep 10
+        if [ -n "$worker_id" ] && [ "$(${pkgs.podman}/bin/podman inspect -f '{{.Id}}' kya-fc-worker 2>/dev/null)" = "$worker_id" ]; then
+          ${pkgs.podman}/bin/podman image prune -f >/dev/null 2>&1 || true
+          echo "kya-fc deploy OK"
+          exit 0
+        fi
+        echo "kya-fc worker crash-looping after restart" >&2
+        exit 1
+      fi
+      sleep 2
+    done
+    echo "kya-fc worker not running after restart" >&2
     exit 1
   '';
 in
