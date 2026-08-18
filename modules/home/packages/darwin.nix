@@ -20,6 +20,7 @@
         jq
         tree
         bun
+        nodejs_22
         ffmpeg
         cmake
         ninja
@@ -60,6 +61,7 @@
       [
         "$HOME/.bun/bin"
         "$HOME/.npm-global/bin"
+        "$HOME/.opencode/bin"
       ]
       ++ lib.optionals enableRust [ "$HOME/.cargo/bin" ]
       ++ lib.optionals enableVolta [ "$HOME/.volta/bin" ]
