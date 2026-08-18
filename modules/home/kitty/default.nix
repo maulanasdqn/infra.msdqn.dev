@@ -41,7 +41,8 @@
 
       macos_titlebar_color = "background";
       macos_option_as_alt = "yes";
-      hide_window_decorations = "titlebar-only";
+      linux_display_server = "wayland";
+      wayland_titlebar_color = "background";
 
       clipboard_control = "write-clipboard write-primary read-clipboard read-primary";
     };
