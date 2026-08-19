@@ -14,7 +14,7 @@ let
     ${pkgs.systemd}/bin/systemctl restart kya-el.service
     ${pkgs.systemd}/bin/systemctl restart kya-el-worker.service
     for _ in $(seq 1 45); do
-      if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:3005/healthz >/dev/null 2>&1; then
+      if ${pkgs.curl}/bin/curl -sf --connect-timeout 5 --max-time 10 http://127.0.0.1:3005/healthz >/dev/null 2>&1; then
         ${pkgs.podman}/bin/podman image prune -f >/dev/null 2>&1 || true
         echo "kya-el deploy OK"
         exit 0

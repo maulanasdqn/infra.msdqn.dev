@@ -15,7 +15,7 @@ let
     ${pkgs.systemd}/bin/systemctl restart kya-fc-worker.service
     app_ok=0
     for _ in $(seq 1 45); do
-      if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:3006/healthz >/dev/null 2>&1; then
+      if ${pkgs.curl}/bin/curl -sf --connect-timeout 5 --max-time 10 http://127.0.0.1:3006/healthz >/dev/null 2>&1; then
         app_ok=1
         break
       fi
