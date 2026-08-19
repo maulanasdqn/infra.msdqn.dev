@@ -29,6 +29,7 @@ in
     ./services/kya-bill-pay.nix
     ./services/kya-entity-license-renewal.nix
     ./services/kya-field-checklist.nix
+    ./services/kya-bid-intake.nix
     ./services/kya-ci-runner-env.nix
   ];
 
