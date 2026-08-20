@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>infra.msdqn.dev — One Flake, Every Device</title>
+    <meta
+      name="description"
+      content="Maulana Sodiqin's unified Nix configuration: NixOS workstations, macOS via nix-darwin, VPS fleets via nixos-anywhere, WSL, Raspberry Pi, and Android — all reproducible from a single flake."
+    />
+    <link rel="canonical" href="https://infra.msdqn.dev/" />
+    <meta property="og:title" content="infra.msdqn.dev — One Flake, Every Device" />
+    <meta
+      property="og:description"
+      content="A single Nix flake managing an entire fleet: NixOS, macOS, VPS, WSL, Raspberry Pi, and Android. Every machine reproducible from a git clone."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://infra.msdqn.dev/" />
+    <style>
+      :root {
+        --base: #191724;
+        --surface: #1f1d2e;
+        --overlay: #26233a;
+        --hl-med: #403d52;
+        --muted: #6e6a86;
+        --subtle: #908caa;
+        --text: #e0def4;
+        --love: #eb6f92;
+        --gold: #f6c177;
+        --rose: #ebbcba;
+        --pine: #31748f;
+        --foam: #9ccfd8;
+        --iris: #c4a7e7;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: var(--base);
+        color: var(--text);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        line-height: 1.6;
+      }
+      .mono {
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      header {
+        padding: 96px 0 64px;
+        text-align: center;
+      }
+      header .kicker {
+        color: var(--foam);
+        font-size: 15px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      header h1 {
+        font-size: clamp(36px, 6vw, 64px);
+        margin: 12px 0 16px;
+      }
+      header h1 span {
+        color: var(--iris);
+      }
+      header p.lead {
+        color: var(--subtle);
+        max-width: 640px;
+        margin: 0 auto 32px;
+        font-size: 18px;
+      }
+      .btns {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 22px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+      }
+      .btn.primary {
+        background: var(--iris);
+        color: var(--base);
+      }
+      .btn.ghost {
+        border: 1px solid var(--hl-med);
+        color: var(--text);
+      }
+      .btn:hover {
+        opacity: 0.85;
+      }
+      section {
+        padding: 48px 0;
+      }
+      h2 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      .sub {
+        color: var(--muted);
+        margin-bottom: 32px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--overlay);
+        border-radius: 12px;
+        padding: 24px;
+      }
+      .card:hover {
+        border-color: var(--iris);
+      }
+      .card .tag {
+        display: inline-block;
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+      .card h3 {
+        font-size: 18px;
+        margin-bottom: 6px;
+      }
+      .card p {
+        color: var(--subtle);
+        font-size: 14.5px;
+      }
+      .card .hosts {
+        margin-top: 12px;
+        color: var(--foam);
+        font-size: 13px;
+      }
+      .t-iris { background: rgba(196, 167, 231, 0.15); color: var(--iris); }
+      .t-foam { background: rgba(156, 207, 216, 0.15); color: var(--foam); }
+      .t-gold { background: rgba(246, 193, 119, 0.15); color: var(--gold); }
+      .t-pine { background: rgba(49, 116, 143, 0.25); color: var(--foam); }
+      .t-rose { background: rgba(235, 188, 186, 0.15); color: var(--rose); }
+      .t-love { background: rgba(235, 111, 146, 0.15); color: var(--love); }
+      pre {
+        background: var(--surface);
+        border: 1px solid var(--overlay);
+        border-radius: 12px;
+        padding: 24px;
+        overflow-x: auto;
+        font-size: 13.5px;
+        line-height: 1.7;
+        color: var(--subtle);
+      }
+      pre .c { color: var(--muted); }
+      pre .k { color: var(--iris); }
+      pre .s { color: var(--gold); }
+      ul.feats {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 12px 24px;
+      }
+      ul.feats li {
+        padding-left: 26px;
+        position: relative;
+        color: var(--subtle);
+        font-size: 15px;
+      }
+      ul.feats li::before {
+        content: '❄';
+        position: absolute;
+        left: 0;
+        color: var(--foam);
+      }
+      ul.feats li strong {
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--overlay);
+        margin-top: 48px;
+        padding: 32px 0 48px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      footer a {
+        color: var(--foam);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="wrap">
+      <div class="kicker mono">nix flake · reproducible fleet</div>
+      <h1>One flake. <span>Every device.</span></h1>
+      <p class="lead">
+        A single Nix configuration managing an entire fleet — NixOS
+        workstations, Macs, cloud servers, a Raspberry Pi, WSL, even an Android
+        phone. Every machine rebuilds identically from one
+        <span class="mono">git clone</span>.
+      </p>
+      <div class="btns">
+        <a class="btn primary" href="https://github.com/maulanasdqn/infra.msdqn.dev">View on GitHub</a>
+        <a class="btn ghost" href="https://msdqn.dev">About the Author</a>
+      </div>
+    </header>
+
+    <section class="wrap">
+      <h2>The Fleet</h2>
+      <p class="sub">Seven platform classes, one entry point.</p>
+      <div class="grid">
+        <div class="card">
+          <span class="tag t-iris">NixOS</span>
+          <h3>Workstations</h3>
+          <p>
+            Daily drivers running NixOS with Hyprland on Wayland, declarative
+            desktops down to the wallpaper.
+          </p>
+          <div class="hosts mono">pc · vivobook</div>
+        </div>
+        <div class="card">
+          <span class="tag t-foam">nix-darwin</span>
+          <h3>Macs</h3>
+          <p>
+            macOS managed declaratively: system defaults, Homebrew casks,
+            Aerospace tiling, Sketchybar — all in Nix.
+          </p>
+          <div class="hosts mono">beast · 2 work machines</div>
+        </div>
+        <div class="card">
+          <span class="tag t-pine">nixos-anywhere</span>
+          <h3>Cloud Servers</h3>
+          <p>
+            VPS hosts provisioned from zero with nixos-anywhere: disk
+            partitioning, hardening, nginx, and production client workloads —
+            fully declared, deployed over SSH.
+          </p>
+          <div class="hosts mono">hostinger · digitalocean</div>
+        </div>
+        <div class="card">
+          <span class="tag t-gold">ARM</span>
+          <h3>Raspberry Pi</h3>
+          <p>
+            Same flake, aarch64 target. The Pi gets the identical base profile
+            as every other machine.
+          </p>
+          <div class="hosts mono">raspi</div>
+        </div>
+        <div class="card">
+          <span class="tag t-rose">WSL</span>
+          <h3>Windows via WSL</h3>
+          <p>
+            NixOS-WSL brings the full home-manager environment onto Windows
+            machines without dual-booting.
+          </p>
+          <div class="hosts mono">wsl</div>
+        </div>
+        <div class="card">
+          <span class="tag t-love">nix-on-droid</span>
+          <h3>Android</h3>
+          <p>
+            Even the phone is in the flake — a declarative shell environment
+            running on Android.
+          </p>
+          <div class="hosts mono">honor</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <h2>How It Fits Together</h2>
+      <p class="sub">Layered profiles and per-platform modules, shared where it counts.</p>
+      <pre class="mono"><span class="c">.</span>
+├── <span class="k">flake.nix</span>            <span class="c"># single entry point for every host</span>
+├── <span class="k">hosts/</span>               <span class="c"># workstation · darwin · vps · raspi · wsl · android</span>
+├── <span class="k">profiles/</span>            <span class="c"># base → workstation / server (hardened SSH, nginx)</span>
+├── <span class="k">modules/</span>
+│   ├── <span class="s">nixos/</span>           <span class="c"># boot, desktop, audio, networking, git-sync</span>
+│   ├── <span class="s">darwin/</span>          <span class="c"># macOS defaults, homebrew, aerospace, sketchybar</span>
+│   └── <span class="s">home/</span>            <span class="c"># home-manager: shared dotfiles, per-OS packages</span>
+├── <span class="k">secrets/</span>             <span class="c"># sops-encrypted, decrypted only on target hosts</span>
+└── <span class="k">templates/</span>           <span class="c"># devenv project templates: rust · nodejs · laravel</span></pre>
+    </section>
+
+    <section class="wrap">
+      <h2>Why This Setup</h2>
+      <p class="sub">The properties that make it worth maintaining.</p>
+      <ul class="feats">
+        <li><strong>Reproducible by construction</strong> — a new machine is a clone, a config entry, and one rebuild away from identical.</li>
+        <li><strong>Zero-touch server provisioning</strong> — nixos-anywhere takes a blank VPS to a hardened, service-running host over SSH in one command.</li>
+        <li><strong>Secrets done right</strong> — sops-encrypted in git, decrypted only on the hosts that need them.</li>
+        <li><strong>Self-healing servers</strong> — VPS hosts git-sync their configuration, so the repo is always the source of truth.</li>
+        <li><strong>One editor everywhere</strong> — nixvim builds the same Neovim on every platform, plugins pinned by the flake lock.</li>
+        <li><strong>Instant dev environments</strong> — devenv templates spin up Rust, Node.js, or Laravel projects with databases via direnv.</li>
+      </ul>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        Built and maintained by
+        <a href="https://msdqn.dev">Maulana Sodiqin</a> ·
+        <a href="https://github.com/maulanasdqn/infra.msdqn.dev">source on GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>

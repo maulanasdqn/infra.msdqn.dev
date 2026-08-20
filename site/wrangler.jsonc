@@ -1,0 +1,8 @@
+{
+  "name": "infra-msdqn-dev",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./public"
+  },
+  "routes": [{ "pattern": "infra.msdqn.dev", "custom_domain": true }]
+}
