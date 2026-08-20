@@ -201,6 +201,75 @@
         color: var(--foam);
         text-decoration: none;
       }
+      .diagram-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+        gap: 16px;
+        align-items: start;
+      }
+      @media (max-width: 800px) {
+        .diagram-shell {
+          grid-template-columns: 1fr;
+        }
+      }
+      #fleet-graph {
+        width: 100%;
+        height: auto;
+        background: var(--surface);
+        border: 1px solid var(--overlay);
+        border-radius: 12px;
+      }
+      #fleet-graph .edge {
+        fill: none;
+        stroke: var(--hl-med);
+        stroke-width: 1.5;
+        transition: stroke 0.15s, stroke-width 0.15s;
+      }
+      #fleet-graph .edge.lit {
+        stroke-width: 2.5;
+      }
+      #fleet-graph .node rect {
+        fill: var(--overlay);
+        stroke: var(--hl-med);
+        stroke-width: 1.5;
+        rx: 8;
+        transition: stroke 0.15s, fill 0.15s;
+        cursor: pointer;
+      }
+      #fleet-graph .node text {
+        fill: var(--text);
+        font-size: 13px;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+        pointer-events: none;
+      }
+      #fleet-graph .node .sublabel {
+        fill: var(--muted);
+        font-size: 10.5px;
+      }
+      #fleet-graph .node:hover rect,
+      #fleet-graph .node:focus-visible rect,
+      #fleet-graph .node.selected rect {
+        fill: var(--base);
+      }
+      #fleet-graph .node:focus {
+        outline: none;
+      }
+      .detail .cmd {
+        margin-top: 14px;
+        background: var(--base);
+        border: 1px solid var(--overlay);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 12.5px;
+        color: var(--gold);
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .detail ul {
+        margin: 10px 0 0 18px;
+        color: var(--subtle);
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
@@ -282,6 +351,31 @@
     </section>
 
     <section class="wrap">
+      <h2>The Graph</h2>
+      <p class="sub">
+        How one flake fans out to nine machines. Hover to trace a path, click
+        any node for details.
+      </p>
+      <div class="diagram-shell">
+        <svg
+          id="fleet-graph"
+          viewBox="0 0 1000 600"
+          role="group"
+          aria-label="Interactive diagram of the Nix flake fanning out to platform builders and hosts"
+        ></svg>
+        <aside class="detail card" id="detail-panel" aria-live="polite">
+          <span class="tag t-iris" id="detail-tag">flake.nix</span>
+          <h3 id="detail-title">The entry point</h3>
+          <p id="detail-body">
+            Every machine below is an output of this one flake. Click a node to
+            see what it runs and how it deploys.
+          </p>
+          <div class="cmd mono" id="detail-cmd">nix flake show</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="wrap">
       <h2>How It Fits Together</h2>
       <p class="sub">Layered profiles and per-platform modules, shared where it counts.</p>
       <pre class="mono"><span class="c">.</span>
@@ -316,5 +410,356 @@
         <a href="https://github.com/maulanasdqn/infra.msdqn.dev">source on GitHub</a>
       </div>
     </footer>
+
+    <script>
+      const COLORS = {
+        iris: '#c4a7e7',
+        gold: '#f6c177',
+        foam: '#9ccfd8',
+        love: '#eb6f92',
+        pine: '#5ba9c9',
+        rose: '#ebbcba',
+      };
+
+      const FLAKE = {
+        id: 'flake',
+        label: 'flake.nix',
+        color: 'iris',
+        tag: 'flake.nix',
+        title: 'The entry point',
+        body: 'Every machine on this page is an output of this one flake: nixosConfigurations, darwinConfigurations, and nixOnDroidConfigurations, all sharing profiles, modules, and sops-encrypted secrets.',
+        bullets: [
+          'Pinned inputs via flake.lock — the whole fleet moves in lockstep',
+          'User settings live in a gitignored config.nix',
+          'home-manager and nixvim shared across every platform',
+        ],
+        cmd: 'nix flake show',
+      };
+
+      const LANES = [
+        {
+          id: 'workstation',
+          label: 'NixOS',
+          sub: 'workstations',
+          color: 'iris',
+          tag: 'NixOS',
+          title: 'NixOS workstations',
+          body: 'Daily-driver machines with declarative desktops: Hyprland on Wayland, fonts, audio, and programs all defined in modules/nixos.',
+          bullets: [
+            'workstation profile on top of the shared base',
+            'Desktop declared down to the wallpaper',
+          ],
+          cmd: 'sudo nixos-rebuild switch --flake .#<host>',
+          hosts: [
+            {
+              id: 'pc',
+              label: 'pc',
+              sub: 'desktop',
+              title: 'Desktop PC',
+              body: 'Primary NixOS workstation with the full Hyprland desktop and tiling workflow.',
+              bullets: ['x86_64 · workstation profile', 'Hyprland + declarative dotfiles'],
+              cmd: 'sudo nixos-rebuild switch --flake .#pc',
+            },
+            {
+              id: 'vivobook',
+              label: 'vivobook',
+              sub: 'laptop',
+              title: 'Asus Vivobook',
+              body: 'NixOS laptop sharing the exact same workstation profile as the desktop — identical environment on the go.',
+              bullets: ['x86_64 · workstation profile', 'Same home-manager config as pc'],
+              cmd: 'sudo nixos-rebuild switch --flake .#vivobook',
+            },
+          ],
+        },
+        {
+          id: 'raspi-lane',
+          label: 'ARM',
+          sub: 'aarch64',
+          color: 'gold',
+          tag: 'ARM',
+          title: 'Raspberry Pi',
+          body: 'The same flake cross-targets aarch64. The Pi runs the shared base profile like every other machine.',
+          bullets: ['aarch64-linux output from the same inputs'],
+          cmd: 'sudo nixos-rebuild switch --flake .#raspi',
+          hosts: [
+            {
+              id: 'raspi',
+              label: 'raspi',
+              sub: 'aarch64',
+              title: 'Raspberry Pi',
+              body: 'Small ARM box, full citizen of the fleet — base profile, shared modules, same rebuild workflow.',
+              bullets: ['aarch64-linux', 'Base profile + shared home modules'],
+              cmd: 'sudo nixos-rebuild switch --flake .#raspi',
+            },
+          ],
+        },
+        {
+          id: 'darwin',
+          label: 'nix-darwin',
+          sub: 'macOS',
+          color: 'foam',
+          tag: 'nix-darwin',
+          title: 'Macs via nix-darwin',
+          body: 'macOS managed declaratively: system defaults, Homebrew casks, Aerospace tiling, and Sketchybar are all Nix modules.',
+          bullets: [
+            'darwinConfigurations built by mkDarwinMachine',
+            'home-manager rides along with extraSpecialArgs',
+          ],
+          cmd: 'darwin-rebuild switch --flake .#<host>',
+          hosts: [
+            {
+              id: 'beast',
+              label: 'beast',
+              sub: 'personal',
+              title: 'beast',
+              body: 'Personal Mac with the full darwin module set: tiling window manager, custom menu bar, declared Homebrew.',
+              bullets: ['Aerospace + Sketchybar', 'macOS defaults set in Nix'],
+              cmd: 'darwin-rebuild switch --flake .#beast',
+            },
+            {
+              id: 'macbook-mrscraper',
+              label: 'macbook-mrscraper',
+              sub: 'work',
+              title: 'Work MacBook',
+              body: 'Work laptop sharing the same darwin modules — a new work machine is one rebuild from feeling like home.',
+              bullets: ['Same modules, work-specific config'],
+              cmd: 'darwin-rebuild switch --flake .#macbook-mrscraper',
+            },
+            {
+              id: 'macmini-mrscraper',
+              label: 'macmini-mrscraper',
+              sub: 'work',
+              title: 'Work Mac mini',
+              body: 'Desk-bound work machine, kept identical to the MacBook by construction.',
+              bullets: ['Same modules, work-specific config'],
+              cmd: 'darwin-rebuild switch --flake .#macmini-mrscraper',
+            },
+          ],
+        },
+        {
+          id: 'droid',
+          label: 'nix-on-droid',
+          sub: 'Android',
+          color: 'love',
+          tag: 'nix-on-droid',
+          title: 'Android via nix-on-droid',
+          body: 'Even the phone is a flake output — a declarative shell environment with the shared tooling, running on Android.',
+          bullets: ['nixOnDroidConfigurations output'],
+          cmd: 'nix-on-droid switch --flake .#honor',
+          hosts: [
+            {
+              id: 'honor',
+              label: 'honor',
+              sub: 'phone',
+              title: 'Honor phone',
+              body: 'Terminal environment on the phone, built from the same flake inputs as everything else.',
+              bullets: ['Shared shell + git config', 'aarch64-linux'],
+              cmd: 'nix-on-droid switch --flake .#honor',
+            },
+          ],
+        },
+        {
+          id: 'vps',
+          label: 'nixos-anywhere',
+          sub: 'cloud',
+          color: 'pine',
+          tag: 'nixos-anywhere',
+          title: 'Cloud servers',
+          body: 'Blank VPS to hardened, service-running host over SSH in one command: disk layout, server profile, nginx, and production client workloads, all declared.',
+          bullets: [
+            'Server profile: hardened SSH, nginx, docker',
+            'git-sync keeps hosts converged with the repo',
+          ],
+          cmd: 'nixos-anywhere --flake .#<host> root@<ip>',
+          hosts: [
+            {
+              id: 'hostinger',
+              label: 'hostinger',
+              sub: 'static ip',
+              title: 'Hostinger VPS',
+              body: 'Production server running client application workloads behind nginx, provisioned from zero with nixos-anywhere.',
+              bullets: ['Static IP · BIOS boot · declared disks', 'CI runner + production services'],
+              cmd: 'nixos-anywhere --flake .#hostinger root@<ip>',
+            },
+            {
+              id: 'digitalocean',
+              label: 'digitalocean',
+              sub: 'droplet',
+              title: 'DigitalOcean droplet',
+              body: 'Second cloud host on the same server profile — DHCP networking and hybrid boot, otherwise identical by construction.',
+              bullets: ['DHCP · hybrid boot', 'Server profile'],
+              cmd: 'nixos-anywhere --flake .#digitalocean root@<ip>',
+            },
+          ],
+        },
+        {
+          id: 'wsl-lane',
+          label: 'NixOS-WSL',
+          sub: 'Windows',
+          color: 'rose',
+          tag: 'NixOS-WSL',
+          title: 'Windows via WSL',
+          body: 'The full home-manager environment on Windows machines without dual-booting, through NixOS-WSL.',
+          bullets: ['Same shell, editor, and tooling as native NixOS'],
+          cmd: 'sudo nixos-rebuild switch --flake .#wsl',
+          hosts: [
+            {
+              id: 'wsl',
+              label: 'wsl',
+              sub: 'windows',
+              title: 'WSL',
+              body: 'NixOS inside Windows — the escape hatch that keeps the environment consistent even on a Windows box.',
+              bullets: ['NixOS-WSL distribution', 'Shared home modules'],
+              cmd: 'sudo nixos-rebuild switch --flake .#wsl',
+            },
+          ],
+        },
+      ];
+
+      const svg = document.getElementById('fleet-graph');
+      const NS = 'http://www.w3.org/2000/svg';
+      const W = 1000;
+      const hostRows = LANES.reduce((n, l) => n + l.hosts.length, 0);
+      const ROW = 58;
+      const TOP = 46;
+      const H = TOP * 2 + (hostRows - 1) * ROW;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+      const X = { flake: 90, lane: 420, host: 790 };
+      const NODE_W = { flake: 150, lane: 190, host: 260 };
+      const NODE_H = 40;
+
+      let row = 0;
+      const positions = {};
+      LANES.forEach(lane => {
+        const ys = lane.hosts.map(() => TOP + row++ * ROW);
+        ys.forEach((y, i) => (positions[lane.hosts[i].id] = { x: X.host, y }));
+        positions[lane.id] = { x: X.lane, y: ys.reduce((a, b) => a + b, 0) / ys.length };
+      });
+      positions.flake = { x: X.flake, y: H / 2 };
+
+      const edgePath = (a, b, wa, wb) => {
+        const x1 = a.x + wa / 2;
+        const x2 = b.x - wb / 2;
+        const mx = (x1 + x2) / 2;
+        return `M ${x1} ${a.y} C ${mx} ${a.y}, ${mx} ${b.y}, ${x2} ${b.y}`;
+      };
+
+      const el = (name, attrs, parent) => {
+        const node = document.createElementNS(NS, name);
+        Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+        parent.appendChild(node);
+        return node;
+      };
+
+      const edges = {};
+      LANES.forEach(lane => {
+        edges[lane.id] = el(
+          'path',
+          {
+            class: 'edge',
+            'data-lane': lane.id,
+            d: edgePath(positions.flake, positions[lane.id], NODE_W.flake, NODE_W.lane),
+          },
+          svg
+        );
+        lane.hosts.forEach(host => {
+          edges[host.id] = el(
+            'path',
+            {
+              class: 'edge',
+              'data-lane': lane.id,
+              d: edgePath(positions[lane.id], positions[host.id], NODE_W.lane, NODE_W.host),
+            },
+            svg
+          );
+        });
+      });
+
+      const panel = {
+        tag: document.getElementById('detail-tag'),
+        title: document.getElementById('detail-title'),
+        body: document.getElementById('detail-body'),
+        cmd: document.getElementById('detail-cmd'),
+      };
+      let bulletList = null;
+      let selected = null;
+
+      const show = info => {
+        panel.tag.textContent = info.tag;
+        panel.tag.style.background = COLORS[info.color] + '26';
+        panel.tag.style.color = COLORS[info.color];
+        panel.title.textContent = info.title;
+        panel.body.textContent = info.body;
+        panel.cmd.textContent = info.cmd;
+        if (bulletList) bulletList.remove();
+        bulletList = document.createElement('ul');
+        (info.bullets || []).forEach(text => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          bulletList.appendChild(li);
+        });
+        panel.body.after(bulletList);
+      };
+
+      const light = (laneId, on) => {
+        const lane = LANES.find(l => l.id === laneId);
+        const ids = [laneId, ...lane.hosts.map(h => h.id)];
+        ids.forEach(id => {
+          edges[id].classList.toggle('lit', on);
+          edges[id].style.stroke = on ? COLORS[lane.color] : '';
+        });
+      };
+
+      const makeNode = (info, kind, laneId, color) => {
+        const pos = positions[info.id];
+        const width = NODE_W[kind];
+        const group = el(
+          'g',
+          {
+            class: 'node',
+            transform: `translate(${pos.x - width / 2}, ${pos.y - NODE_H / 2})`,
+            tabindex: '0',
+            role: 'button',
+            'aria-label': `${info.label}: ${info.title}`,
+          },
+          svg
+        );
+        const rect = el('rect', { width, height: NODE_H, rx: 8 }, group);
+        rect.style.stroke = COLORS[color];
+        el('rect', { x: 0, y: 0, width: 4, height: NODE_H, rx: 2 }, group).style.fill =
+          COLORS[color];
+        el('text', { x: 16, y: info.sub ? 18 : 25 }, group).textContent = info.label;
+        if (info.sub) {
+          el('text', { x: 16, y: 32, class: 'sublabel' }, group).textContent = info.sub;
+        }
+        const select = () => {
+          if (selected) selected.classList.remove('selected');
+          selected = group;
+          group.classList.add('selected');
+          show({ color, tag: info.tag || LANES.find(l => l.id === laneId)?.tag || info.label, ...info });
+        };
+        group.addEventListener('click', select);
+        group.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            select();
+          }
+        });
+        if (laneId) {
+          group.addEventListener('mouseenter', () => light(laneId, true));
+          group.addEventListener('mouseleave', () => light(laneId, false));
+          group.addEventListener('focus', () => light(laneId, true));
+          group.addEventListener('blur', () => light(laneId, false));
+        }
+        return group;
+      };
+
+      makeNode(FLAKE, 'flake', null, FLAKE.color);
+      LANES.forEach(lane => {
+        makeNode(lane, 'lane', lane.id, lane.color);
+        lane.hosts.forEach(host => makeNode(host, 'host', lane.id, lane.color));
+      });
+    </script>
   </body>
 </html>
