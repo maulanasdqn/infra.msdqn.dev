@@ -9,6 +9,8 @@
 let
 
   topGap = if config.networking.hostName == "macmini-mrscraper" then 50 else 17;
+  # Discord isn't installed on the mac mini — see modules/darwin/homebrew.
+  withDiscord = config.networking.hostName != "macmini-mrscraper";
   aerospaceConfig = pkgs.writeText "aerospace.toml" ''
     # Rosé Pine — Aerospace tiling WM
     # Keybinds mirror workstation (Hyprland/SUPER → macOS/cmd)
@@ -43,7 +45,7 @@ let
       'exec-and-forget open -b net.kovidgoyal.kitty',
       'exec-and-forget open -b net.imput.helium',
       'exec-and-forget open -b com.tinyspeck.slackmacgap',
-      'exec-and-forget open -b com.hnc.Discord',
+      ${lib.optionalString withDiscord "'exec-and-forget open -b com.hnc.Discord',"}
     ]
 
     [key-mapping]
@@ -133,9 +135,11 @@ let
     if.app-id = 'com.tinyspeck.slackmacgap'
     run = 'move-node-to-workspace 3'
 
-    [[on-window-detected]]
-    if.app-id = 'com.hnc.Discord'
-    run = 'move-node-to-workspace 5'
+    ${lib.optionalString withDiscord ''
+      [[on-window-detected]]
+      if.app-id = 'com.hnc.Discord'
+      run = 'move-node-to-workspace 5'
+    ''}
   '';
 in
 lib.mkIf enableTilingWM {

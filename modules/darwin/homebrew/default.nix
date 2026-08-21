@@ -27,12 +27,15 @@
     casks = [
       "chromium"
       "helium-browser"
-      "discord"
       "slack"
       "figma"
       "pritunl"
       "postman"
       "microsoft-teams"
+    ]
+    # No Discord on the mac mini.
+    ++ lib.optionals (config.networking.hostName != "macmini-mrscraper") [
+      "discord"
     ];
   };
 }
