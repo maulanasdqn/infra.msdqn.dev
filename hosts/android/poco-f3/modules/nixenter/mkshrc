@@ -1,0 +1,37 @@
+# Copyright (c) 2010, 2012, 2013, 2014
+#	Thorsten Glaser <tg@mirbsd.org>
+# This file is provided under the same terms as mksh.
+#-
+# Minimal /system/etc/mkshrc for Android
+#
+# Support: https://launchpad.net/mksh
+
+set +o nohup
+
+if (( USER_ID )); then PS1='$'; else PS1='#'; fi
+PS4='[$EPOCHREALTIME] '; PS1='${|
+	local e=$?
+
+	(( e )) && REPLY+="$e|"
+
+	return $e
+}$HOSTNAME:${PWD:-?} '"$PS1 "
+
+export TERM=xterm-256color
+
+# --- poco-f3: auto-enter the native Nix environment in the terminal app -------
+#
+# mksh sources this file only for interactive shells. USER_ID is the caller's
+# uid: Android app uids are always >= 10000, while adb shell is 2000, root is 0,
+# system is 1000. So this branch fires ONLY for a GUI terminal app (the AOSP
+# Terminal) and can never trigger for adb, su, or system shells.
+#
+# nix-enter re-execs through `su`; that root shell re-sources this file with
+# USER_ID=0, so the guard is false and there is no loop.
+#
+# Do NOT test for /nix here: an app (untrusted_app) is denied even statting
+# /nix, so `[[ -e /nix/... ]]` is always false in the terminal and would stop
+# this from ever firing. nix-enter runs `su` first; root can see /nix.
+if (( USER_ID >= 10000 )) && [[ -x /system/bin/nix-enter ]]; then
+	exec /system/bin/nix-enter
+fi

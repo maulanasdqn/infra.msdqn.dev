@@ -13,6 +13,15 @@
           User = "mrscrapersupport";
           Port = 22;
         };
+        "poco-f3" = {
+          HostName = "127.0.0.1";
+          Port = 8022;
+          User = "root";
+          IdentityFile = "~/.ssh/poco-f3_ed25519";
+          StrictHostKeyChecking = "no";
+          UserKnownHostsFile = "/dev/null";
+          LogLevel = "ERROR";
+        };
       };
     };
 

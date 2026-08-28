@@ -467,6 +467,56 @@
           };
         };
 
+      homeConfigurations = {
+        poco-f3 = home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs {
+            system = "aarch64-linux";
+            config.allowUnfree = true;
+          };
+          extraSpecialArgs = {
+            inherit claude-code nixvim;
+            enableLaravel = false;
+          };
+          modules = [ ./hosts/android/poco-f3 ];
+        };
+      };
+
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          iosRuntime = builtins.getEnv "IOS_RUNTIME_ROOT";
+          pocoModules = import ./hosts/android/poco-f3/modules {
+            inherit pkgs;
+            iosRuntime = if iosRuntime == "" then null else iosRuntime;
+          };
+        in
+        {
+          poco-f3-nixbind = pocoModules.nixbind;
+          poco-f3-hardening = pocoModules.hardening;
+          poco-f3-adblock = pocoModules.adblock;
+          poco-f3-nixenter = pocoModules.nixenter;
+          poco-f3-sshd = pocoModules.sshd;
+          poco-f3-modules = pocoModules.all;
+        }
+        // nixpkgs.lib.optionalAttrs (pocoModules.iossounds != null) {
+          poco-f3-iossounds = pocoModules.iossounds;
+        }
+      );
+
+      apps = forAllSystems (system: {
+        poco-f3-deploy = {
+          type = "app";
+          program = "${
+            nixpkgs.legacyPackages.${system}.writeShellApplication {
+              name = "poco-f3-deploy";
+              runtimeInputs = [ nixpkgs.legacyPackages.${system}.android-tools ];
+              text = builtins.readFile ./hosts/android/poco-f3/modules/deploy.sh;
+            }
+          }/bin/poco-f3-deploy";
+        };
+      });
+
       devShells = forAllSystems (
         system:
         let

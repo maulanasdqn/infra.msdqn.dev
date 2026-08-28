@@ -1,7 +1,27 @@
 # Android (nix-on-droid)
 
 Shared nix-on-droid base: packages, the nix-env shim, timezone and
-stateVersion. Host-specific config lives in subdirectories (`honor/`).
+stateVersion. Host-specific config lives in subdirectories.
+
+## Two kinds of Android host
+
+Not every phone here is a nix-on-droid host, and `default.nix` only applies to
+the ones that are.
+
+| Host      | Device                | Nix runs             | Imports `default.nix` |
+| --------- | --------------------- | -------------------- | --------------------- |
+| `honor`   | HONOR X9c (BRP-NX1)   | nix-on-droid / proot | yes                   |
+| `poco-f3` | POCO F3 (`alioth`)    | natively at `/nix`   | **no**                |
+
+`honor` has a permanently locked bootloader, so proot is the only option.
+`poco-f3` is unlocked and rooted, so `/nix` is a real bind mount and Nix runs
+without proot — which also frees it from the 25.11 pinning `honor` needs, since
+the glibc 2.42 breakage is a proot bug.
+
+Because this file sets nix-on-droid-only options (`environment.packages`,
+`terminal.font`, `system.stateVersion`), `poco-f3` cannot import it; it is a
+standalone `homeManagerConfiguration` under `nix.homeConfigurations` instead of
+`nixOnDroidConfigurations`. See `poco-f3/README.md`.
 
 ## Bootstrap essentials only
 
