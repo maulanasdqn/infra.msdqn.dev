@@ -2,8 +2,8 @@
 # Two Android facts make a native /nix impossible without help:
 #
 #   1. / is read-only ext4, so the mountpoint cannot simply be created.
-#      Remounting it rw works only because LineageOS disables dm-verity;
-#      this would fail on stock MIUI.
+#      Remounting it rw works only because the custom ROM (crDroid/LineageOS)
+#      disables dm-verity; this would fail on stock MIUI.
 #   2. There is no /etc/resolv.conf. Android resolves DNS through bionic and
 #      netd, so glibc binaries fail every hostname lookup while toybox ping
 #      succeeds — which makes it look like the network is fine when Nix
@@ -46,9 +46,10 @@ if [ ! -d /dev/shm ]; then
 fi
 
 # Seed a working nix.conf on a fresh store if one is not already present.
-#   sandbox=true         - the custom kernel enables CONFIG_USER_NS, so Nix gets
-#                          a real build sandbox (rootless user namespaces). On the
-#                          stock LineageOS kernel this had to be false.
+#   sandbox=true         - the custom msdqn-kernel enables CONFIG_USER_NS, so Nix
+#                          gets a real build sandbox (rootless user namespaces). On
+#                          the stock InfiniR/crDroid kernel (no USER_NS) this had to
+#                          be false or local builds hung in D-state.
 #   nix-path             - lets legacy `nix-shell -p` / <nixpkgs> resolve via the
 #                          flake registry; without it the flakes-only setup gives
 #                          "file 'nixpkgs' was not found in the Nix search path"
