@@ -48,6 +48,6 @@ stdenvNoCC.mkDerivation {
   '';
 
   meta = {
-    description = "Magisk module applying GrapheneOS-inspired hardening to LineageOS";
+    description = "Magisk module applying GrapheneOS-inspired hardening to crDroid";
   };
 }

@@ -1,7 +1,7 @@
 #!/system/bin/sh
 # Runtime kernel hardening, applied early at post-fs-data.
 #
-# LineageOS already ships the important compile-time hardening on this kernel
+# crDroid already ships the important compile-time hardening on this kernel
 # (KASLR, HARDENED_USERCOPY, SLAB_FREELIST_RANDOM/HARDENED, STACKPROTECTOR_STRONG,
 # STRICT_KERNEL_RWX, INIT_ON_ALLOC, BUG_ON_DATA_CORRUPTION), so what is left is
 # the sysctl surface, which ships wide open.

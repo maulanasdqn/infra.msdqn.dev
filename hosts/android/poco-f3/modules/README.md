@@ -1,6 +1,6 @@
 # poco-f3 Magisk modules
 
-Everything this phone needs on top of stock LineageOS, built by Nix instead of
+Everything this phone needs on top of stock crDroid, built by Nix instead of
 by hand. `nix build` produces the flashable zips; `nix run .#poco-f3-deploy`
 pushes, installs and reboots.
 
@@ -84,7 +84,7 @@ timbre. Removing `Effect_Tick` from the map is the authentic option.
 `post-fs-data.sh` applies kernel sysctls; `service.sh` applies framework
 settings at `late_start` and then runs an idle watcher.
 
-LineageOS already ships the compile-time kernel hardening that matters —
+crDroid already ships the compile-time kernel hardening that matters —
 `RANDOMIZE_BASE` (KASLR), `HARDENED_USERCOPY`, `SLAB_FREELIST_RANDOM` and
 `_HARDENED`, `STACKPROTECTOR_STRONG`, `STRICT_KERNEL_RWX`, `INIT_ON_ALLOC`,
 `BUG_ON_DATA_CORRUPTION`. Rebuilding the kernel would only add `INIT_ON_FREE`,

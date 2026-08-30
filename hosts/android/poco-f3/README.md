@@ -1,13 +1,13 @@
 # poco-f3 — POCO F3 / M2012K11AG (`alioth`)
 
-LineageOS 23.2 (Android 16) on a **custom kernel** with KernelSU-Next.
+crDroid 16 (Android 16) on the custom **`msdqn-kernel`** with KernelSU-Next.
 **Not a nix-on-droid host.**
 
-Root is **KernelSU** (kernel-level), not Magisk — see `kernel/README.md`. The
-custom kernel enables `CONFIG_USER_NS`, so Nix runs with a real build sandbox
-(`sandbox = true`) and rootless containers work. The six `/data/adb/modules`
-migrated from Magisk to KernelSU unchanged (KernelSU is Magisk-module
-compatible).
+Root is **KernelSU-Next** (kernel-level), not Magisk — see `kernel/README.md`.
+The custom `msdqn-kernel` enables `CONFIG_USER_NS`, so Nix runs with a real build
+sandbox (`sandbox = true`) and rootless containers work. The `/data/adb/modules`
+are Magisk-format, so they load unchanged under KernelSU-Next (which is baked
+into the InfiniR base crDroid ships).
 
 ## Why this is a home-manager config, not nix-on-droid
 
@@ -73,7 +73,7 @@ Magisk module (`post-fs-data.sh`), not by Nix:
 1. `/` is **read-only ext4**, so the `/nix` mountpoint cannot simply be
    created. The module briefly remounts `/` read-write to `mkdir /nix`, then
    binds `/data/nix` over it and remounts read-only. This works only because
-   LineageOS ships with **dm-verity disabled**; it would fail on stock MIUI.
+   crDroid ships with **dm-verity disabled**; it would fail on stock MIUI.
 2. Android has **no `/etc/resolv.conf`** — DNS goes through bionic and netd.
    glibc binaries therefore fail every hostname lookup while toybox `ping`
    succeeds, which makes it look like the network is fine when Nix cannot
@@ -85,13 +85,15 @@ survive an OTA, hence recreating it each boot rather than once.
 
 ## sandbox = true (custom kernel)
 
-`/nix/etc/nix.conf` sets `sandbox = true`. The custom kernel (`kernel/`) enables
-`CONFIG_USER_NS`/`CONFIG_PID_NS`, so Nix gets a real rootless build sandbox.
-Verified: a from-source build's own `/proc/self/uid_map` reads `0 0 4294967295`.
+`/nix/etc/nix.conf` sets `sandbox = true`. The custom `msdqn-kernel` (`kernel/`)
+enables `CONFIG_USER_NS`/`CONFIG_PID_NS`, so Nix gets a real rootless build
+sandbox. Verified from root: `unshare -U -r --map-root-user id` → `uid=0(root)`
+(`/proc/self/uid_map` = `0 0 1`).
 
-Historical note: on the **stock** LineageOS kernel these were unset, so this had
-to be `sandbox = false` (substitution worked, source builds were unsandboxed).
-The custom kernel removed that tradeoff — see `kernel/README.md`.
+Historical note: on the **stock** InfiniR/crDroid kernel these were unset, so
+this had to be `sandbox = false` and — worse — local from-source builds hung in
+uninterruptible D-state. The custom kernel removed that tradeoff — see
+`kernel/README.md`.
 
 ## HOME
 
@@ -103,7 +105,7 @@ filesystem.
 
 ## Firmware
 
-LineageOS 23.2 for `alioth` requires HyperOS **`OS1.0.1.0.TKHIDXM`** (Indonesia
-variant) as its vendor firmware base — not MIUI 14. Flash the fastboot ROM's
-`flash_all.sh`. Never `flash_all_lock.sh`: it relocks the bootloader, which
-bricks a device running a custom ROM.
+crDroid 16 for `alioth` needs a recent **HyperOS** (`…TKHMIXM`) firmware base as
+its vendor firmware — not MIUI 14; the device currently runs `V816.0.3.0.TKHMIXM`.
+Flash the matching fastboot ROM's `flash_all.sh`. Never `flash_all_lock.sh`: it
+relocks the bootloader, which bricks a device running a custom ROM.
