@@ -39,31 +39,33 @@ nix run .#poco-f3-deploy    # build + push + install + reboot
 ```
 
 **User side** — shell, prompt, editor and CLI tooling (zsh + starship + neovim +
-the same `cli.nix` tools as the darwin hosts). Run on the phone, as root, with
-the Nix env sourced:
+the same `cli.nix` tools as the darwin hosts):
 
 ```sh
-. /nix/etc/profile.sh
-nix run home-manager/master -- switch --flake .#poco-f3
+nix run .#poco-f3-hm-deploy    # build on Colima, import + activate on the phone
 ```
 
-The flake lives on the Mac; to build it on the phone (aarch64-linux — the Mac
-can't), copy the tree over (`tar` + `adb push`, or `ssh poco-f3`), `git init` it
-so flakes see it, and run the switch there. `/nix/etc/profile.sh` sets
-`SHELL=~/.nix-profile/bin/zsh` and sources home-manager's `hm-session-vars.sh`,
-so `nix-enter` (which execs `$SHELL -l`) drops the terminal straight into zsh
-with the starship prompt and aliases.
+**Do not run `home-manager switch` on the phone.** The device has 5.5 GB RAM and
+`nix-env -i home-manager-path` (the buildEnv that unions ~1108 packages) hangs
+indefinitely on-device. `hm-deploy.sh` therefore builds the `activationPackage` on
+the Colima aarch64-linux VM, copies the closure over, and activates by pointing the
+profile straight at the pre-built `home-manager-path` with `nix-env --set` (zero
+build) and hand-linking the generation's dotfiles. Re-run it to update the config.
 
-Two gotchas hit while applying it:
+Two config gotchas baked into `default.nix`:
 
 - **`manual.manpages.enable = false` + `news.display = "silent"`** — the
-  home-manager reference manpage derivation fails on this target (see below), so
-  it is disabled in `default.nix`.
+  home-manager reference manpage derivation fails on this target.
 - **`/dev/shm` is required.** Android has none (it uses ashmem), so Python
-  multiprocessing — which `nixos-render-docs` uses to build nixvim's /
-  home-manager's manpages — dies with `FileNotFoundError` in `SemLock`, failing
-  the whole `switch`. The `nixbind` module now mounts a tmpfs at `/dev/shm` at
-  boot; without it, any Python-multiprocessing build fails inside the sandbox.
+  multiprocessing — which `nixos-render-docs` uses for manpages — dies with
+  `FileNotFoundError` in `SemLock`. The `nixbind` module mounts a tmpfs at
+  `/dev/shm` at boot.
+
+`hm-deploy.sh` also wires **Termux** to drop straight into the native nix zsh:
+opening Termux `exec su -c '… zsh -l'` after a one-time KernelSU Superuser grant for
+`com.termux` (SELinux blocks non-root domains from `/nix`, so it must go through
+`su`). And it seeds `/data/local/nixhome/etc/{passwd,group}` which `nixbind`
+bind-mounts over `/etc` so glibc `getpwuid(0)` resolves root (zsh needs it).
 
 ## How /nix exists at all
 

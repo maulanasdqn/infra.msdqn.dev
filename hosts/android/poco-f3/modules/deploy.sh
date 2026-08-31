@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Push every built Magisk module to the phone, install it, and reboot once.
+# Push every built KernelSU/Magisk-format module to the phone, install it, and
+# reboot once (the device runs KernelSU on crDroid; ksud installs the same zips).
 #
 # Usage:  nix run .#poco-f3-deploy -- <module.zip> [more.zip ...]
 #   or:   nix run .#poco-f3-deploy            (builds and deploys everything)
@@ -27,13 +28,13 @@ dev=$(adb shell getprop ro.product.device | tr -d '\r')
 [ "$dev" = "alioth" ] || die "device reports '$dev', expected 'alioth'. Refusing."
 say "confirmed alioth"
 
-adb shell 'su -c "echo root-ok"' >/dev/null 2>&1 || die "no root — Magisk su denied"
+adb shell 'su -c "echo root-ok"' >/dev/null 2>&1 || die "no root — KernelSU su denied"
 
 for z in "${zips[@]}"; do
   name=$(basename "$z")
   say "installing $name"
   adb push "$z" "/data/local/tmp/$name" >/dev/null
-  adb shell "su -c 'magisk --install-module /data/local/tmp/$name'"
+  adb shell "su -c 'ksud module install /data/local/tmp/$name'"
   adb shell "su -c 'rm -f /data/local/tmp/$name'"
 done
 

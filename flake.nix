@@ -515,6 +515,17 @@
             }
           }/bin/poco-f3-deploy";
         };
+
+        poco-f3-hm-deploy = {
+          type = "app";
+          program = "${
+            nixpkgs.legacyPackages.${system}.writeShellApplication {
+              name = "poco-f3-hm-deploy";
+              runtimeInputs = [ nixpkgs.legacyPackages.${system}.android-tools ];
+              text = builtins.readFile ./hosts/android/poco-f3/hm-deploy.sh;
+            }
+          }/bin/poco-f3-hm-deploy";
+        };
       });
 
       devShells = forAllSystems (

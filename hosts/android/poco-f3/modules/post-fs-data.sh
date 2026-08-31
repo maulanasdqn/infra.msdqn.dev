@@ -63,3 +63,12 @@ max-jobs = auto
 nix-path = nixpkgs=flake:nixpkgs
 CONF
 fi
+
+# glibc tools (zsh, home-manager) call getpwuid(0); Android's /etc/passwd is empty
+# and glibc (unlike bionic) won't synthesise root, so they fail with "failed to get
+# user information". hm-deploy.sh writes these under the home dir; bind them over the
+# read-only /etc so glibc can resolve root every boot.
+if [ -f /data/local/nixhome/etc/passwd ]; then
+  mountpoint -q /etc/passwd 2>/dev/null || mount --bind /data/local/nixhome/etc/passwd /etc/passwd
+  mountpoint -q /etc/group  2>/dev/null || mount --bind /data/local/nixhome/etc/group  /etc/group
+fi
