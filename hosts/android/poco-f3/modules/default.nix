@@ -21,6 +21,8 @@ let
 
   sshd = pkgs.callPackage ./sshd.nix { };
 
+  stealth = pkgs.callPackage ./stealth.nix { };
+
   iossounds =
     if iosRuntime == null then
       null
@@ -37,6 +39,7 @@ let
     adblock
     nixenter
     sshd
+    stealth
   ]
   ++ pkgs.lib.optional (iossounds != null) iossounds;
 in
@@ -48,6 +51,7 @@ in
     adblock
     nixenter
     sshd
+    stealth
     iossounds
     ;
 

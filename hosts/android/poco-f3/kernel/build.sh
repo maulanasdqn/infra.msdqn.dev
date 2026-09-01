@@ -18,6 +18,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 KREV=020d4f362                                    # InfiniR 16.0-alioth pin
+STEALTH=${STEALTH:-1}                             # 1 = stock InfiniR identity; 0 = msdqn-kernel brand
 IMG_EXT4=/Users/ms/kbuild/ks.ext4                 # case-sensitive build fs
 MNT=/mnt/ks
 KDIR="$MNT/kernel"
@@ -56,7 +57,7 @@ run "
   ARCH=arm64 scripts/kconfig/merge_config.sh -O out out/.config custom.config
 "
 
-echo "==> patch Makefile: strip InfiniR ML-only -mllvm flags, honest IKCONFIG, msdqn name"
+echo "==> patch Makefile: strip InfiniR ML-only -mllvm flags, honest IKCONFIG"
 run "
   set -e
   cd $KDIR
@@ -64,21 +65,34 @@ run "
   # with 'Requested regalloc eviction advisor analysis could not be created'.
   sed -i '/-mllvm -regalloc-enable-advisor=release/d; /-mllvm -enable-ml-inliner=release/d' Makefile
   # InfiniR ships /proc/config.gz from a FIXED stock_defconfig, not the real
-  # .config, so config.gz lies about USER_NS. Point IKCONFIG at the live config.
+  # .config, so config.gz lies about USER_NS. Point IKCONFIG at the live config
+  # (still needed even though IKCONFIG_PROC is disabled — extract-ikconfig uses it).
   sed -i 's|^\\(\\\$(obj)/config_data.gz: \\).*FORCE|\\1\\\$(KCONFIG_CONFIG) FORCE|' kernel/Makefile
-  # Rename: uname -r => 4.19.404-msdqn-kernel
-  sed -i 's|^EXTRAVERSION = .*|EXTRAVERSION = -msdqn-kernel|' Makefile
-  sed -i 's|^CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|' out/.config
+  # Suppress git dirty-tree '+' suffix in uname
   printf '' > .scmversion
+  if [ '${STEALTH}' = '0' ]; then
+    sed -i 's|^EXTRAVERSION = .*|EXTRAVERSION = -msdqn-kernel|' Makefile
+    sed -i 's|^CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|' out/.config
+  fi
   make O=out ARCH=arm64 LLVM=-14 olddefconfig
 "
 
-echo "==> build Image"
+if [ "$STEALTH" = "1" ]; then
+  echo "==> stealth: patching /proc/PID/maps to hide frida indicators"
+  colima ssh -- bash -lc "cat > $KDIR/proc-hide-frida.sh && chmod +x $KDIR/proc-hide-frida.sh" < "$HERE/patches/proc-hide-frida.sh"
+  run "bash $KDIR/proc-hide-frida.sh $KDIR"
+fi
+
+echo "==> build Image (STEALTH=${STEALTH})"
 run "
   set -e
   cd $KDIR
-  make -j\"\$(nproc)\" O=out ARCH=arm64 LLVM=-14 LLVM_IAS=1 \
-    KBUILD_BUILD_USER=msdqn KBUILD_BUILD_HOST=poco-f3 Image
+  if [ '${STEALTH}' = '0' ]; then
+    make -j\"\$(nproc)\" O=out ARCH=arm64 LLVM=-14 LLVM_IAS=1 \
+      KBUILD_BUILD_USER=msdqn KBUILD_BUILD_HOST=poco-f3 Image
+  else
+    make -j\"\$(nproc)\" O=out ARCH=arm64 LLVM=-14 LLVM_IAS=1 Image
+  fi
 "
 
 echo "==> verify USER_NS is genuinely compiled in (config.gz alone is not enough)"

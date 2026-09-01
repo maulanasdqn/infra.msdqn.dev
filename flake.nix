@@ -497,6 +497,7 @@
           poco-f3-adblock = pocoModules.adblock;
           poco-f3-nixenter = pocoModules.nixenter;
           poco-f3-sshd = pocoModules.sshd;
+          poco-f3-stealth = pocoModules.stealth;
           poco-f3-modules = pocoModules.all;
         }
         // nixpkgs.lib.optionalAttrs (pocoModules.iossounds != null) {

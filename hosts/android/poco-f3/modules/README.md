@@ -11,6 +11,7 @@ pushes, installs and reboots.
 | `adblock`   | System-wide ad/tracker blocking via `/system/etc/hosts`        |
 | `nixenter`  | `nix-enter` / `ne` on PATH: root shell with Nix, from any term  |
 | `sshd`      | Native-nix OpenSSH on `127.0.0.1:8022` for a real terminal     |
+| `stealth`   | Spoofs boot state, build type and detection-prone props        |
 | `iossounds` | Replaces UI sounds, notifications, ringtones and alarms        |
 
 ## Building
@@ -138,6 +139,116 @@ Before-First-Unlock evicts disk encryption keys from RAM and reseals `/data` —
 the strongest anti-forensic control available without GrapheneOS itself. Radios
 switch off after 15 minutes idle. Both are `hardening.nix` arguments
 (`rebootIdleHours`, `radioIdleMinutes`); set either to `0` to disable.
+
+## stealth
+
+Spoofs the properties that root detectors, banking apps and Play Integrity read
+to determine whether the bootloader is unlocked and the build is modified.
+
+`post-fs-data.sh` runs **before zygote** (before any app starts) and uses
+`resetprop` to overwrite read-only properties in memory:
+
+| Property                          | Stock value | Spoofed value  |
+| --------------------------------- | ----------- | -------------- |
+| `ro.boot.verifiedbootstate`       | `orange`    | `green`        |
+| `ro.boot.flash.locked`            | `0`         | `1`            |
+| `ro.boot.vbmeta.device_state`     | `unlocked`  | `locked`       |
+| `ro.secureboot.lockstate`         | `unlocked`  | `locked`       |
+| `ro.debuggable`                   | `1`         | `0`            |
+| `ro.build.type`                   | `userdebug` | `user`         |
+| `ro.build.tags`                   | `test-keys` | `release-keys` |
+
+`service.sh` re-applies the same props at `late_start` (Android init overwrites
+some during boot) and forces SELinux to enforcing.
+
+### resetprop
+
+The module needs a `resetprop` binary to modify `ro.*` properties. It probes
+`/data/adb/ksu/bin/resetprop`, `/data/adb/magisk/resetprop`, and the module
+directory itself. If none is found it falls back to `setprop`, which cannot
+write read-only properties.
+
+Check whether resetprop is already present:
+
+```sh
+adb shell su -c 'ls /data/adb/ksu/bin/resetprop /data/adb/magisk/resetprop 2>/dev/null'
+```
+
+If not, extract it from a Magisk release (the binary works standalone, no full
+Magisk install needed):
+
+```sh
+curl -Lo Magisk.apk https://github.com/topjohnwu/Magisk/releases/latest/download/Magisk-v28.1.apk
+unzip -j Magisk.apk lib/arm64-v8a/libmagisk64.so
+adb push libmagisk64.so /data/local/tmp/resetprop
+adb shell su -c 'mv /data/local/tmp/resetprop /data/adb/ksu/bin/resetprop; chmod 755 /data/adb/ksu/bin/resetprop'
+```
+
+### What stealth does NOT cover
+
+This module handles the **property layer** only. Three other layers need
+separate tools (all installable as KSU modules, no kernel rebuild):
+
+| Layer | Tool | What it does |
+| ----- | ---- | ------------ |
+| Device fingerprint | **Play Integrity Fix** (PIF) | Spoofs `ro.build.fingerprint` to a known-good device so DEVICE-level Play Integrity passes. Community-maintained; update the fingerprint JSON when Google rotates. Install: `ksud module install PlayIntegrityFix-*.zip`. |
+| Per-app root hiding | **Shamiko** (+ ZygiskNext) | Unmounts KSU/module overlays and hides su in the mount namespace of deny-listed apps. Needed for banking apps that scan `/proc/self/mountinfo` for `/nix`, `/data/adb`, or overlay mounts. Install ZygiskNext first, then Shamiko. |
+| Hardware attestation | **Tricky Store** | Spoofs the TEE keybox so STRONG-level Play Integrity (hardware attestation) passes. Needs a valid leaked keybox; without one only DEVICE level is reachable. |
+
+### Frida stealth
+
+The module installs `frida-start` and `frida-stop` scripts to `/system/bin/`.
+They wrap a user-provided frida-server binary with stealth:
+
+- **Renamed binary** — copied to `/data/local/tmp/.cache/<random-uuid>` so
+  the process name in `/proc` never contains "frida"
+- **Non-standard port** — defaults to `29170` instead of `27042` (the
+  first thing detection SDKs scan)
+- **Localhost only** — `127.0.0.1`, nothing on the network
+
+Setup once:
+
+```sh
+# Use strongR-frida-android for maximum stealth (obfuscated thread names
+# and agent strings): github.com/hluwa/strongR-frida-android/releases
+adb push frida-server /data/local/tmp/
+adb shell su -c 'mkdir -p /data/adb/frida && mv /data/local/tmp/frida-server /data/adb/frida/ && chmod 755 /data/adb/frida/frida-server'
+```
+
+Use:
+
+```sh
+adb shell su -c 'frida-start'           # or: frida-start 31337
+adb forward tcp:29170 tcp:29170
+frida -H 127.0.0.1:29170 -f com.shopee.id
+```
+
+Stop:
+
+```sh
+adb shell su -c 'frida-stop'
+```
+
+Stock Frida leaks detection signals that e-commerce apps (Shopee, Tokopedia,
+etc.) actively scan for. The main vectors and what covers each one:
+
+| Detection vector | What finds it | What hides it |
+| --- | --- | --- |
+| Port 27042 open | `connect()` scan | `frida-start` (non-standard port) |
+| Process name contains "frida" | `/proc` enumeration | `frida-start` (renamed binary) |
+| `/proc/self/maps` contains "frida" | `fopen("/proc/self/maps")` | Kernel maps filter (`build.sh` STEALTH=1) |
+| Frida agent strings in memory | `memcmp` on loaded `.so` | **strongR-frida-android** (obfuscated build) |
+| Thread names: `gmain`, `gum-js-loop` | `/proc/self/task/*/comm` | **strongR-frida-android** |
+| D-Bus protocol on listening port | `recv()` + header check | Hard to avoid — use Frida gadget mode instead |
+
+### Kernel-side stealth
+
+The kernel `build.sh` defaults to `STEALTH=1`, which keeps InfiniR's original
+version strings so `uname -r` and `/proc/version` match stock crDroid.
+`custom.config` disables `CONFIG_IKCONFIG_PROC`, removing `/proc/config.gz`
+entirely so apps cannot read kernel config. The kernel also patches
+`fs/proc/task_mmu.c` to filter Frida's injected libraries from
+`/proc/PID/maps` and `/proc/PID/smaps` — see `kernel/README.md`.
 
 ## adblock
 

@@ -1,13 +1,20 @@
 # poco-f3 — POCO F3 / M2012K11AG (`alioth`)
 
-crDroid 16 (Android 16) on the custom **`msdqn-kernel`** with KernelSU-Next.
+crDroid 16 (Android 16) on a custom kernel with KernelSU-Next.
 **Not a nix-on-droid host.**
 
 Root is **KernelSU-Next** (kernel-level), not Magisk — see `kernel/README.md`.
-The custom `msdqn-kernel` enables `CONFIG_USER_NS`, so Nix runs with a real build
+The custom kernel enables `CONFIG_USER_NS`, so Nix runs with a real build
 sandbox (`sandbox = true`) and rootless containers work. The `/data/adb/modules`
 are Magisk-format, so they load unchanged under KernelSU-Next (which is baked
 into the InfiniR base crDroid ships).
+
+The kernel and userland are **stealth by default**: `uname -r` matches the stock
+crDroid kernel, `/proc/config.gz` is removed, and the `stealth` KSU module
+spoofs verified-boot state and build properties so the device looks like an
+unmodified, locked-bootloader release build. See `kernel/README.md` and
+`modules/README.md` for details and complementary tools (PIF, ZygiskNext,
+Shamiko, Tricky Store).
 
 ## Why this is a home-manager config, not nix-on-droid
 

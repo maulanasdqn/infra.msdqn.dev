@@ -1,11 +1,40 @@
-# poco-f3 custom kernel — `msdqn-kernel`
+# poco-f3 custom kernel
 
 A custom `alioth` kernel for **crDroid 16 (Android 16)**: InfiniR (raystef66)
-`16.0-alioth` + **KernelSU-Next** + **`CONFIG_USER_NS`/`PID_NS`** + **BBR**,
-renamed `msdqn-kernel`. `build.sh` reproduces the `Image`; `custom.config` is the
-fragment merged onto InfiniR's `vendor/alioth_defconfig`.
+`16.0-alioth` + **KernelSU-Next** + **`CONFIG_USER_NS`/`PID_NS`** + **BBR**.
+`build.sh` reproduces the `Image`; `custom.config` is the fragment merged onto
+InfiniR's `vendor/alioth_defconfig`.
 
-`uname -r` → `4.19.404-msdqn-kernel`.
+## Stealth mode (default)
+
+`build.sh` defaults to `STEALTH=1`: the kernel keeps InfiniR's original
+version strings and build identity so `uname -r` and `/proc/version` match what
+crDroid ships — apps cannot distinguish it from the stock ROM kernel.
+`/proc/config.gz` is removed entirely (`# CONFIG_IKCONFIG_PROC is not set` in
+`custom.config`) so apps cannot read kernel config to detect USER_NS or KSU.
+
+To brand the kernel as `msdqn-kernel` instead (identifiable but detectable):
+
+```sh
+STEALTH=0 bash hosts/android/poco-f3/kernel/build.sh
+```
+
+### /proc maps filter (Frida)
+
+When `STEALTH=1`, `build.sh` also patches `fs/proc/task_mmu.c` to filter
+Frida-related entries from `/proc/PID/maps` and `/proc/PID/smaps`. Any VMA
+whose backing file path contains `frida` or `linjector` is silently omitted
+from the output. This prevents apps (Shopee, banking, etc.) from detecting
+Frida's injected agent libraries by reading their own `/proc/self/maps`.
+
+The patch inserts a `should_hide_vma()` check into both `show_map()` and
+`show_smap()`. It is idempotent — re-running `build.sh` on an already-patched
+tree is a no-op. The patch script is at `patches/proc-hide-frida.sh` and
+restores the original file if it fails to apply.
+
+This handles the **kernel-side** detection vector. For complete Frida stealth
+also use **strongR-frida-android** (obfuscates thread names and agent strings
+in the Frida binary itself) — see `modules/README.md`.
 
 ## Why it exists
 
