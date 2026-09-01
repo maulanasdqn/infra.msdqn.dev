@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Patch fs/proc/task_mmu.c to filter Frida-related entries from
-# /proc/PID/maps and /proc/PID/smaps. VMAs whose backing file path
-# contains "frida" or "linjector" are silently omitted from the output,
-# so apps reading their own /proc/self/maps cannot detect Frida's
-# injected agent libraries.
+# /proc/PID/maps and /proc/PID/smaps. VMAs whose backing file dentry
+# name contains "frida" or "linjector" are silently omitted.
+#
+# Uses dentry->d_name.name (lockless, no allocation) instead of d_path()
+# which is unsafe under mmap_sem and caused a bootloop.
 #
 # Idempotent: re-running on an already-patched tree is a no-op.
 # Applied by build.sh when STEALTH=1.
@@ -22,44 +23,46 @@ fi
 cp "$FILE" "$FILE.orig"
 
 awk '
-/^static void show_map_vma\(struct seq_file/ {
+/^static int show_map\(struct seq_file \*m, void \*v\)/ && !inserted {
     print "static bool should_hide_vma(struct vm_area_struct *vma)"
     print "{"
     print "\tstruct file *file = vma->vm_file;"
-    print "\tchar buf[256];"
-    print "\tchar *p;"
+    print "\tconst char *name;"
     print ""
-    print "\tif (!file)"
+    print "\tif (!file || !file->f_path.dentry)"
     print "\t\treturn false;"
-    print "\tp = d_path(&file->f_path, buf, sizeof(buf));"
-    print "\tif (IS_ERR(p))"
+    print ""
+    print "\tname = file->f_path.dentry->d_name.name;"
+    print "\tif (!name)"
     print "\t\treturn false;"
-    print "\tif (strstr(p, \"frida\") || strstr(p, \"linjector\"))"
+    print ""
+    print "\tif (strstr(name, \"frida\") || strstr(name, \"linjector\"))"
     print "\t\treturn true;"
     print "\treturn false;"
     print "}"
     print ""
+    inserted = 1
 }
 { print }
 ' "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 
 awk '
-/^static int show_map\(struct seq_file \*m, void \*v\)/ { in_show_map=1 }
-in_show_map && /^\{[[:space:]]*$/ {
+/^static int show_map\(struct seq_file \*m, void \*v\)/ { in_fn=1 }
+in_fn && /^\{[[:space:]]*$/ {
     print $0
     print "\tif (should_hide_vma((struct vm_area_struct *)v)) return 0;"
-    in_show_map=0
+    in_fn=0
     next
 }
 { print }
 ' "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 
 awk '
-/^static int show_smap\(struct seq_file \*m, void \*v\)/ { in_show_smap=1 }
-in_show_smap && /^\{[[:space:]]*$/ {
+/^static int show_smap\(struct seq_file \*m, void \*v\)/ { in_fn=1 }
+in_fn && /^\{[[:space:]]*$/ {
     print $0
     print "\tif (should_hide_vma((struct vm_area_struct *)v)) return 0;"
-    in_show_smap=0
+    in_fn=0
     next
 }
 { print }
