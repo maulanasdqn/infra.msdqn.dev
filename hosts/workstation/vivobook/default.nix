@@ -25,6 +25,7 @@
   programs.hyprland.enable = lib.mkForce false;
 
   environment.systemPackages = with pkgs; [
+    gnomeExtensions.caffeine
     rpi-imager
     minicom
     picocom
@@ -39,6 +40,13 @@
     usbutils
     screen
   ];
+
+  home-manager.users.${username}.dconf.settings = {
+    "org/gnome/shell" = {
+      disable-user-extensions = false;
+      enabled-extensions = [ "caffeine@patapon.info" ];
+    };
+  };
 
   services.udev.extraRules = ''
     SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", MODE="0666"

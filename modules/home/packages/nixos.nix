@@ -12,6 +12,7 @@
 
       packages = with pkgs; [
         (callPackage ../../../pkgs/helium-browser { })
+        google-chrome
         slack
         discord
       ];
