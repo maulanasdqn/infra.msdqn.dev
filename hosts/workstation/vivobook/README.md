@@ -54,3 +54,20 @@ you are tempted to add it for some ACPI quirk, expect an unbootable machine.
 Governor tuning is deliberately left alone — see
 `../../../modules/nixos/README.md`. This machine uses `amd-pstate-epp` in active
 mode with `balance_performance`, which is already correct for Zen3 laptops.
+
+## Dual-boot Gentoo
+
+`nvme0n1p4` is Gentoo (OpenRC), created by shrinking `p3` (NixOS) from 460 GiB
+to 210 GiB with a one-shot initrd hook that has since been removed. `p1` (ESP)
+and `p2` (swap) are shared between both systems.
+
+`boot.loader.systemd-boot.extraEntries."gentoo.conf"` adds Gentoo to the
+systemd-boot menu declaratively, so it survives every `nixos-rebuild`. Gentoo
+boots by EFISTUB: its kernel is a self-contained image at
+`/EFI/Gentoo/vmlinuz.efi` on the shared ESP with everything built in (no
+initramfs), so the entry has a `linux` line and no `initrd`. `root=UUID=` is
+p4's filesystem UUID — re-read with `blkid -s UUID -o value /dev/nvme0n1p4` if
+the partition is ever recreated.
+
+Gentoo also has its own standalone UEFI boot entry (via `efibootmgr`) as a
+fallback, independent of systemd-boot.

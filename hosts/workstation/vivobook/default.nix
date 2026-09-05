@@ -14,6 +14,14 @@
 
   networking.hostName = "vivobook";
 
+  boot.loader.systemd-boot.extraEntries = {
+    "gentoo.conf" = ''
+      title Gentoo
+      linux /EFI/Gentoo/vmlinuz.efi
+      options root=UUID=8bc69613-f59f-4763-bcfd-a99ec40b135b rw amd_pstate=active
+    '';
+  };
+
   services.desktopManager.gnome.enable = true;
   services.displayManager.gdm.enable = true;
   services.displayManager.defaultSession = lib.mkForce "gnome";
