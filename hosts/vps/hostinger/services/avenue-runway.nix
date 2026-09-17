@@ -145,6 +145,21 @@ in
     };
   };
 
+  services.nginx.virtualHosts."runway.msdqn.dev" = {
+    enableACME = true;
+    forceSSL = true;
+    extraConfig = "client_max_body_size 25m;";
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:3100";
+      proxyWebsockets = true;
+      extraConfig = ''
+        proxy_buffering off;
+        proxy_read_timeout 700s;
+        proxy_send_timeout 700s;
+      '';
+    };
+  };
+
   services.nginx.virtualHosts."runway.stynx.app" = {
     enableACME = true;
     forceSSL = true;
