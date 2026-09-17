@@ -31,6 +31,7 @@ in
     ./services/kya-field-checklist.nix
     ./services/kya-bid-intake.nix
     ./services/kya-ci-runner-env.nix
+    ./services/avenue-runway.nix
   ];
 
   services.nginx = {
