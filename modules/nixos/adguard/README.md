@@ -24,6 +24,8 @@ Eight curated lists enabled by default:
 | 7 | Perflyst - Smart-TV Blocklist |
 | 23 | Game Console Adblock List |
 | 33 | Steven Black - Unified hosts |
+| 100 | Gambling Blocklist (Sinfonietta) |
+| 101 | HaGeZi Gambling Blocklist (424k rules, includes Indonesian judi online) |
 
 ## Mutable Settings
 

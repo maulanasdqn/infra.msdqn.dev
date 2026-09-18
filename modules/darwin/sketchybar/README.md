@@ -1,33 +1,26 @@
-# sketchybar
+# Sketchybar Module
 
-Status bar, drawn as separate "islands" rather than one unified bar.
+Custom macOS status bar via [SketchyBar](https://felixkratz.github.io/SketchyBar/).
 
-## Geometry feeds AeroSpace
+## Widgets
 
-Island layout: bar `y_offset` 8, bar height 34, island height 30, giving an
-island bottom edge at 40px from screen-top, with a uniform 10px gap around.
+| Item       | Script       | Trigger             |
+|------------|--------------|----------------------|
+| Volume     | `sb-volume`  | `volume_change`      |
+| Brightness | `sb-brightness` | polling (2s)      |
+| Battery    | `sb-battery` | `system_woke`, polling |
+| Swap       | `sb-swap`    | polling (30s)        |
+| WiFi       | `sb-network` | `wifi_change`        |
+| CPU        | `sb-cpu`     | polling (4s)         |
 
-`../aerospace/README.md` derives its `outer.top` gap from exactly these
-numbers. Change one and you must redo the other.
+## Lockfile Guard
 
-## Workspace indicator
+`sb-volume` and `sb-brightness` use `flock` to prevent zombie accumulation.
+When sketchybar restarts or triggers fire faster than scripts finish,
+overlapping instances exit immediately instead of piling up. Without this,
+orphaned `osascript`/`python3` processes accumulate and spike load average.
 
-Responds to the `aerospace_workspace_change` event.
+## Timeout
 
-- `$NAME` is set by sketchybar itself (e.g. `space.3`)
-- `$AEROSPACE_FOCUSED_WORKSPACE` arrives via the trigger payload
-
-## CPU item
-
-A single instantaneous `top` sample (user + sys), normalised to 100% across all
-cores. `-n 0` skips the process list to keep it cheap.
-
-Colour ramp: foam → gold at ≥50% → love at ≥85%.
-
-**`/usr/bin/top` is hardcoded on purpose.** The `procps` build on PATH cannot
-read RSS on macOS 26 — that needs an entitlement only Apple's binary carries.
-
-## Native menu-bar mirroring
-
-Requires Screen Recording permission to be granted, or the mirrored items render
-empty.
+External calls (`osascript`, `python3`) are wrapped in `timeout 5` so a
+stuck subprocess is killed after 5 seconds instead of hanging indefinitely.

@@ -15,24 +15,10 @@ between them except the machine.**
 | `kya-bill-pay.nix` | AP Invoice Automation | 3001 | `kya-bp.stynx.app` | Redis + BullMQ worker |
 | `kya-entity-license-renewal.nix` | Entity License Renewal | 3005 | `kya-el.stynx.app` | Redis db 4 + BullMQ worker |
 | `kya-field-checklist.nix` | Field PM Checklist | 3006 | `kya-fc.stynx.app` | Redis db 5 + BullMQ worker |
-| `avenue-runway.nix` | Avenue Media superapp | 3100 | `runway.msdqn.dev`, `runway.stynx.app` | Redis + cron scheduler container |
 
 Field-quote was migrated off DigitalOcean App Platform. Its image is built **on
 the VPS** from `/opt/kya-group` and tagged `localhost/kya-field-quote:latest`.
 
-Avenue Runway is a moon + pnpm monorepo (Hono + oRPC + Effect API serving a
-Vite SPA). Its image is built **on the VPS** from `/opt/avenue-runway` with
-`podman build --target build` (the build stage keeps devDependencies so the
-migrate step can run `drizzle-kit push`), tagged `localhost/avenue-runway:latest`.
-It answers on runway.msdqn.dev (DNS in this DigitalOcean account) and runway.stynx.app (DNS managed elsewhere; point an A record at the box for the certificate to issue). It runs three services off that one image: `avenue-runway-migrate` (a oneshot
-that runs `db:prepare`, `db:push` and `seed:e2e-admin`), `avenue-runway` (the
-API on `127.0.0.1:3100`, which also serves the built SPA from `WEB_DIST_PATH`),
-and `avenue-runway-scheduler` (the node-cron process for the sixteen jobs, one
-replica). Its env lives at `/etc/avenue-runway.env` and the Postgres password at
-`/etc/avenue-runway-postgres.env`, both `chmod 600`, placed by hand like the KYA
-apps. `APP_ENV=staging`, so the email guard only sends to the allowlist and
-tags subjects `[STAGING]`; provider credentials are entered through the app's
-Integrations page and stored encrypted in the database.
 
 ## Deploy flow
 

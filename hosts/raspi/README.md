@@ -7,7 +7,9 @@ Raspberry Pi running AdGuard Home as a network-wide DNS ad blocker.
 - **Platform**: `aarch64-linux` (Raspberry Pi 4/5)
 - **OS**: NixOS (SD card image via `sd-image-aarch64`)
 - **Primary service**: AdGuard Home (DNS-level ad/tracker blocking)
-- **Network**: DHCP by default, discoverable via mDNS (`raspi.local`)
+- **Static IP**: `192.168.100.139/24` on the Huawei ONT subnet
+- **Gateway**: `192.168.100.1` (Huawei ONT)
+- **Discoverable via**: mDNS (`raspi.local`)
 
 ## Initial Flash
 
@@ -42,19 +44,22 @@ On first boot, AdGuard Home listens on port 3000 for initial setup:
 3. Set listen interface to all interfaces (`0.0.0.0`)
 4. Upstream DNS, blocklists, and DNSSEC are pre-configured by the Nix module
 
-## Pointing Your Network to the Pi
+## Network Topology
 
-**Router-level** (recommended — blocks ads for all devices):
-- Router admin → DNS settings → set primary DNS to Pi's IP
-- Set secondary DNS to `1.1.1.1` as fallback
+```
+Huawei ONT (192.168.100.1) ─── PPPoE + DHCP 192.168.100.x
+  ├── MikroTik hEX (WAN: 192.168.100.117, LAN: 192.168.88.1)
+  │     └── Switch → 3× Ruijie APs (mesh) + all devices
+  └── Raspberry Pi (192.168.100.139) ← DNS server
+```
 
-**Per-device**: set DNS server to the Pi's IP on each device.
+The Pi sits on the ONT subnet so MikroTik can reach it via its WAN interface.
+MikroTik is configured with `dns servers=192.168.100.139` (AdGuard only, no
+fallback) so all ad blocking goes through AdGuard. LAN clients receive
+`192.168.88.1` (MikroTik) as their DNS from DHCP; MikroTik forwards to
+AdGuard.
 
-## Changing Networks (Office → Home)
-
-The Pi uses DHCP, so it gets an IP automatically on any network. Avahi/mDNS
-is enabled, so `raspi.local` resolves regardless of which network or IP it
-gets. Just plug in Ethernet and SSH to `raspi.local`.
+LAN devices (192.168.88.x) can reach the Pi through MikroTik's masquerade NAT.
 
 ## Deployed Services
 

@@ -121,8 +121,11 @@ let
 
   volumeScript = pkgs.writeShellScript "sb-volume" ''
     export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
-    RES=$(osascript -e "set s to (get volume settings)" \
-                    -e "return (output volume of s as text) & \",\" & (output muted of s as text)" 2>/dev/null)
+    LOCK="/tmp/sb-volume.lock"
+    exec 9>"$LOCK"
+    flock -n 9 || exit 0
+    RES=$(timeout 5 osascript -e "set s to (get volume settings)" \
+                    -e "return (output volume of s as text) & \",\" & (output muted of s as text)" 2>/dev/null) || exit 0
     VOL="''${RES%%,*}"
     MUTED="''${RES##*,}"
     if [ "$MUTED" = "true" ]; then
@@ -134,7 +137,10 @@ let
 
   brightnessScript = pkgs.writeShellScript "sb-brightness" ''
         export PATH="/usr/local/bin:/run/current-system/sw/bin:$PATH"
-        BRIGHT=$(python3 -c "
+        LOCK="/tmp/sb-brightness.lock"
+        exec 9>"$LOCK"
+        flock -n 9 || exit 0
+        BRIGHT=$(timeout 5 python3 -c "
     import ctypes, sys
     ds = ctypes.CDLL('/System/Library/PrivateFrameworks/DisplayServices.framework/DisplayServices')
     ds.DisplayServicesGetBrightness.restype = ctypes.c_int

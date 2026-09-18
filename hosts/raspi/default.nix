@@ -18,13 +18,13 @@
     useDHCP = false;
     nameservers = [ "127.0.0.1" ];
     defaultGateway = {
-      address = "192.168.100.1";
+      address = "192.168.88.1";
       interface = "end0";
     };
     interfaces.end0 = {
       ipv4.addresses = [
         {
-          address = "192.168.100.139";
+          address = "192.168.88.10";
           prefixLength = 24;
         }
       ];
@@ -119,7 +119,7 @@
   services.homepage-dashboard = {
     enable = true;
     listenPort = 8082;
-    allowedHosts = "raspi.local:8082,192.168.100.139:8082";
+    allowedHosts = "raspi.lan:8082,raspi.local:8082,192.168.88.10:8082,192.168.100.139:8082";
     settings = {
       title = "msdqn homelab";
       favicon = "https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/heimdall.png";
@@ -129,7 +129,7 @@
       layout = {
         Network = {
           style = "row";
-          columns = 3;
+          columns = 4;
         };
         Servers = {
           style = "row";
@@ -162,10 +162,17 @@
             };
           }
           {
-            "Ruijie Router" = {
+            "MikroTik hEX" = {
+              icon = "router";
+              href = "http://192.168.88.1";
+              description = "Main Router — DHCP + Firewall";
+            };
+          }
+          {
+            "Huawei ONT" = {
               icon = "router";
               href = "http://192.168.100.1";
-              description = "Huawei ONT Gateway";
+              description = "Fiber Gateway — PPPoE";
             };
           }
         ];
@@ -207,8 +214,8 @@
           {
             "Xiaomi C302N" = {
               icon = "frigate";
-              href = "http://192.168.100.119";
-              description = "192.168.100.119 — Enable RTSP via Mi Home app";
+              href = "http://192.168.88.246";
+              description = "192.168.88.246 — Enable RTSP via Mi Home app";
             };
           }
         ];

@@ -83,6 +83,18 @@
           name = "Steven Black - Unified hosts";
           id = 33;
         }
+        {
+          enabled = true;
+          url = "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/gambling-hosts";
+          name = "Gambling Blocklist (Sinfonietta)";
+          id = 100;
+        }
+        {
+          enabled = true;
+          url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.txt";
+          name = "HaGeZi Gambling Blocklist";
+          id = 101;
+        }
       ];
     };
   };
