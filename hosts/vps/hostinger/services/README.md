@@ -81,7 +81,12 @@ a 4 GB **tmpfs**, i.e. RAM. Checkouts and `pnpm install` therefore run in memory
 which is why the `CI` workflow fails with `ENOSPC` while the real disk is nearly
 empty. Deploy workflows are unaffected: they only `git archive | ssh`.
 
-`kya-ci-runner-env.nix` supplies the environment those runners need:
+`kya-ci-runner-env.nix` supplies the environment those runners need. It derives
+its target list from `config.services.github-runners`, so every runner defined in
+this directory is covered automatically. It previously hardcoded six unit names
+and silently missed `kya-bi`, whose `CI` job failed at
+`moonrepo/setup-toolchain` with `curl: command not found`. Add a runner and it is
+covered; nothing needs editing here.
 
 - `NIX_LD` — `actions/setup-node` and `moonrepo/setup-toolchain` download
   generic-linux binaries, and NixOS refuses to exec them unless the stub loader
@@ -96,13 +101,18 @@ empty. Deploy workflows are unaffected: they only `git archive | ssh`.
 Read from env files created on the VPS by hand, mode 0600 — never in git:
 
 ```
-/etc/kya-{fq,sr,bc,bp,el,fc}-postgres.env   POSTGRES_USER / PASSWORD / DB
-/etc/kya-{fq,sr,bc,bp,el,fc}.env            DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN,
-                                            admin bootstrap
+/etc/kya-{fq,sr,bc,bp,el,fc,bi}-postgres.env  POSTGRES_USER / PASSWORD / DB
+/etc/kya-{fq,sr,bc,bp,el,fc,bi}.env           DATABASE_URL, BETTER_AUTH_*, WEB_ORIGIN,
+                                              admin bootstrap
 ```
 
 `kya-bp.env` additionally carries the optional `ANTHROPIC` / `GMAIL_*` /
 `SAGE_*` / `SHEETS_*` / `PHASE2_BILLS_ENABLED` integration secrets.
+
+`kya-bi.env` additionally carries `ANTHROPIC_API_KEY`, the `GMAIL_*` intake
+credentials (`CLIENT_ID`, `CLIENT_SECRET`, `REFRESH_TOKEN`, `DELEGATED_USER`,
+`POLL_INTERVAL_MS`), `GDRIVE_ROOT_FOLDER_ID`, and the `OBJECT_STORAGE_*` bucket
+credentials.
 
 ## Gotchas
 

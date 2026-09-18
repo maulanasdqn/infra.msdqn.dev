@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
 
   ldEnv = {
@@ -27,18 +32,11 @@ in
 {
   programs.nix-ld.enable = true;
 
-  systemd.services =
-    lib.genAttrs
-      [
-        "github-runner-kya-fq"
-        "github-runner-kya-sr"
-        "github-runner-kya-bc"
-        "github-runner-kya-bp"
-        "github-runner-kya-el"
-        "github-runner-kya-fc"
-      ]
-      (_: {
-        environment = ldEnv;
-        path = ciTools;
-      });
+  systemd.services = lib.mapAttrs' (
+    name: _:
+    lib.nameValuePair "github-runner-${name}" {
+      environment = ldEnv;
+      path = ciTools;
+    }
+  ) config.services.github-runners;
 }
