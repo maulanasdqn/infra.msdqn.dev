@@ -5,6 +5,18 @@ Avenue Runway superapp run here, each fully self-contained: its own Postgres,
 podman network, forced-command SSH key and nginx vhost. **Nothing is shared
 between them except the machine.**
 
+## Parallax proxy
+
+| Module | Service | Port | Protocol |
+|---|---|---|---|
+| `parallax.nix` | Parallax SOCKS5/HTTP proxy | 1080 | SOCKS5 + HTTP CONNECT + HTTP forward |
+
+Native Rust binary built from `pkgs/parallax` via `rustPlatform.buildRustPackage`,
+fetched from `github:maulanasdqn/parallax`. Runs as a hardened `DynamicUser`
+systemd service (no container, no Postgres, no nginx). Auto-detects SOCKS5 vs
+HTTP per connection on the same port. No authentication configured by default;
+set `PROXY_USER` and `PROXY_PASS` in the environment block to enable.
+
 ## The six apps
 
 | Module | App | Port | Domain | Extras |
