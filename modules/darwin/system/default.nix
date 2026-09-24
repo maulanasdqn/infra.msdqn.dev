@@ -10,6 +10,13 @@
 
   documentation.enable = false;
 
+  programs.zsh = {
+    enableCompletion = false;
+    promptInit = "";
+  };
+
+  environment.pathsToLink = [ "/share/zsh" ];
+
   power.sleep = lib.mkIf enableAggressiveTweaks {
     computer = 30;
     display = 10;

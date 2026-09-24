@@ -8,7 +8,7 @@
 
 Sessions, windows, panes and their working directories survive leaving tmux,
 killing the server and rebooting. tmux-resurrect saves the layout to
-`~/.tmux/resurrect/`, and tmux-continuum saves it every minute and
+`~/.tmux/resurrect/`, and tmux-continuum saves it every 5 minutes and
 restores it automatically when a new tmux server starts.
 
 **Why continuum is not in `plugins`.** Continuum's auto-save works by adding a

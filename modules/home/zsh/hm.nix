@@ -21,14 +21,16 @@
 
     oh-my-zsh = {
       enable = true;
-      theme = "robbyrussell";
+      theme = "";
       plugins = [
         "git"
-        "z"
         "docker"
         "tmux"
       ];
       extraConfig = ''
+        ZSH_DISABLE_COMPFIX=true
+        DISABLE_AUTO_UPDATE=true
+        DISABLE_MAGIC_FUNCTIONS=true
         ZSH_TMUX_AUTOSTART=false
         ZSH_TMUX_AUTOCONNECT=true
         ZSH_TMUX_FIXTERM=false
@@ -39,10 +41,6 @@
     initContent = ''
       bindkey '^[[A' history-search-backward
       bindkey '^[[B' history-search-forward
-
-      if command -v fzf &> /dev/null; then
-        eval "$(fzf --zsh)"
-      fi
 
       export PATH="$HOME/.cargo/bin:$PATH"
       export PATH="$HOME/.moon/bin:$PATH"

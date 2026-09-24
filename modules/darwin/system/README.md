@@ -13,6 +13,16 @@ outright.
 The same reasoning applies to the home-manager manual — see
 `../../home/README.md`.
 
+## zsh: no system compinit or prompt
+
+`programs.zsh.enableCompletion = false` and `promptInit = ""` keep
+`/etc/zshrc` from running `compinit` and `promptinit` (`prompt suse`). The
+home-manager zsh config runs `compinit` itself through oh-my-zsh and starship
+draws the prompt, so the system versions were pure duplicate startup cost.
+`environment.pathsToLink = [ "/share/zsh" ]` keeps system packages'
+completions linked into `/run/current-system/sw/share/zsh`, which
+`enableCompletion` used to do. See `../../home/zsh/README.md`.
+
 ## Single-owner tweaks
 
 A block of settings gated by `enableAggressiveTweaks` (MacBook only). These
