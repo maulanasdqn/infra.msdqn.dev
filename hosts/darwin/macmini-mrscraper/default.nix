@@ -6,7 +6,10 @@
     localHostName = "macmini-mrscraper";
   };
 
-  homebrew.casks = [ "microsoft-edge" ];
+  homebrew.casks = [
+    "microsoft-edge"
+    "google-chrome"
+  ];
 
   power.sleep = {
     computer = "never";

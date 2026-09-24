@@ -11,10 +11,11 @@ Homebrew `cleanup = "none"` and leaves the other account's packages alone.
 options across modules, so nothing has to be repeated. Anything declared in
 this file installs on the Mac mini only.
 
-Microsoft Edge lives here rather than in the shared list on purpose. The
-MacBook and beast run `cleanup = "zap"`, so putting a cask in the shared list
-installs it on every Mac on their next rebuild, and removing it later would
-uninstall it **with its data** there. A host-local entry sidesteps both.
+Microsoft Edge and Google Chrome live here rather than in the shared list on
+purpose. The MacBook and beast run `cleanup = "zap"`, so putting a cask in the
+shared list installs it on every Mac on their next rebuild, and removing it
+later would uninstall it **with its data** there. A host-local entry sidesteps
+both.
 
 Nothing in the darwin config pins a default browser, so adding a browser here
 does not change which one opens links.
