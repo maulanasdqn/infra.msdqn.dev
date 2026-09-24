@@ -6,16 +6,36 @@
       settings = {
         formatters_by_ft = {
           php = [ "php_cs_fixer" ];
-          javascript = [ "prettierd" ];
-          typescript = [ "prettierd" ];
-          javascriptreact = [ "prettierd" ];
-          typescriptreact = [ "prettierd" ];
+          javascript = {
+            __unkeyed-1 = "biome-check";
+            __unkeyed-2 = "prettierd";
+            stop_after_first = true;
+          };
+          typescript = {
+            __unkeyed-1 = "biome-check";
+            __unkeyed-2 = "prettierd";
+            stop_after_first = true;
+          };
+          javascriptreact = {
+            __unkeyed-1 = "biome-check";
+            __unkeyed-2 = "prettierd";
+            stop_after_first = true;
+          };
+          typescriptreact = {
+            __unkeyed-1 = "biome-check";
+            __unkeyed-2 = "prettierd";
+            stop_after_first = true;
+          };
+          json = {
+            __unkeyed-1 = "biome-check";
+            __unkeyed-2 = "prettierd";
+            stop_after_first = true;
+          };
           astro = [ "prettierd" ];
           rust = [ "rustfmt" ];
           css = [ "prettierd" ];
           scss = [ "prettierd" ];
           html = [ "prettierd" ];
-          json = [ "prettierd" ];
           yaml = [ "prettierd" ];
           markdown = [ "prettierd" ];
           nix = [ "nixfmt" ];
@@ -26,6 +46,12 @@
           lsp_fallback = true;
           async = false;
           timeout_ms = 2000;
+        };
+
+        formatters = {
+          "biome-check" = {
+            require_cwd = true;
+          };
         };
       };
     };

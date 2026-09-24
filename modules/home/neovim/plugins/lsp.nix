@@ -9,6 +9,7 @@
       typescript-language-server
       vscode-langservers-extracted
       eslint
+      biome
 
       astro-language-server
 
@@ -70,6 +71,8 @@
           };
 
           eslint.enable = true;
+
+          biome.enable = true;
 
           taplo.enable = true;
 
