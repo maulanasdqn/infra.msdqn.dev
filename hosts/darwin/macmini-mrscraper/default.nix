@@ -11,6 +11,10 @@
     "google-chrome"
   ];
 
+  determinateNix.customSettings = {
+    http2 = false;
+  };
+
   power.sleep = {
     computer = "never";
     harddisk = "never";
