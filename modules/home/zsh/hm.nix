@@ -26,7 +26,14 @@
         "git"
         "z"
         "docker"
+        "tmux"
       ];
+      extraConfig = ''
+        ZSH_TMUX_AUTOSTART=false
+        ZSH_TMUX_AUTOCONNECT=true
+        ZSH_TMUX_FIXTERM=false
+        ZSH_TMUX_CONFIG="$HOME/.config/tmux/tmux.conf"
+      '';
     };
 
     initContent = ''
