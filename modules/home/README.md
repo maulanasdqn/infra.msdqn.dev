@@ -19,6 +19,19 @@ single-user home-manager config, without dragging in anything desktop-specific.
 | `hyprland/` | Linux desktop |
 | `ssh/`, `git/`, `docker/` | Small, self-contained |
 
+## macOS apps are copied, not trampolined
+
+`darwin.nix` sets `targets.darwin.copyApps` (and turns off `linkApps`), so
+home-manager copies each GUI app into `~/Applications/Home Manager Apps/` as a
+real bundle that Spotlight, Raycast and the Dock can find. nix-darwin does the
+same for system apps in `/Applications/Nix Apps/`.
+
+This replaced mac-app-util, which built "trampoline" launcher apps with an SBCL
+(Common Lisp) binary. On this macOS that binary dies with
+`failed to allocate 1048576 bytes at 0x300100000`, which aborted every
+`darwin-rebuild switch` partway through activation, left the trampolines stale
+and skipped cleanup of removed launch agents.
+
 ## Manual disabled
 
 `darwin.nix` skips the home-configuration man page for the same reason as the

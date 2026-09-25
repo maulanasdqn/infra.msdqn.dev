@@ -20,8 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
 
-    mac-app-util.url = "github:hraban/mac-app-util";
-
     determinate = {
       url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -94,7 +92,6 @@
       nixpkgs-stable,
       nix-darwin,
       home-manager,
-      mac-app-util,
       determinate,
       nixvim,
       nixvim-stable,
@@ -152,7 +149,6 @@
           secretsFile
           clan-core
           claude-code
-          mac-app-util
           ;
       };
 
@@ -170,7 +166,6 @@
           imports = [
             determinate.darwinModules.default
             home-manager.darwinModules.home-manager
-            mac-app-util.darwinModules.default
             nix-homebrew.darwinModules.nix-homebrew
             {
               nix-homebrew = {

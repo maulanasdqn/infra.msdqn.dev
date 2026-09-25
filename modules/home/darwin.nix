@@ -5,7 +5,6 @@
   enableVolta ? false,
   enableGolang ? false,
   sshKeys ? [ ],
-  mac-app-util,
   lib,
   ...
 }:
@@ -32,9 +31,13 @@
   home-manager.useUserPackages = true;
   home-manager.backupFileExtension = "backup";
   home-manager.sharedModules = [
-    mac-app-util.homeManagerModules.default
-
     { manual.manpages.enable = false; }
   ];
-  home-manager.users.${username}.home.stateVersion = "24.11";
+  home-manager.users.${username} = {
+    home.stateVersion = "24.11";
+    targets.darwin = {
+      copyApps.enable = true;
+      linkApps.enable = false;
+    };
+  };
 }

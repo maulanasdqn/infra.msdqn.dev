@@ -21,9 +21,7 @@ height — this calculation must be redone or the gap will visibly drift. See
 
 ## Terminal launch path
 
-`alt-enter` opens Ghostty from `~/Applications/Home Manager Apps/`, which
-home-manager always creates, not from `Home Manager Trampolines/`. The
-trampolines come from mac-app-util, whose SBCL binary currently fails on this
-macOS (`failed to allocate 1048576 bytes at 0x300100000`), so that folder can
-be stale or missing new apps. `open -b com.mitchellh.ghostty` at startup
-resolves through Launch Services and does not depend on either folder.
+`alt-enter` opens Ghostty from `~/Applications/Home Manager Apps/`, where
+home-manager copies user apps (see `../../home/README.md`).
+`open -b com.mitchellh.ghostty` at startup resolves through Launch Services
+and does not depend on that folder.
