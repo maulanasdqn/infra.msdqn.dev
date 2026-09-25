@@ -61,6 +61,7 @@
         set -g default-command "${pkgs.zsh}/bin/zsh"
         set -g default-shell "${pkgs.zsh}/bin/zsh"
         set -ag terminal-overrides ",xterm-256color:RGB"
+        set -ag terminal-overrides ",xterm-ghostty:RGB"
         set -g renumber-windows on
         set -g allow-rename off
         set -g mouse on

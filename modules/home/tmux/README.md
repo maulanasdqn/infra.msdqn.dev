@@ -19,3 +19,9 @@ continuum with `lib.mkAfter`, after the theme, so the hook survives. Do not set
 `status-right` in anything that loads later than this.
 
 Manual save/restore: `prefix + C-s` / `prefix + C-r`.
+
+## True colour
+
+`terminal-overrides` marks both `xterm-256color` and `xterm-ghostty` (Ghostty's
+`TERM`) as RGB-capable, so nvim and the Rose Pine theme get 24-bit colour
+inside tmux.

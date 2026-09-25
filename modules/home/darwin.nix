@@ -21,7 +21,7 @@
     ./docker
     ./ssh
     ./sops
-    ./kitty
+    ./ghostty
     ./services
     ./wallpaper
     ./laravel

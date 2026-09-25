@@ -42,7 +42,7 @@ let
     # rules at the bottom then pin each one to its workspace. Together they
     # reproduce the saved layout hands-free on every boot.
     after-startup-command = [
-      'exec-and-forget open -b net.kovidgoyal.kitty',
+      'exec-and-forget open -b com.mitchellh.ghostty',
       'exec-and-forget open -b net.imput.helium',
       'exec-and-forget open -b com.tinyspeck.slackmacgap',
       ${lib.optionalString withDiscord "'exec-and-forget open -b com.hnc.Discord',"}
@@ -62,7 +62,7 @@ let
 
     [mode.main.binding]
     # Terminal / launcher
-    alt-enter   = 'exec-and-forget open -n $HOME/Applications/Home\ Manager\ Trampolines/kitty.app'
+    alt-enter   = 'exec-and-forget open -n $HOME/Applications/Home\ Manager\ Apps/Ghostty.app'
     alt-d       = 'exec-and-forget open -a Raycast'
     alt-b       = 'exec-and-forget open -a Helium'
 
@@ -124,7 +124,7 @@ let
     # workspace. Edit a number here to remap, or add a block for a new app
     # (find its id with: aerospace list-windows --all --format '%{app-bundle-id}').
     [[on-window-detected]]
-    if.app-id = 'net.kovidgoyal.kitty'
+    if.app-id = 'com.mitchellh.ghostty'
     run = 'move-node-to-workspace 1'
 
     [[on-window-detected]]

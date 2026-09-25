@@ -18,3 +18,12 @@ islandBottom = bar y_offset + (bar height + island height) / 2
 If you change the sketchybar geometry — `y_offset`, bar height, or island
 height — this calculation must be redone or the gap will visibly drift. See
 `../sketchybar/README.md`.
+
+## Terminal launch path
+
+`alt-enter` opens Ghostty from `~/Applications/Home Manager Apps/`, which
+home-manager always creates, not from `Home Manager Trampolines/`. The
+trampolines come from mac-app-util, whose SBCL binary currently fails on this
+macOS (`failed to allocate 1048576 bytes at 0x300100000`), so that folder can
+be stale or missing new apps. `open -b com.mitchellh.ghostty` at startup
+resolves through Launch Services and does not depend on either folder.
