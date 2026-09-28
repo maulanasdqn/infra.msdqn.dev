@@ -68,6 +68,7 @@ LAN devices (192.168.88.x) can reach the Pi through MikroTik's masquerade NAT.
 | 22 | SSH |
 | 53 | DNS (AdGuard Home) |
 | 80 | AdGuard Home web UI |
+| 1080 | Parallax proxy (`services/parallax.nix`) |
 | 3000 | AdGuard Home initial setup wizard |
 
 ## Updating

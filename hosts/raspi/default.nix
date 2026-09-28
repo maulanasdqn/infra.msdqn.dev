@@ -9,6 +9,7 @@
     ./hardware.nix
     ../../profiles/base.nix
     ../../modules/nixos/adguard
+    ./services/parallax.nix
   ];
 
   services.resolved.enable = false;
