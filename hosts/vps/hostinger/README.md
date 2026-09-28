@@ -1,6 +1,6 @@
 # Hostinger VPS (`msdqn`)
 
-Production box at `72.62.125.38`. Runs the six KYA business apps behind nginx.
+Production box at `72.62.125.38`. Runs the non-KYA sites behind nginx (KYA apps moved to DigitalOcean on 2026-09-28).
 Per-app detail lives in [`services/README.md`](services/README.md).
 
 ## Layout
