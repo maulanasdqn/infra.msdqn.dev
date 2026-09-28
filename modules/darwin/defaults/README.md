@@ -26,9 +26,19 @@ The real Liquid Glass killer is **Accessibility → "Reduce transparency"**
 cannot be written declaratively — it must be toggled by hand in System Settings.
 The writable key here is the closest declarative approximation.
 
+### Heavy user agents
+
+With `enableAggressiveTweaks`, a login agent runs `launchctl disable` on
+background user agents that burn CPU without being used here: Game Center
+(`gamed`, `gamecontrolleragentd`), Screen Time / parental controls, photo and
+media analysis, `knowledgeconstructiond`, `suggestd` and `tipsd`. Errors are
+discarded because some labels do not exist on every macOS release.
+
 ## performance.nix
 
 Single-owner machines only. Disables Spotlight and Time Machine on **all**
-volumes, applies kernel/network sysctl tuning, sets `pmset` for maximum
-performance (battery drain accepted), and schedules a weekly storage cleanup
+volumes, applies kernel/network sysctl tuning (file-descriptor limits, a
+larger listen backlog and SysV shared memory, no delayed ACK, 1 MiB TCP buffers,
+short MSL and window scaling), sets `pmset` for maximum performance —
+`highpowermode` on AC, no CPU reduction on battery, battery drain accepted, and schedules a weekly storage cleanup
 every Sunday at 03:00.

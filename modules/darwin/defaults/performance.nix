@@ -102,11 +102,9 @@
             /usr/bin/pmset -a standby 0
             /usr/bin/pmset -a autopoweroff 0
 
-            # AC: sleep 30min, no throttle, no power saving
             /usr/bin/pmset -c sleep 30 displaysleep 10 disksleep 10 \
-              powernap 0 lowpowermode 0 womp 0 tcpkeepalive 0
+              powernap 0 lowpowermode 0 womp 0 tcpkeepalive 0 highpowermode 1
 
-            # Battery: same performance profile, don't reduce CPU speed
             /usr/bin/pmset -b sleep 10 displaysleep 5 disksleep 5 \
               powernap 0 lowpowermode 0 lessbright 0
           ''
@@ -122,19 +120,17 @@
           "/bin/sh"
           "-c"
           ''
-            # File descriptor limits — prevents "too many open files" under heavy dev load
             /usr/sbin/sysctl -w kern.maxfiles=524288
             /usr/sbin/sysctl -w kern.maxfilesperproc=524288
+            /usr/sbin/sysctl -w kern.ipc.somaxconn=2048
+            /usr/sbin/sysctl -w kern.sysv.shmmax=268435456
+            /usr/sbin/sysctl -w kern.sysv.shmall=65536
 
-            # Network: disable TCP delayed ACK for lower latency
             /usr/sbin/sysctl -w net.inet.tcp.delayed_ack=0
-
-            # Network: larger TCP buffers for faster throughput
             /usr/sbin/sysctl -w net.inet.tcp.sendspace=1048576
             /usr/sbin/sysctl -w net.inet.tcp.recvspace=1048576
-
-            # Network: faster connection reuse
             /usr/sbin/sysctl -w net.inet.tcp.msl=1000
+            /usr/sbin/sysctl -w net.inet.tcp.win_scale_factor=8
           ''
         ];
         RunAtLoad = true;
