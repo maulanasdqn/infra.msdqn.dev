@@ -7,10 +7,10 @@
   };
 
   determinateNix.customSettings = {
-    max-jobs = 4;
-    cores = 2;
-    max-substitution-jobs = 32;
-    http-connections = 50;
+    max-jobs = "auto";
+    cores = 4;
+    max-substitution-jobs = 64;
+    http-connections = 128;
     keep-going = true;
     warn-dirty = false;
   };
