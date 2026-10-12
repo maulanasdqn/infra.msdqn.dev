@@ -135,6 +135,10 @@ let
     if.app-id = 'com.tinyspeck.slackmacgap'
     run = 'move-node-to-workspace 3'
 
+    [[on-window-detected]]
+    if.app-id = 'dev.stynx.code.desktop'
+    run = 'move-node-to-workspace 4'
+
     ${lib.optionalString withDiscord ''
       [[on-window-detected]]
       if.app-id = 'com.hnc.Discord'
