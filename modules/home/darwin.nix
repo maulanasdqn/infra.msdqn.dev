@@ -17,6 +17,7 @@
     ./neovim
 
     ./tmux
+    ./herdr
     ./docker
     ./ssh
     ./sops
