@@ -27,7 +27,12 @@
         meson
         pkg-config
         ccache
-        bear
+        (bear.overrideAttrs (old: {
+          doCheck = false;
+          postInstall =
+            builtins.replaceStrings [ "libexec.so" ] [ "libexec${stdenv.hostPlatform.extensions.sharedLibrary}" ]
+              old.postInstall;
+        }))
         android-tools
         xcodes
         protobuf

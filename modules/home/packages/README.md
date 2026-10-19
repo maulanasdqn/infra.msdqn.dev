@@ -4,6 +4,7 @@
 |---|---|
 | `cli.nix` | Shared CLI toolset, no GUI |
 | `nixos.nix` | GUI / desktop-only apps |
+| `darwin.nix` | macOS-only packages and session variables |
 
 `cli.nix` is imported both by the workstation home config **and** directly by
 nix-on-droid (`honor`), so phone and desktop get the same command-line tools.
@@ -27,3 +28,20 @@ its own.
 
 Chrome is unfree. That builds only because `profiles/base.nix` sets
 `nixpkgs.config.allowUnfree = true` for the whole workstation profile.
+
+## `bear` on darwin
+
+`darwin.nix` overrides nixpkgs' `bear` (4.2.3, nixpkgs 2026-10-16) in two ways.
+Without them it does not build on macOS:
+
+- **`postInstall`**: the upstream recipe runs `mv $out/lib/libexec.so`, which is
+  the Linux filename. On macOS the preload library is `libexec.dylib`, so the
+  install step fails. The override swaps in
+  `stdenv.hostPlatform.extensions.sharedLibrary`.
+- **`doCheck = false`**: three integration tests fail inside the macOS Nix
+  sandbox: `forwards_the_exact_signal_received`,
+  `signal_tears_down_build_process_tree` and
+  `semantic_print_compilers_does_not_block_on_stdin`. They depend on signals and
+  timing, which the sandbox breaks. The unit tests pass.
+
+Remove the override once nixpkgs' `bear` builds on darwin as-is.
