@@ -32,6 +32,7 @@
       "pritunl"
       "postman"
       "microsoft-teams"
+      "obs"
     ]
     # No Discord on the mac mini.
     ++ lib.optionals (config.networking.hostName != "macmini-mrscraper") [
