@@ -88,25 +88,35 @@
     memoryPercent = 50;
   };
 
-  system.autoUpgrade = {
-    enable = true;
-    allowReboot = false;
-    dates = "04:00";
-  };
+  system.autoUpgrade.enable = false;
+
+  services.zfs.autoScrub.enable = lib.mkForce false;
 
   services.logrotate.enable = true;
 
+  boot.tmp.useTmpfs = true;
+
   boot.kernel.sysctl = {
     "vm.swappiness" = 10;
+    "vm.dirty_ratio" = 40;
+    "vm.dirty_background_ratio" = 10;
+    "vm.vfs_cache_pressure" = 50;
     "fs.file-max" = 131072;
     "net.core.rmem_max" = 8388608;
     "net.core.wmem_max" = 8388608;
     "net.core.netdev_max_backlog" = 5000;
+    "net.core.somaxconn" = 4096;
   };
 
+  services.udev.extraRules = ''
+    ACTION=="add|change", KERNEL=="mmcblk[0-9]*", ATTR{queue/scheduler}="none"
+  '';
+
   nix.settings = {
-    max-jobs = 2;
-    cores = 2;
+    max-jobs = "auto";
+    cores = 4;
+    max-substitution-jobs = 16;
+    http-connections = 32;
     substituters = [
       "https://cache.nixos.org"
       "https://msdqn.cachix.org"
