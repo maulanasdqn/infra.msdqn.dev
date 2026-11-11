@@ -549,6 +549,7 @@
                       echo "Done!"
                     '';
               })
+              just
               nixfmt
               clan-core.packages.${system}.clan-cli
             ];

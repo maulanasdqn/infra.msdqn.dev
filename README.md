@@ -401,6 +401,28 @@ sudo nixos-rebuild switch --flake .#pc
 nix develop --command rebuild
 ```
 
+### VPS (Hostinger)
+
+Recipes live in the root `justfile`; `just` and `clan` come from the dev shell.
+
+```bash
+just          # list recipes
+just deploy   # clan machines update hostinger, built on the VPS itself
+just provision <machine> <ip>   # wipe a fresh VPS and install NixOS on it
+just deploy-raspi              # clan machines update raspi, built on the Pi itself
+```
+
+`provision` runs `clan machines install` against `root@<ip>` with
+`--build-on remote`: it kexecs the box into a NixOS installer, partitions it
+with disko, installs and reboots. It **erases the target disk**; clan asks for
+confirmation before starting. `<machine>` is a clan machine from `flake.nix`
+(`hostinger`, `digitalocean`). The Hostinger config uses a static IP from
+`config.nix`, so set `vpsHostingerIP` to the new box before provisioning it.
+
+`deploy` uses the VPS as both build and target host because a Mac cannot
+cross-compile to `x86_64-linux`. Each switch restarts all containers, so expect
+roughly two minutes of 502s on the apps.
+
 ## Keybindings
 
 ### macOS (AeroSpace)

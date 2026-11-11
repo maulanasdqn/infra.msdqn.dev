@@ -107,6 +107,8 @@ From the infra repo on any machine:
 
 ```bash
 # Build on Pi (recommended for aarch64)
+just deploy-raspi
+# which runs:
 clan machines update raspi --build-host ms@raspi.local --target-host ms@raspi.local
 
 # Or push config and let git-sync pick it up (if enabled)
