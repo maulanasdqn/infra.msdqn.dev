@@ -45,8 +45,12 @@ which nix-darwin has no options for.
 
 ## Locks after 30 minutes idle
 
-The machine itself stays awake, but `power.sleep.display = 30` turns the
-display off after 30 minutes without input. The lock comes from macOS's
+The machine itself stays awake. Two idle timers can lock it, and both are set to
+30 minutes: `power.sleep.display = 30` turns the display off, and the screen
+saver's `idleTime` (seconds, per-host defaults domain `com.apple.screensaver`,
+written through home-manager's `targets.darwin.currentHostDefaults`) is `1800`.
+It was `60` before, which started the screen saver — and so locked the Mac —
+after one minute, regardless of the display timer. The lock comes from macOS's
 "require password after screen saver begins or display is turned off" setting,
 which is already `immediate` here (`sysadminctl -screenLock status`). That
 setting is not managed declaratively: on modern macOS the

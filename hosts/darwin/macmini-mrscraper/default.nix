@@ -1,4 +1,4 @@
-{ ... }:
+{ username, ... }:
 {
   networking = {
     computerName = "Mac mini Mrscraper";
@@ -20,6 +20,9 @@
     display = 30;
     harddisk = "never";
   };
+
+  home-manager.users.${username}.targets.darwin.currentHostDefaults."com.apple.screensaver".idleTime =
+    1800;
 
   launchd.daemons.pmset-never-sleep = {
     serviceConfig = {
