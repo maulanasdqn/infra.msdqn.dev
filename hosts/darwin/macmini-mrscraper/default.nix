@@ -17,6 +17,7 @@
 
   power.sleep = {
     computer = "never";
+    display = 30;
     harddisk = "never";
   };
 

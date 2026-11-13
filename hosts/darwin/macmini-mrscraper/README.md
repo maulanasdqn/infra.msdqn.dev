@@ -42,3 +42,18 @@ setting once the fetcher is fixed upstream.
 `pmset-never-sleep` launchd daemon re-applies the rest at boot —
 `disablesleep`, `standby`, `autopoweroff`, `hibernatemode` and `powernap` —
 which nix-darwin has no options for.
+
+## Locks after 30 minutes idle
+
+The machine itself stays awake, but `power.sleep.display = 30` turns the
+display off after 30 minutes without input. The lock comes from macOS's
+"require password after screen saver begins or display is turned off" setting,
+which is already `immediate` here (`sysadminctl -screenLock status`). That
+setting is not managed declaratively: on modern macOS the
+`system.defaults.screensaver.askForPassword*` keys are ignored, and
+`sysadminctl -screenLock` needs the user's password, so it was set by hand in
+System Settings → Lock Screen. If the Mac stops locking, check it there first.
+
+A process holding a `PreventUserIdleDisplaySleep` assertion (e.g.
+`caffeinate -d`, a video call) keeps the display on and therefore unlocked;
+`pmset -g assertions` shows who.
