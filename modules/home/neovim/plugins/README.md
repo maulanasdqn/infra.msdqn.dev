@@ -34,3 +34,29 @@ biome-check ships a `cwd` finder that locates the nearest `biome.json` /
 `biome.jsonc`, but `require_cwd` defaults to `false`, which means conform still
 treats the formatter as available when that finder comes up empty — it would run
 biome-check and error in every non-Biome repo instead of moving on to prettierd.
+
+## lsp.nix — `checkJs` for loose JavaScript
+
+`ts_ls` sets `implicitProjectConfiguration.checkJs = true`. Plain `.js` files
+outside a `jsconfig.json` / `tsconfig.json` project otherwise get only syntax
+errors: DOM typos (`document.getElementByid`) and possibly-null elements from
+`querySelector` go unreported. With it, they are type-checked against `lib.dom`
+like TypeScript.
+
+It only applies to inferred projects. A repo with its own `jsconfig.json` or
+`tsconfig.json` keeps its own `checkJs` setting.
+
+## lsp.nix — formatters live in `extraPackages`
+
+`prettierd` and `stylua` are referenced by `formatting.nix` and must be in
+`extraPackages`, which puts them on nvim's PATH. Without them, conform silently
+skips HTML, CSS, SCSS, YAML, Markdown, Astro and Lua, and falls back to LSP
+formatting (or nothing) on save.
+
+## No typescript-tools
+
+`ts_ls` is the only TypeScript/JavaScript server. typescript-tools.nvim was
+removed: it looks for `tsserver` in the project's `node_modules` or a global npm
+install, and neither exists on these machines, so it raised `Cannot find
+tsserver executable` on every JS/TS buffer outside a project. Running both would
+also duplicate completions and diagnostics.

@@ -68,22 +68,5 @@
         };
       };
     };
-
-    typescript-tools = {
-      enable = true;
-      settings = {
-        settings = {
-          separate_diagnostic_server = true;
-          publish_diagnostic_on = "insert_leave";
-          tsserver_file_preferences = {
-            includeInlayParameterNameHints = "all";
-            includeInlayFunctionParameterTypeHints = true;
-            includeInlayVariableTypeHints = true;
-            includeInlayPropertyDeclarationTypeHints = true;
-            includeInlayFunctionLikeReturnTypeHints = true;
-          };
-        };
-      };
-    };
   };
 }

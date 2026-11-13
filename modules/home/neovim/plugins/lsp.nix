@@ -10,6 +10,8 @@
       vscode-langservers-extracted
       eslint
       biome
+      prettierd
+      stylua
 
       astro-language-server
 
@@ -45,6 +47,9 @@
           ts_ls = {
             enable = true;
             settings = {
+              implicitProjectConfiguration = {
+                checkJs = true;
+              };
               typescript = {
                 inlayHints = {
                   includeInlayParameterNameHints = "all";
