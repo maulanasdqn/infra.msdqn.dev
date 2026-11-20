@@ -13,5 +13,6 @@
     http-connections = 128;
     keep-going = true;
     warn-dirty = false;
+    download-attempts = 3;
   };
 }

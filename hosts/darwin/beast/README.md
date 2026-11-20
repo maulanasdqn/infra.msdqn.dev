@@ -19,6 +19,7 @@ setting, not merely risky.
 | `http-connections` | 50 | Same reasoning — parallel fetch is the real bottleneck for a config machine. |
 | `keep-going` | true | Build everything buildable before reporting failure. |
 | `warn-dirty` | false | Silences the dirty-tree warning on every local eval. |
+| `download-attempts` | 3 | Retry a failed substitute download before giving up, so one flaky fetch doesn't fail the whole switch. |
 
 `profiles/server.nix` makes the same trade in the other direction for the VPS
 (`max-jobs = 1`, `cores = 2`) because that box has less RAM still.
