@@ -16,21 +16,40 @@
       [update]
       version_check = false
 
+      [terminal]
+      default_shell = "${pkgs.zsh}/bin/zsh"
+      shell_mode = "auto"
+      new_cwd = "follow"
+
       [keys]
       prefix = "ctrl+a"
-      split_vertical = "prefix+v"
-      split_horizontal = "prefix+minus"
+      new_tab = "prefix+c"
+      next_tab = "prefix+n"
+      previous_tab = "prefix+p"
+      close_tab = "prefix+shift+x"
+      rename_tab = "prefix+shift+t"
+      switch_tab = "prefix+1..9"
+
       focus_pane_left = "prefix+h"
       focus_pane_down = "prefix+j"
       focus_pane_up = "prefix+k"
       focus_pane_right = "prefix+l"
-      new_tab = "prefix+c"
-      previous_tab = "prefix+p"
-      next_tab = "prefix+n"
-      switch_tab = "prefix+1..9"
+
+      split_vertical = "prefix+|"
+      split_horizontal = "prefix+minus"
+      close_pane = "prefix+x"
+      zoom = "prefix+z"
+      copy_mode = "prefix+["
+
+      resize_pane_left = "prefix+shift+h"
+      resize_pane_down = "prefix+shift+j"
+      resize_pane_up = "prefix+shift+k"
+      resize_pane_right = "prefix+shift+l"
+
+      new_workspace = "prefix+shift+n"
+      close_workspace = "prefix+shift+d"
       workspace_picker = "prefix+w"
       goto = "prefix+g"
-      zoom = "prefix+z"
       detach = "prefix+d"
       reload_config = "prefix+shift+r"
     '';
