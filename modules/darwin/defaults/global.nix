@@ -98,6 +98,20 @@
             launchctl disable user/$UID/com.apple.knowledgeconstructiond 2>/dev/null
             launchctl disable user/$UID/com.apple.suggestd 2>/dev/null
             launchctl disable user/$UID/com.apple.tipsd 2>/dev/null
+            launchctl disable user/$UID/com.apple.parsecd 2>/dev/null
+            launchctl disable user/$UID/com.apple.parsec-fbf 2>/dev/null
+            launchctl disable user/$UID/com.apple.siriactionsd 2>/dev/null
+            launchctl disable user/$UID/com.apple.siriknowledged 2>/dev/null
+            launchctl disable user/$UID/com.apple.siriinferenced 2>/dev/null
+            launchctl disable user/$UID/com.apple.sirittsd 2>/dev/null
+            launchctl disable user/$UID/com.apple.siri.context.service 2>/dev/null
+            launchctl disable user/$UID/com.apple.siriappintentsd 2>/dev/null
+            launchctl disable user/$UID/com.apple.cloudphotod 2>/dev/null
+            launchctl disable user/$UID/com.apple.knowledge-agent 2>/dev/null
+            launchctl disable user/$UID/com.apple.diagnostics_agent 2>/dev/null
+            launchctl disable user/$UID/com.apple.diagnosticextensionsd 2>/dev/null
+            launchctl disable user/$UID/com.apple.ReportCrash 2>/dev/null
+            launchctl disable user/$UID/com.apple.accessibility.heard 2>/dev/null
           ''
         ];
         RunAtLoad = true;

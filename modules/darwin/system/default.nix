@@ -18,9 +18,9 @@
   environment.pathsToLink = [ "/share/zsh" ];
 
   power.sleep = lib.mkIf enableAggressiveTweaks {
-    computer = 30;
+    computer = "never";
     display = 10;
-    harddisk = 10;
+    harddisk = "never";
   };
 
   system.keyboard = lib.mkIf enableAggressiveTweaks {

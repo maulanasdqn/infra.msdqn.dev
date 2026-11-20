@@ -102,11 +102,11 @@
             /usr/bin/pmset -a standby 0
             /usr/bin/pmset -a autopoweroff 0
 
-            /usr/bin/pmset -c sleep 30 displaysleep 10 disksleep 10 \
-              powernap 0 lowpowermode 0 womp 0 tcpkeepalive 0 highpowermode 1
+            /usr/bin/pmset -c sleep 0 displaysleep 10 disksleep 0 \
+              powernap 0 lowpowermode 0 womp 0 tcpkeepalive 0
 
             /usr/bin/pmset -b sleep 10 displaysleep 5 disksleep 5 \
-              powernap 0 lowpowermode 0 lessbright 0
+              powernap 0 lowpowermode 0 womp 0 lessbright 0
           ''
         ];
         RunAtLoad = true;
@@ -122,7 +122,8 @@
           ''
             /usr/sbin/sysctl -w kern.maxfiles=524288
             /usr/sbin/sysctl -w kern.maxfilesperproc=524288
-            /usr/sbin/sysctl -w kern.ipc.somaxconn=2048
+            /usr/sbin/sysctl -w kern.ipc.somaxconn=4096
+            /usr/sbin/sysctl -w kern.ipc.maxsockbuf=8388608
             /usr/sbin/sysctl -w kern.sysv.shmmax=268435456
             /usr/sbin/sysctl -w kern.sysv.shmall=65536
 
@@ -131,6 +132,7 @@
             /usr/sbin/sysctl -w net.inet.tcp.recvspace=1048576
             /usr/sbin/sysctl -w net.inet.tcp.msl=1000
             /usr/sbin/sysctl -w net.inet.tcp.win_scale_factor=8
+            /usr/sbin/sysctl -w net.inet.udp.maxdgram=65535
           ''
         ];
         RunAtLoad = true;
