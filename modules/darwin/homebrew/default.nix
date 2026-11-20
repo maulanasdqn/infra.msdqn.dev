@@ -34,6 +34,8 @@
       "microsoft-teams"
       "obs"
       "protonvpn"
+      "proton-pass"
+      "proton-drive"
     ]
     # No Discord on the mac mini.
     ++ lib.optionals (config.networking.hostName != "macmini-mrscraper") [
