@@ -31,5 +31,6 @@
 
   sshKeys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICdLKnxrQl735W+ANR4dnWTrNEMmrIzv7TioI0teJmMZ ms@computer"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHClDA6APz7L3J9ZYkT1qrnyFxHN1vgE9Mg9J//+rcz/ randikaa1999@gmail.com"
   ];
 }
